@@ -1,8 +1,6 @@
 import os
 import sys
 import pyvolve
-from sw_functions import *
-import sys
 import numpy as np
  
 """
@@ -21,7 +19,7 @@ ZERO    = 1e-8
 G            = pyvolve.Genetics()
 GENETIC_CODE = G.genetic_code
 CODONS       = G.codons
-SWPATH     = "simulations/swmutsel_output/"
+PREFPATH   = "simulations/preferences/"
 OUTPATH    = "hb_models/"
 PAML_AA    = "ARNDCQEGHILKMFPSTWYV"
 PYVOLVE_AA = "ACDEFGHIKLMNPQRSTVWY"
@@ -43,29 +41,23 @@ def codon_freqs_to_aa_freqs(codonfreqs):
     assert((1. - np.sum(aa_freqs)) <= ZERO), "\nImproperly converted codon to amino acid frequencies."
     return aa_freqs
 
+mu = {'AC':1.,  'CA':1.,  'AG':1.,  'GA':1.,  'AT':1.,  'TA':1.,  'CG':1.,  'GC':1.,  'CT':1.,  'TC':1.,  'GT':1.,  'TG':1.}
+paml_frequencies = "\n" +  " ".join(["0.05"]*20)
 
+def main():    
 
-def main():
-    swfiles = [x for x in os.listdir(SWPATH) if x.endswith("MLE.txt")]
-    
-    paml_frequencies = "\n" +  " ".join(["0.05"]*20)
-    for rawname in swfiles:
-        name = rawname.split("_")[0]
+    pref_files = [x for x in os.listdir(PREFPATH) if x.endswith("_prefs.csv")]
+    for file in pref_files:
+        name = file.split("_")[0]
         outfilepaml = OUTPATH + name + "_HB.paml" 
-        print(name)
-    
-        with open(SWPATH + rawname, "r") as f:
-            swstuff = f.readlines()
-        mu = parse_swmutsel_mutation(swstuff)
-        all_fitness = parse_swmutsel_fitness(swstuff)
-        
-        ## Average codon rates
-        mean_codon_matrix = np.zeros([61, 61])
-        for site_fitness in all_fitness:
-            params = {"fitness": site_fitness, "mu": mu}
-            m = pyvolve.Model("mutsel", params)
+        prefs = np.loadtxt(PREFPATH + file, delimiter=",")
+
+        mean_codon_matrix = np.zeros([61,61])
+        for siteprefs in prefs:
+            sitefit = np.log(  siteprefs/np.sum(siteprefs)   ) ## renormalize, my tolerance is a bit more stringent
+            m = pyvolve.Model("mutsel", {"fitness": sitefit, "mu": mu})
             mean_codon_matrix += m.extract_rate_matrix() ## 61x61
-        mean_codon_matrix /= len(all_fitness)
+        mean_codon_matrix /= len(prefs)
         
         
         ## Convert to amino acid model assuming equal frequencies
