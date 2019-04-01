@@ -12,10 +12,10 @@ TOPPATH=/csm_data/spielman_lab/dms_modelselection/
 ALNPATH=${TOPPATH}/simulations/alignments
 OUTPATH=${TOPPATH}/selected_models
 mkdir -p $OUTPATH
+
+cd $TOPPATH
 for TREE in rtree64_bl0.3.tree rtree64_bl3.0.tree btree64_bl0.3.tree btree64_bl3.0.tree; do
-    iqtree -nt 8 -m TESTONLY -s $ALNPATH/${NAME}_${TREE}_rep${REP}_AA.fasta -st AA
-    mv $ALNPATH/${NAME}_${TREE}_rep${REP}_AA.fasta.log $OUTPATH/${NAME}_${TREE}_rep${REP}_AA.model_selection_log
-    rm $ALNPATH/${NAME}_${TREE}_rep${REP}_AA.fasta.*
+    python3 infer_trees.py $NAME $TREE $REP 8
 done
 #HA_rtree64_bl0.3.tree_rep4_AA.fasta   
 
