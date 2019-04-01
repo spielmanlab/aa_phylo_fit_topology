@@ -3,6 +3,13 @@ import re
 import sys
 from copy import deepcopy
 
+model_file        = "quantile_selected_models.csv"
+alignment_path    = "simulations/alignments/"
+fitted_tree_path  = "fitted_trees/" 
+true_tree_path    = "simulations/true_trees/"
+hb_path           = "hb_models/"
+pogomodel_path    = "pogofit_models/"
+
 
 def run_save_iqtree(alignment_file, data_type, model, outname, true_tree, threads):
     
@@ -27,69 +34,45 @@ def run_save_iqtree(alignment_file, data_type, model, outname, true_tree, thread
 
 
 def main():
-    name    = sys.argv[1]
-    tree    = sys.argv[2]
-    repl    = sys.argv[3]
-    threads = sys.argv[4]
-    
-    rawname = name + "_" + tree + "_rep" + repl + "_"
-    
-    alignment_path    = "simulations/alignments/"
-    selection_path    = "selected_models/"
-    fitted_tree_path  = "fitted_trees/" 
-    true_tree_path    = "simulations/true_trees/"
-    hb_path           = "hb_models/"
-    pogomodel_path    = "pogofit_models/"
+    name      = sys.argv[1]
+    tree      = sys.argv[2] ## includes .tree since i was a genius at file naming before...
+    repl      = sys.argv[3]
+    threads   = sys.argv[4]
 
-    with open(selection_path + rawname + "selected_models.csv", "r") as f:
-        selection_lines = f.readlines()[1:]
-
-    #print(selection_lines)
-    for line in selection_lines:
-        splitline = line.strip().split(",")
-        # "pandit,tree,repl,datatype,model,kind,ic\n"
-
-
-        data_type   = splitline[3]
-        model       = splitline[4]
-        kindofmodel = splitline[5]
-        ic          = splitline[6].strip()
     
-        
-        alignment_file = alignment_path + rawname + data_type + ".fasta"
-        true_tree_file = true_tree_path + "tree" + tree + ".tree"
+    rawname        = name + "_" + tree + "_rep" + repl + "_AA"
+    alignment_file = alignment_path + rawname + ".fasta"
+    true_tree_file = true_tree_path + tree
+
+  
+    with open(model_file, "r") as f: 
+        all_models = f.readlines()
     
-        outname_prefix = fitted_tree_path + rawname + data_type + "_"
-        print(alignment_file)
-        if data_type == "AA" and kindofmodel  == "best": 
-            outname = outname_prefix + "poisson"
-            run_save_iqtree(alignment_file, data_type, "Poisson", outname, true_tree_file)
+    use_models = {}
+    for line in all_models:
+        if line.startswith(name + "," + tree + "," + repl):
+            line2 = line.split(",")
+            model = line2[3].strip()
+            q = line2[4].strip()
+            use_models[q] = model
+            
+    
+    for modelquant in use_models:
+        outname = fitted_tree_path + rawname + "_"
+        if modelquant == 1:
+            outname += "poisson"
+            run_save_iqtree(alignment_file, "AA", "Poisson", outname, true_tree_file, threads)
     
             hbmodel = hb_path + name + "_HB.paml+G+F"
-            outname = outname_prefix + "hbstyle"
-            run_save_iqtree(alignment_file, data_type, hbmodel, outname, true_tree_file)
+            outname += "hbstyle"
+            run_save_iqtree(alignment_file, "AA", hbmodel, outname, true_tree_file, threads)
 
-            pogomodel = pogomodel_path + rawname + "AA.dat.POGOFIT.paml+G"  ### already has +F
-            outname = outname_prefix + "pogofit"
-            run_save_iqtree(alignment_file, data_type, pogomodel, outname, true_tree_file)
+            pogomodel = pogomodel_path + rawname + ".dat.POGOFIT.paml+G"  ### already has +F
+            outname += "pogofit"
+            run_save_iqtree(alignment_file, "AA", pogomodel, outname, true_tree_file, threads)
 
         
-        
-        outname = outname_prefix + "_".join([model,kindofmodel,ic])
-        
-        ### in case ICs gave the same model, don't reinvent the wheel.
-       # run_the_trees = True
-        
-        #for check_ic in all_ic:
-        #    check_outname = outname_prefix + "_".join([model,kindofmodel,check_ic])
-        #    if os.path.exists(check_outname + ".log"): 
-        #        for suff in [".log", ".treefile"]:
-        #            for tree in ["_truetree", "_optimizedtree"]:
-        #                os.system("cp " + check_outname + tree + suff + outname + tree + suff)
-        #        run_the_trees = False
-        #        break   
-         
-        #if run_the_trees:
-        run_save_iqtree(alignment_file, data_type, model, outname, true_tree_file)
+        outname += "q" + modelquant
+        run_save_iqtree(alignment_file, "AA", use_models[modelquant], outname, true_tree_file, threads)
 
 main()
