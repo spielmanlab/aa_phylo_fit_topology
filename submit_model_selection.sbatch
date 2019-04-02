@@ -4,19 +4,19 @@
 #SBATCH --ntasks-per-node=10
 #SBATCH --mem-per-cpu=100
 #SBATCH -p csm
-#SBATCH --array=1-5
+#SBATCH --array=1-20
 
 REP=${SLURM_ARRAY_TASK_ID}
-NAME=$1
-TOPPATH=/csm_data/spielman_lab/dms_modelselection/
+TOPPATH=/csm_data/spielman_lab/dms_modelselection
 ALNPATH=${TOPPATH}/simulations/alignments
 OUTPATH=${TOPPATH}/selected_models
 mkdir -p $OUTPATH
-for TREE in rtree64_bl0.3.tree rtree64_bl3.0.tree btree64_bl0.3.tree btree64_bl3.0.tree; do
-    iqtree -nt 8 -m TESTONLY -s $ALNPATH/${NAME}_${TREE}_rep${REP}_AA.fasta -st AA
-    mv $ALNPATH/${NAME}_${TREE}_rep${REP}_AA.fasta.log $OUTPATH/${NAME}_${TREE}_rep${REP}_AA.model_selection_log
-    rm $ALNPATH/${NAME}_${TREE}_rep${REP}_AA.fasta.*
+for TREE in rtree100_bl0.3_rep1 rtree100_bl1.5_rep1 rtree100_bl3_rep1; do
+  for NAME in HIV LAC Gal4 NP HA; do
+   X=${NAME}_${TREE}_rep${REP}_AA
+   iqtree -nt 8 -m TESTONLY -s ${ALNPATH}/${X}.fasta -st AA
+   mv ${ALNPATH}/${X}.fasta.log $OUTPATH/${X}.model_selection_log
+   rm $ALNPATH/${X}.fasta.*
+  done
 done
-#HA_rtree64_bl0.3.tree_rep4_AA.fasta   
-
 
