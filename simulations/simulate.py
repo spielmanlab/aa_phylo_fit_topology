@@ -32,67 +32,69 @@ translation_table = {
  
 
 
-#"LAC", "HA", "NP",
-names = [ "HIV", "Gal4"]
+names = [ "HIV", "Gal4", "LAC", "HA", "NP"]
 mudict = {'AC':1.,  'CA':1.,  'AG':1.,  'GA':1.,  'AT':1.,  'TA':1.,  'CG':1.,  'GC':1.,  'CT':1.,  'TC':1.,  'GT':1.,  'TG':1.}
+
+simrep = sys.argv[1] ## 1-20
 
 treepath = "true_trees/"
 prefpath = "preferences/"
 simpath  = "alignments/"
+trees = [x for x in os.listdir(treepath) if x.endswith("_rep1.tree")]
 
-trees = [x for x in os.listdir(treepath) if x.endswith("tree")]
+
+all_partitions = {}
+all_trees      = {}
 
 for name in names: ### 5
-    print("Simulating", name)
     prefs = np.loadtxt(prefpath + name + "_prefs.csv", delimiter=",")
-
-
     partitions = []
     for siteprefs in prefs:
         sitefit = np.log(  siteprefs/np.sum(siteprefs)   ) ## renormalize, my tolerance is a bit more stringent
         m = pyvolve.Model("mutsel", {"fitness": sitefit, "mu": mudict})
         p = pyvolve.Partition(models = m, size = 1)
         partitions.append(p)
+    all_partitions[name] = partitions
+
+for tree in trees:  ### 3 for now
+    with open(treepath + tree, "r") as f:
+        treestring = f.read().strip()
+
+    pytree = pyvolve.read_tree(tree = all_trees[tree])
+    treename = tree.split(".tree")[0]
     
-    for tree in trees:  ### 4
-        print("  tree", tree)
-        with open(treepath + tree, "r") as f:
-            treestring = f.read().strip()
-        pytree = pyvolve.read_tree(tree = treestring)
-        tree_name = tree.split(".tree")[0]
+    for name in all_partitions:
         
-        for simrep in range(1,6): ### 5
-            print("      replicate", simrep)
-            outname = simpath + name + "_" + tree + "_rep" + str(simrep) + "_CODON.fasta" ##### CODON
-            outname1 = outname.replace("_CODON", "_DNA")               ##### NUCLEOTIDE (same as codon but naming is convenient downstream)
-            outname2 = outname.replace("_CODON", "_AA")                ###### AMINO ACID
-            outname3 = outname2.replace(".fasta", ".dat")              ###### AMINO ACID
+        outname = simpath + name + "_" + treename + "_rep" + str(simrep) + "_CODON.fasta" ##### CODON
+        outname1 = outname.replace("_CODON", "_DNA")               ##### NUCLEOTIDE (same as codon but naming is convenient downstream)
+        outname2 = outname.replace("_CODON", "_AA")                ###### AMINO ACID
+        outname3 = outname2.replace(".fasta", ".dat")              ###### AMINO ACID
 
-            if os.path.exists(outname):
-                continue
+        if os.path.exists(outname):
+            continue
 
-            e = pyvolve.Evolver(partitions = deepcopy(partitions), tree = pytree)
-            e(seqfile = outname, seqfmt = "fasta", ratefile = None, infofile = None)
+        e = pyvolve.Evolver(partitions = deepcopy(all_partitions[name]), tree = deepcopy(pytree))
+        e(seqfile = outname, seqfmt = "fasta", ratefile = None, infofile = None)
 
-            nucseqs = e.get_sequences()
-            aaseqs = {}
-            for id in nucseqs:
-                seq = nucseqs[id]
-                protein = ""    
-                for i in range(0, len(seq), 3):
-                    codon = seq[i:i + 3]
-                    protein += translation_table[codon]
-                aaseqs[id] = protein
+        nucseqs = e.get_sequences()
+        aaseqs = {}
+        for id in nucseqs:
+            seq = nucseqs[id]
+            protein = ""    
+            for i in range(0, len(seq), 3):
+                codon = seq[i:i + 3]
+                protein += translation_table[codon]
+            aaseqs[id] = protein
 
-            os.system("cp " + outname + " " + outname1)
+        os.system("cp " + outname + " " + outname1)
 
-            aa_out = ""
-            for record in aaseqs:
-                aa_out += ">" + str(record) + "\n" + str(aaseqs[record]) + "\n"
+        aa_out = ""
+        for record in aaseqs:
+            aa_out += ">" + str(record) + "\n" + str(aaseqs[record]) + "\n"
 
-            with open(outname2, "w") as f:
-                f.write(aa_out)
+        with open(outname2, "w") as f:
+            f.write(aa_out)
 
-            with open(outname3, "w") as f:
-                f.write(aa_out)
-                f.write("\n" + treestring) 
+        with open(outname3, "w") as f:
+            f.write(aa_out)
+            f.write("\n" + treestring) 
