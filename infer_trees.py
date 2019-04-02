@@ -58,8 +58,9 @@ def main():
             
     
     for modelquant in use_models:
+        #print(modelquant)
         outname = fitted_tree_path + rawname + "_"
-        if modelquant == 1:
+        if modelquant == "1":
             outname += "poisson"
             run_save_iqtree(alignment_file, "AA", "Poisson", outname, true_tree_file, threads)
     
@@ -71,7 +72,7 @@ def main():
             outname += "pogofit"
             run_save_iqtree(alignment_file, "AA", pogomodel, outname, true_tree_file, threads)
 
-        
+        continue
         outname += "q" + modelquant
         run_save_iqtree(alignment_file, "AA", use_models[modelquant], outname, true_tree_file, threads)
 
