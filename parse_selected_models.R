@@ -30,4 +30,4 @@ for (namex in unique(dat$name)){
                     }
                     selected_models <- bind_rows(selected_models, tempdat)
 }}}}
-write_csv(selected_models, "quantile_selected_models.csv")        
+write_csv(selected_models, "quantile_model_selection.csv")        
