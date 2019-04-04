@@ -1,6 +1,6 @@
 library(tidyverse)
 
-dat <- read_csv("model_selection.csv")
+dat <- read_csv("all_model_selection.csv")
 
 selected_models <- tibble(name = as.character(),
                           tree = as.character(),
@@ -14,7 +14,7 @@ selected_models <- tibble(name = as.character(),
 ## gotta loop since sometimes multiple rows get returned for similarly fitting models
 for (namex in unique(dat$name)){
     for(treex in unique(dat$tree)){
-        for(replx in 1:5){
+        for(replx in 1:20){
             dat %>% filter(name == namex, tree == treex, repl == replx) -> subdat
             for (q in 1:5) {
                 subdat %>%

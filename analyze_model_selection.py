@@ -39,16 +39,16 @@ alignment_path = "simulations/alignments/"
 output_path    = "selected_models/" ## mv log files here
 
 
-outfile = "model_selection.csv"
+outfile = "all_model_selection.csv"
 outstring = "name,tree,repl,model,logl,df,aic,aicc,bic\n"
 for name in ["NP", "HA", "HIV", "Gal4", "LAC"]:
-    for tree in ["rtree64_bl0.3.tree", "rtree64_bl3.0.tree", "btree64_bl0.3.tree", "btree64_bl3.0.tree"]:
-        for repli in range(1,6):
+    for tree in ["rtree100_bl0.3_rep1", "rtree100_bl1.5_rep1", "rtree100_bl3_rep1"]:
+        for repli in range(1,21):
 
             repl = str(repli)
             rawname = name + "_" + tree + "_rep" + repl + "_AA"
             prefix  = ",".join([name, tree, repl])
-
+            print(prefix)
             alignment_file       = alignment_path + rawname + ".fasta"
             model_selection_file = output_path + rawname + ".model_selection_log"
             #print(model_selection_file)

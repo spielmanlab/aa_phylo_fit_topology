@@ -35,28 +35,30 @@ def run_save_iqtree(alignment_file, data_type, model, outname, true_tree, thread
 
 def main():
     name      = sys.argv[1]
-    tree      = sys.argv[2] ## includes .tree since i was a genius at file naming before...
+    tree      = sys.argv[2] 
     repl      = sys.argv[3]
     threads   = sys.argv[4]
 
     
     rawname        = name + "_" + tree + "_rep" + repl + "_AA"
     alignment_file = alignment_path + rawname + ".fasta"
-    true_tree_file = true_tree_path + tree
+    true_tree_file = true_tree_path + tree + ".tree"
 
   
     with open(model_file, "r") as f: 
         all_models = f.readlines()
-    
+    #print(all_models)   
     use_models = {}
+    # LAC,btree64_bl3.0.tree,5,HIVw,5
     for line in all_models:
-        if line.startswith(name + "," + tree + "," + repl):
+        print(line)
+        if line.startswith(name + "," + tree + ".tree," + repl):
             line2 = line.split(",")
             model = line2[3].strip()
             q = line2[4].strip()
             use_models[q] = model
             
-    
+    print(use_models)
     for modelquant in use_models:
         #print(modelquant)
         outname = fitted_tree_path + rawname + "_"
