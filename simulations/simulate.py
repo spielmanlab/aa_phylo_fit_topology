@@ -40,11 +40,10 @@ simrep = sys.argv[1] ## 1-20
 treepath = "true_trees/"
 prefpath = "preferences/"
 simpath  = "alignments/"
-trees = [x for x in os.listdir(treepath) if x.endswith("_rep1.tree")]
+trees = [x for x in os.listdir(treepath) if x.endswith("bl0.75_rep1.tree")]
 
 
 all_partitions = {}
-all_trees      = {}
 
 for name in names: ### 5
     prefs = np.loadtxt(prefpath + name + "_prefs.csv", delimiter=",")
@@ -60,7 +59,7 @@ for tree in trees:  ### 3 for now
     with open(treepath + tree, "r") as f:
         treestring = f.read().strip()
 
-    pytree = pyvolve.read_tree(tree = all_trees[tree])
+    pytree = pyvolve.read_tree(tree = treestring)
     treename = tree.split(".tree")[0]
     
     for name in all_partitions:

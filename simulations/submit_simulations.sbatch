@@ -12,5 +12,5 @@ TOPDIR=/csm_data/spielman_lab/dms_modelselection/simulations
 cd $TOPDIR
 mkdir -p alignments
 
+#python3 simulate_empirical.py $REP
 python3 simulate.py $REP
-
