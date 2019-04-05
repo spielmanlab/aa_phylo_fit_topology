@@ -1,0 +1,75 @@
++ `MLTreeswBLandBS_2Dec.zip` from [https://bmcevolbiol.biomedcentral.com/articles/10.1186/1471-2148-14-23](https://bmcevolbiol.biomedcentral.com/articles/10.1186/1471-2148-14-23)
+	+ Used variety of datatypes to infer green plant phylogeny from plastid genomes
+
++ `Dryad` from [https://datadryad.org/resource/doi:10.5061/dryad.q8n0v](https://datadryad.org/resource/doi:10.5061/dryad.q8n0v)
+
++ `G3` from [http://www.g3journal.org/content/6/12/3927](http://www.g3journal.org/content/6/12/3927) 
+
+------------------
+
+
++ `yeast.tre` is the G3 "1233AA_concatenation_ML.tre"
++ `opisthokonta.tre` is "RAxML_bipartitions.meta50.rax.opisthokonta.best_wbs.pruned.tre" using EST data from Ryan ctenophore genome paper
++ `greenalga.tre` is RAxML_bestTree.concat-aa2.tre from the Dryad repo, this tree is the concatenated amino acid tree.  Fucikova et al.
++ `greenplant.tre` From algae to angiosperms–inferring the phylogeny of green plants (Viridiplantae) from 360 plastid genomes
+
+
+
+
+
+l> library(ape)
+t> t <- read.tree("greenalga.tree")
+> sum(t$edge.length)
+[1] 2.481443
+> t <- read.tree("greenplant.tree")
+> sum(t$edge.length)
+[1] 43.05466
+> t <- read.tree("opisthokonta.tree")
+> sum(t$edge.length)
+[1] 20.92042
+> sum(t$edge.length)
+[1] 35.57072
+
+
+----------------------------------------------------------
+THIS FILE AND THE ASSOCIATED FILES AND FOLDERS PERTAIN TO TABLE 1 OF:
+
+Kalyaanamoorthy S, Minh BQ, Wong TFK, von Haeseler A & Jermiin LS. ModelFinder: Fast model selection for accurate phylogenetic estimates. Nature Methods ??, ??? (2017).
+
+For question regarding this files in this folder, please contact: lars.jermiin@anu.edu.au.
+
+This file acts as a detailed step-by-step log of events that led to Table 1. The folder within which this file is found contains the following items:
+
+Andersen_2015      (folder)
+dos_Reis_2012      (folder)
+Prum_2015          (folder)
+README             (file)
+Ruhfel_2014        (folder)
+Salichos_2013      (folder)
+
+
+
+STEP-BY-STEP LOG
+01.  Initially, we set up a structure of folders within these five folders:
+     01_Original_data (original information obtained from web site and/or the authors)
+     02_Revised_data  (alignment of data in FASTA format)
+     03_IQ-TREE_STd   (implementation of popular model selection)
+     04_IQ-TREE_STa   (implementation of popular model selection, with tree search)
+     05_IQ-TREE_MFd   (default ModelFinder)
+     06_IQ_TREE_MFa   (advanced ModelFinder)
+     07_IQ-TREE_x     (Tree-search, assuming best model inferred using popular method (x))
+     08_IQ-TREE_y     (Tree-search, assuming best model inferred using ModelFinder (y))
+     09_TreeDist      (comparison of trees)
+This structure was used for analysis of each data set. Each of these folders contain the relevant data and script to analyse the data. 
+
+02.  Then we ran Distributor.sh to distribute the (sometimes) very large input file to the right folders.
+
+03.  Identification of optimal models (03_, 04_, 05_, and 06_) was repeated 10-100 times each to minimise the chance of entrapment in local optima. 
+
+04.  Phylogenetic analyses under the optimal models of SE (07_ and 08_) were repeated 100 time each to minimise the chance of entrapment in local optima.
+
+05.  The most likely tree in 07_IQ-TREE_x and the most likely tree in 08_IQ-TREE_y were copied to /09_TreeDist/intree. 
+
+06.  Using IQ-TREE's -rf_all option, the Robinson-Foulds (RF) distance was calculated between the trees in /09_TreeDist/intree.
+
+07.  The results from analyses of the five data sets were reported in Table 1.

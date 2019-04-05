@@ -8,16 +8,16 @@ truepath      = "simulations/true_trees/"
 dms_list   = ["NP", "LAC", "Gal4", "HA", "HIV"]
 
 
-treenames = [x for x in os.listdir(truepath) if x.endswith("tree")]
+treenames = [x.split(".tree")[0] for x in os.listdir(truepath) if x.endswith("_rep1.tree")]
 treespaces = {}
 truetrees = {}
 for treename in treenames:
     ts = dendropy.TaxonNamespace()
     treespaces[treename] = ts
-    truetrees[treename] = dendropy.Tree.get_from_path(truepath + treename, "newick", taxon_namespace = treespaces[treename], rooting='force-unrooted')
+    truetrees[treename] = dendropy.Tree.get_from_path(truepath + treename + ".tree", "newick", taxon_namespace = treespaces[treename], rooting='force-unrooted')
 
 
-fileinfo_order = ["name", "tree", "bl", "rep", "model", "optim"]
+fileinfo_order = ["name", "treerep", "bl", "rep", "model", "optim"]
 fitinfo_order  = ["logl", "k", "AIC", "AICc", "BIC"]
 
 outstring = ",".join(fileinfo_order) + "," + ",".join(fitinfo_order) +",rf_true,treelength\n"
@@ -27,7 +27,7 @@ iqfiles_all = [x for x in os.listdir(inferencepath) if x.endswith(".iqtree")]
 
 for dms in dms_list: 
     for this_treename in treenames:
-        for repindex in range(1,6):
+        for repindex in range(1,21):
             prefix = dms + "_" + this_treename + "_rep" + str(repindex) + "_AA"
             iqfiles = [x for x in iqfiles_all if x.startswith(prefix)]
 
@@ -35,16 +35,16 @@ for dms in dms_list:
                 name = iqfile.replace(".iqtree","")
                 treefile = name + ".treefile"
 
-                fileinfo = {"name": None, "tree": None, "bl": None, "model": None, "optim": None}
-                #NP_rtree64_bl3.0.tree_rep5_AA_q5_inferredtree.iqtree
+                fileinfo = {"name": None, "treerep": None, "bl": None, "model": None, "optim": None}
                 components  = name.split("_")
 
+                # NP_rtree100_bl3_rep1_rep9_AA_q5_optimizedtruetree.iqtree
                 fileinfo["name"]    = components[0]
-                fileinfo["tree"]    = components[1]
                 fileinfo["bl"]      = components[2].split(".tree")[0].replace("bl", "")
+                fileinfo["treerep"] = components[3].replace("rep","")
                 fileinfo["rep"]     = str(repindex)
-                fileinfo["model"]       = components[5]
-                fileinfo["optim"]       = components[6]
+                fileinfo["model"]   = components[6]
+                fileinfo["optim"]   = components[7]
 
                 inftree = dendropy.Tree.get_from_path(
                             inferencepath + treefile,
