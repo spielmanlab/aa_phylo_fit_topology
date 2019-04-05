@@ -3,7 +3,7 @@ import re
 import sys
 from copy import deepcopy
 
-model_file        = "quantile_selected_models.csv"
+model_file        = "quantile_model_selection.csv"
 alignment_path    = "simulations/alignments/"
 fitted_tree_path  = "fitted_trees/" 
 true_tree_path    = "simulations/true_trees/"
@@ -51,30 +51,26 @@ def main():
     use_models = {}
     # LAC,btree64_bl3.0.tree,5,HIVw,5
     for line in all_models:
-        print(line)
-        if line.startswith(name + "," + tree + ".tree," + repl):
+        if line.startswith(name + "," + tree + "," + repl):
             line2 = line.split(",")
             model = line2[3].strip()
             q = line2[4].strip()
             use_models[q] = model
             
-    print(use_models)
     for modelquant in use_models:
         #print(modelquant)
         outname = fitted_tree_path + rawname + "_"
-        if modelquant == "1":
-            outname1 = outname + "poisson"
-            run_save_iqtree(alignment_file, "AA", "Poisson", outname1, true_tree_file, threads)
-    
-            hbmodel = hb_path + name + "_HB.paml+G+F"
-            outname2 = outname + "hbstyle"
-            run_save_iqtree(alignment_file, "AA", hbmodel, outname2, true_tree_file, threads)
-
-            pogomodel = pogomodel_path + rawname + ".dat.POGOFIT.paml+G"  ### already has +F
-            outname3 = outname + "pogofit"
-            run_save_iqtree(alignment_file, "AA", pogomodel, outname3, true_tree_file, threads)
-
-        continue
+         if modelquant == "1":
+             outname1 = outname + "poisson"
+             run_save_iqtree(alignment_file, "AA", "Poisson", outname1, true_tree_file, threads)
+     
+             hbmodel = hb_path + name + "_HB.paml+G+F"
+             outname2 = outname + "hbstyle"
+             run_save_iqtree(alignment_file, "AA", hbmodel, outname2, true_tree_file, threads)
+ 
+             pogomodel = pogomodel_path + rawname + ".dat.POGOFIT.paml+G"  ### already has +F
+             outname3 = outname + "pogofit"
+             run_save_iqtree(alignment_file, "AA", pogomodel, outname3, true_tree_file, threads)
         outname += "q" + modelquant
         run_save_iqtree(alignment_file, "AA", use_models[modelquant], outname, true_tree_file, threads)
 
