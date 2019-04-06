@@ -1,4 +1,5 @@
 #!/bin/bash
 
-python3 selected_models_to_csv.py ## -> all_model_selection.csv
-Rscript parse_selected_models.R   ## -> quantile_model_selection.csv
+TYPE=$1
+python3 selected_models_to_csv.py $TYPE ## -> all_model_selection<_empirical>.csv
+Rscript parse_selected_models.R $TYPE  ## -> quantile_model_selection<_empirical>.csv
