@@ -37,10 +37,10 @@ mudict = {'AC':1.,  'CA':1.,  'AG':1.,  'GA':1.,  'AT':1.,  'TA':1.,  'CG':1.,  
 
 simrep = sys.argv[1] ## 1-10
 
-treepath = "true_trees/"
+treepath = "true_trees/times3/"
 prefpath = "preferences/"
 simpath  = "empirical_alignments/"
-trees = [x for x in os.listdir(treepath) if x.startswith("times3_")] ## 9 trees
+trees = [x for x in os.listdir(treepath) if x.endswith(".tree")] ## 9 trees
 
 prefs = np.loadtxt(prefpath + name + "_prefs.csv", delimiter=",")
 partitions = []
