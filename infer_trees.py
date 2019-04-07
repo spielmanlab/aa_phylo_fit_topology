@@ -3,12 +3,8 @@ import re
 import sys
 from copy import deepcopy
 
-model_file        = "quantile_model_selection.csv"
-alignment_path    = "simulations/alignments/"
-fitted_tree_path  = "fitted_trees/" 
 true_tree_path    = "simulations/true_trees/"
 hb_path           = "hb_models/"
-pogomodel_path    = "pogofit_models/"
 
 
 def run_save_iqtree(alignment_file, data_type, model, outname, true_tree, threads):
@@ -37,8 +33,12 @@ def main():
     name      = sys.argv[1]
     tree      = sys.argv[2] 
     repl      = sys.argv[3]
-    threads   = sys.argv[4]
-
+    fitted_tree_path   = sys.argv[4]
+    alignment_path = sys.argv[5]
+    pogomodel_path = sys.argv[6]
+    model_file = sys.argv[7]
+    threads   = sys.argv[8]
+   
     
     rawname        = name + "_" + tree + "_rep" + repl + "_AA"
     alignment_file = alignment_path + rawname + ".fasta"
@@ -60,7 +60,7 @@ def main():
     for modelquant in use_models:
         #print(modelquant)
         outname = fitted_tree_path + rawname + "_"
-         if modelquant == "1":
+        if modelquant == "1":
              outname1 = outname + "poisson"
              run_save_iqtree(alignment_file, "AA", "Poisson", outname1, true_tree_file, threads)
      
