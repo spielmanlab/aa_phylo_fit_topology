@@ -8,9 +8,9 @@ library(broom)
 dms <- tibble(name = c("Gal4", "LAC", "NP", "HA", "HIV"), nsites=c(63, 262, 497, 564, 661))
 max_rf <- 194 ## 2n - 6
 
-results <- read_csv("inference_results.csv") %>% 
-                select(-treerep) %>% 
-                mutate(rf_true_norm = rf_true / max_rf)
+full_results <- read_csv("inference_results.csv",guess_max = 5000) 
+
+results <- full_results %>% filter(type == "rtree")
 
 name_levels <- c("Gal4", "LAC", "NP", "HA", "HIV")
 name_labels_nsites <- c("Gal4 (63)", "LAC (262)", "NP (497)", "HA (564)", "HIV (661)")
@@ -24,8 +24,8 @@ tree_labels  <- c("Low divergence", "Medium divergence", "High divergence") ## -
 results %>% 
   filter(optim == "inferredtree") %>%
   gather(ic, value, AIC, AICc, BIC) %>%
-  dplyr::select(-k,-logl, -optim, -rf_true, -rf_true_norm, -treelength) %>%
-  group_by(ic, name, bl, rep) %>%
+  dplyr::select(-k,-logl, -optim, -rf_true, -treelength) %>%
+  group_by(ic, name, tree, rep) %>%
   mutate(ic.rank = as.integer(rank(value))) -> ic.ranks
 
 # ### Fit rank with MODEL on the x axis. Less clear than rank on the X axis.
@@ -45,7 +45,7 @@ results %>%
 ### Fit rank with RANK on the x axis and fill by model. Much clearer than reverse.
 ic.ranks %>%
     mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
-           tree_levels  = factor(bl, levels=tree_levels,),
+           tree_levels  = factor(tree, levels=tree_levels),
            name_levels  = factor(name, levels=name_levels, labels = name_labels_nsites)) %>%
     filter(ic == "BIC") %>%
     ggplot(aes(x = factor(ic.rank), fill = model_levels)) + 
@@ -61,7 +61,7 @@ ic.ranks %>%
 ic.ranks %>%
     ungroup() %>%
     filter(ic == "BIC") %>%
-    group_by(name, bl, rep) %>%
+    group_by(name, tree, rep) %>%
     mutate(minBIC = min(value), diffBIC = abs(minBIC - value)) %>%
     #mutate(ic.rank = factor(ic.rank, levels=c(1:8))) %>%
     #mutate(bic_diff = abs(value) - lag(abs(value), default = first(abs(value)))) %>%
@@ -93,7 +93,7 @@ rf_models %>%
 results %>%
   filter(optim == "inferredtree") %>%
   mutate(model_levels = factor(model, levels=model_levels),
-         tree_levels  = factor(bl, levels=tree_levels, labels = tree_labels),
+         tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
          name_levels  = factor(name, levels=name_levels, labels = name_labels_nsites)) %>%
   ggplot(aes(x = model_levels, y = rf_true_norm, fill = model_levels)) + 
   geom_violin(scale="width")+
@@ -104,14 +104,14 @@ results %>%
   theme(axis.text.x = element_text(angle=30))
 
 results %>%
-  mutate(tree_levels  = factor(bl, levels=tree_levels)) %>%
+  mutate(tree_levels  = factor(tree, levels=tree_levels)) %>%
   ggplot(aes(x = model, y = treelength)) + 
   geom_jitter(aes(color = name)) + 
   facet_wrap(~tree_levels, nrow=1,scales="free_y")
 
 results %>%
-  group_by(name, bl, model, rep) %>%
-  select(-k, -AIC, -AICc, -BIC, -rf_true, -rf_true_norm, -treelength) %>%
+  group_by(name, tree, model, rep) %>%
+  select(-k, -AIC, -AICc, -BIC, -rf_true, -treelength) %>%
   spread(optim, logl) %>%
   mutate(true_minus_inf = optimizedtruetree - inferredtree,
          model_levels = factor(model, levels=model_levels),
@@ -123,4 +123,23 @@ results %>%
   geom_vline(xintercept=0) + 
   facet_wrap(name~model_levels, nrow=5, scales="free_y")
 
-  
+#######################################################################################
+
+results <- full_results %>% filter(type == "empirical")
+results %>%
+  filter(optim == "inferredtree") %>%
+  mutate(model_levels = factor(model, levels=model_levels)) %>%
+  ggplot(aes(x = model_levels, y = rf_true, fill = model_levels)) + 
+  geom_violin(scale="width")+
+  geom_jitter(width=0.3, height=0, size=1, alpha=0.5) +
+  #facet_wrap(name_levels~tree_levels, nrow=5, scales="free_y") +
+  facet_wrap(~tree, scales="free_y") +
+  panel_border() +
+  theme(axis.text.x = element_text(angle=30))
+
+
+results %>%
+  ggplot(aes(x = model, y = treelength, color=model, group=rep)) + 
+  geom_point() + geom_line()+
+  facet_grid(name~tree, scales="free_y")
+
