@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=48
 #SBATCH --mem-per-cpu=100
 #SBATCH -p csm
-#SBATCH --array=1-10
+#SBATCH --array=11-20
 
 REP=${SLURM_ARRAY_TASK_ID}
 NAME=HA
@@ -19,7 +19,7 @@ BF=${LIBPATH}/TemplateBatchFiles/pogofit_fixgamma.bf
 OUTPATH=/csm_data/spielman_lab/dms_modelselection/pogofit_models_empirical
 mkdir -p $OUTPATH
 
-ALNPATH=/csm_data/spielman_lab/dms_modelselection/simulations/empirical_alignments
+ALNPATH=/csm_data/spielman_lab/dms_modelselection/simulations/alignments_empirical
 for TREE in yeast greenplant greenalga opisthokonta prum ruhfel salichos dosreis anderson; do
     DAT=${NAME}_${TREE}_rep${REP}_AA.dat
     echo $DAT

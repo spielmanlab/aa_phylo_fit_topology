@@ -8,7 +8,7 @@
 
 REP=${SLURM_ARRAY_TASK_ID}
 TOPPATH=/csm_data/spielman_lab/dms_modelselection/
-ALNPATH=${TOPPATH}/simulations/empirical_alignments/
+ALNPATH=${TOPPATH}/simulations/alignments_empirical/
 POGOPATH=${TOPPATH}/pogofit_models_empirical/
 OUTPATH=${TOPPATH}/fitted_trees_empirical/
 NAME=HA

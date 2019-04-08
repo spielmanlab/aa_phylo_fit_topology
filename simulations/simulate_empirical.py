@@ -7,8 +7,6 @@ import sys
 import numpy as np
 import pyvolve
 from copy import deepcopy 
-# sys.path.append("../")
-# from sw_functions import *
 
 
 translation_table = {
@@ -37,9 +35,9 @@ mudict = {'AC':1.,  'CA':1.,  'AG':1.,  'GA':1.,  'AT':1.,  'TA':1.,  'CG':1.,  
 
 simrep = sys.argv[1] ## 1-10
 
-treepath = "true_trees/times3/"
+treepath = "true_trees/times3/" ## since simulating nucleotide level but want BL to describe, more or less, protein divergence
 prefpath = "preferences/"
-simpath  = "empirical_alignments/"
+simpath  = "alignments_empirical/"
 trees = [x for x in os.listdir(treepath) if x.endswith(".tree")] ## 9 trees
 
 prefs = np.loadtxt(prefpath + name + "_prefs.csv", delimiter=",")
