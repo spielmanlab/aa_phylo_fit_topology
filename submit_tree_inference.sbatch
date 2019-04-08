@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=modelselection
+#SBATCH --job-name=infer_trees
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=10
 #SBATCH --mem-per-cpu=100
