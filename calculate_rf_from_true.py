@@ -3,15 +3,15 @@ import sys
 import dendropy
 from dendropy.calculate import treecompare
 import pprint
+truepath       = "simulations/true_trees/"
+
+
 inferencepaths = {"rtree": "fitted_trees/", "empirical": "fitted_trees_empirical/"}
-truepath      = "simulations/true_trees/"
-dms_list   = {"rtree": ["NP", "LAC", "Gal4", "HA", "HIV"], "empirical": ["HA"]}
-reps = {"rtree": 20, "empirical": 10}
-
-treenames = {"rtree": ["rtree100_bl0.3_rep1.tree", "rtree100_bl1.5_rep1.tree", "rtree100_bl0.75_rep1.tree", "rtree100_bl3_rep1.tree"],
-             "empirical": ["anderson.tree", "dosreis.tree", "greenalga.tree", "greenplant.tree", "opisthokonta.tree", "prum.tree", "ruhfel.tree", "salichos.tree", "yeast.tree"]       
-            }
-
+dms_list       = {"rtree": ["NP", "LAC", "Gal4", "HA", "HIV"], "empirical": ["HA"]}
+treenames      = {"rtree": ["rtree100_bl0.3_rep1.tree", "rtree100_bl1.5_rep1.tree", "rtree100_bl0.75_rep1.tree", "rtree100_bl3_rep1.tree"],
+                  "empirical": ["anderson.tree", "dosreis.tree", "greenalga.tree", "greenplant.tree", "opisthokonta.tree", "prum.tree", "ruhfel.tree", "salichos.tree", "yeast.tree"]       
+                 }
+reps           = 20
 
 def parse_components(type, fileinfo):
     if type  == "empirical":
@@ -39,7 +39,7 @@ outstring = "type," + ",".join(fileinfo_order) + "," + ",".join(fitinfo_order) +
 for type in ["rtree", "empirical"]:
     iqfiles_all = [x for x in os.listdir(inferencepaths[type]) if x.endswith(".iqtree")]
     for dms in dms_list[type]: 
-        for repindex in range(1,reps[type]+1): ## files indexed from 1
+        for repindex in range(1,reps+1): ## files indexed from 1
             
             treespaces = {}
             truetrees = {}
