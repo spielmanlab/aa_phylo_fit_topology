@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=10
 #SBATCH --mem-per-cpu=100
 #SBATCH -p csm
-#SBATCH --array=1-10
+#SBATCH --array=11-21
 
 REP=${SLURM_ARRAY_TASK_ID}
 TOPPATH=/csm_data/spielman_lab/dms_modelselection/
