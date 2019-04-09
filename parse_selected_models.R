@@ -2,16 +2,14 @@ args = commandArgs(trailingOnly=TRUE)
 library(tidyverse)
 
 type = args[1]
-
+nreps <- 20
 if (type == "empirical"){
     infile <- "all_model_selection_empirical.csv"
     outfile <- "quantile_model_selection_empirical.csv"
-    nreps <- 10
 }
 if (type == "rtree"){
     infile <- "all_model_selection.csv"
     outfile <- "quantile_model_selection.csv"
-    nreps <- 20
 }
 dat <- read_csv(infile)
 
