@@ -38,21 +38,19 @@ def parse_all_fits(file, prefix):
 
 type = sys.argv[1]
 assert(len(sys.argv)==2),"\n specify `empirical` or `rtree`"
-
+reps  = list(range(1,21))
 if type == "empirical":
     alignment_path = "simulations/empirical_alignments/"
     output_path    = "selected_models_empirical/" ## mv log files here
     outfile = "all_model_selection_empirical.csv"
     names = ["HA"]
     trees = ["yeast", "greenplant", "greenalga", "opisthokonta", "prum", "ruhfel", "salichos", "dosreis", "anderson"]
-    reps  = list(range(1,11))
 else:
     alignment_path = "simulations/alignments/"
     output_path    = "selected_models/" ## mv log files here
     outfile = "all_model_selection.csv"
     names = ["NP", "HA", "HIV", "Gal4", "LAC"]
     trees = ["rtree100_bl0.3_rep1", "rtree100_bl0.75_rep1", "rtree100_bl1.5_rep1", "rtree100_bl3_rep1"]
-    reps = list(range(1,21))
     
 outstring = "name,tree,repl,model,logl,df,aic,aicc,bic\n"
 for name in names:
