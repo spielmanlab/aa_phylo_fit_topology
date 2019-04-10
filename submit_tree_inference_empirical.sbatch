@@ -14,7 +14,7 @@ OUTPATH=${TOPPATH}/fitted_trees_empirical/
 NAME=HA
 cd $TOPPATH
 for TREE in yeast greenplant greenalga opisthokonta prum ruhfel salichos dosreis anderson; do
-    python3 infer_trees.py $NAME $TREE $REP $OUTPATH $ALNPATH $POGOPATH quantile_model_selection_empirical.csv 8
+   python3 infer_trees.py $NAME $TREE $REP $OUTPATH $ALNPATH $POGOPATH quantile_model_selection_empirical.csv 8
 done
 
 

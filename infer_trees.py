@@ -50,12 +50,14 @@ def main():
     #print(all_models)   
     use_models = {}
     # LAC,btree64_bl3.0.tree,5,HIVw,5
+    #print (name + "," + tree + "," + repl)
     for line in all_models:
         if line.startswith(name + "," + tree + "," + repl):
             line2 = line.split(",")
             model = line2[3].strip()
             q = line2[4].strip()
             use_models[q] = model
+    #print(use_models)
             
     for modelquant in use_models:
         #print(modelquant)

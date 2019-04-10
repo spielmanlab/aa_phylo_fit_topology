@@ -40,7 +40,7 @@ simrep = sys.argv[1] ## 1-20
 treepath = "true_trees/"
 prefpath = "preferences/"
 simpath  = "alignments/"
-trees = [x for x in os.listdir(treepath) if x.endswith("bl0.75_rep1.tree")]
+trees = [x for x in os.listdir(treepath) if x.endswith("bl0.03_rep1.tree")]
 
 
 all_partitions = {}
