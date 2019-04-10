@@ -8,7 +8,7 @@ truepath       = "simulations/true_trees/"
 
 inferencepaths = {"rtree": "fitted_trees/", "empirical": "fitted_trees_empirical/"}
 dms_list       = {"rtree": ["NP", "LAC", "Gal4", "HA", "HIV"], "empirical": ["HA"]}
-treenames      = {"rtree": ["rtree100_bl0.3_rep1.tree", "rtree100_bl1.5_rep1.tree", "rtree100_bl0.75_rep1.tree", "rtree100_bl3_rep1.tree"],
+treenames      = {"rtree": ["rtree100_bl0.3_rep1.tree", "rtree100_bl0.75_rep1.tree", "rtree100_bl1.5_rep1.tree"], #,  "rtree100_bl3_rep1.tree"],
                   "empirical": ["anderson.tree", "dosreis.tree", "greenalga.tree", "greenplant.tree", "opisthokonta.tree", "prum.tree", "ruhfel.tree", "salichos.tree", "yeast.tree"]       
                  }
 reps           = 20
