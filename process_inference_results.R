@@ -14,7 +14,7 @@ emp_tips <- read_csv("empirical_trees_ntaxa.csv") %>% mutate(max_rf = 2*ntaxa - 
 full_results <- read_csv("inference_results.csv",guess_max = 10000) 
 
 results <- full_results %>% 
-            filter(type == "rtree", tree != 3) %>%
+            filter(type == "rtree") %>%
             mutate(rf_true_norm = rf_true / max_rf)
             
 sh_results <- read_csv("results_sh_rtree.csv")
@@ -24,8 +24,8 @@ name_labels_nsites <- c("Gal4 (63)", "LAC (262)", "NP (497)", "HA (564)", "HIV (
 model_levels <- c("pogofit", "hbstyle", "q1", "q2", "q3", "q4", "q5", "poisson")
 model_labels <- c("Self-trained", "HB-style", "Selected Q1", "Selected Q2", "Selected Q3", "Selected Q4", "Selected Q5", "Poisson")
 model_labels_short <- c("Self", "HB", "Q1", "Q2", "Q3", "Q4", "Q5", "Poisson")
-tree_levels  <- c(0.3, 0.75, 1.5) ## -> 0.1, 0.25,  0.5, 1.0
-tree_labels  <- c("Low divergence", "Medium divergence", "High divergence") 
+tree_levels  <- c(0.03, 0.3, 0.75, 1.5) ## -> 0.1, 0.25,  0.5, 1.0
+tree_labels  <- c("Low divergence", "Medium divergence", "High divergence", "Extra-high divergence") 
  
  
 results %>% 
@@ -91,7 +91,7 @@ results %>%
   scale_fill_brewer(palette = "RdYlBu", name = "Protein Model", labels = model_labels) +
   geom_jitter(width=0.3, height=0, size=0.75, alpha=0.7) +
   #facet_wrap(name_levels~tree_levels, nrow=5, scales="free_y") +
-  facet_wrap(tree_levels~name_levels, nrow=3, scales="free_y") +
+  facet_wrap(tree_levels~name_levels, nrow=4, scales="free_y") +
   panel_border() +
   background_grid() +
   theme(axis.text.x = element_text(size=10)) +    #element_text(size=9, angle=25, margin = margin(t = 8))) + 
@@ -101,7 +101,7 @@ results %>%
   mutate(tree_levels  = factor(tree, levels=tree_levels),
          model_levels = factor(model, levels=model_levels)) %>%
   ggplot(aes(x = model, y = treelength)) + 
-  geom_jitter(aes(color = name)) + background_grid() +
+  geom_point(aes(color = name)) + background_grid() +
   facet_wrap(~tree_levels, nrow=1, scales="free_y") 
 
 # results %>%

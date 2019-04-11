@@ -14,17 +14,19 @@ inferencepaths = {"rtree": "fitted_trees/", "empirical": "fitted_trees_empirical
 alignmentpaths = {"rtree": sim_path + "alignments/", "empirical": sim_path + "alignments_empirical/"}
 quantilefile   = {"rtree": "quantile_model_selection.csv", "empirical": "quantile_model_selection_empirical.csv"}
 dms_list       = {"rtree": ["NP", "LAC", "Gal4", "HA", "HIV"], "empirical": ["HA"]}
-treenames      = {"rtree": ["rtree100_bl0.3_rep1", "rtree100_bl1.5_rep1", "rtree100_bl0.75_rep1"],
+treenames      = {"rtree": ["rtree100_bl0.03_rep1", "rtree100_bl0.3_rep1", "rtree100_bl1.5_rep1", "rtree100_bl0.75_rep1"],
                   "empirical": ["anderson", "dosreis", "greenalga", "greenplant", "opisthokonta", "prum", "ruhfel", "salichos", "yeast"]       
                  }
 outtrees      = {"rtree100_bl0.3_rep1": "0.3",
+                 "rtree100_bl0.03_rep1": "0.03",
                  "rtree100_bl1.5_rep1": "1.5",
                  "rtree100_bl0.75_rep1": "0.75"}
     
 reps           = 20
 
 
-iqtree_topline = "Tree      logL    deltaL  bp-RELL    p-KH     p-SH       c-ELW\n"
+iqtree_topline = ['Tree', 'logL', 'deltaL', 'bp-RELL', 'p-KH', 'p-SH', 'c-ELW']
+
 model_order    = ["pogofit", "hb", "q1", "q2", "q3", "q4", "q5", "poisson"]
 
 outfile   = "results_sh_" + type + ".csv"
@@ -79,14 +81,14 @@ for name in dms_list[type]:
     
             ## Call the SH test
             alnfile = alignmentpaths[type] + rawname + ".fasta"
-            os.system("iqtree -quiet -nt 3 -s " + alnfile + " -m " + fitmodels[rawname] + " -z treelist.trees -n 0 -zb 1000 -redo")
+            os.system("iqtree -quiet -nt 4 -s " + alnfile + " -m " + fitmodels[rawname] + " -z treelist.trees -n 0 -zb 1000 -redo")
 
             ## Parse out p-values
             with open(alnfile + ".iqtree", "r") as f:
                 output = f.readlines()
             x = 0
             for line in output:
-                if line == iqtree_topline:
+                if re.split("\s+", line.strip()) == iqtree_topline:
                     break
                 x+=1
             start = x + 2
@@ -101,7 +103,9 @@ for name in dms_list[type]:
                 outtree = outtrees[tree]
             except:
                 outtree = tree
-            outstring += type + "," + ",".join([name, tree, str(rep),p_sh_string]) + "\n"
+            
+            outstring += type + "," + ",".join([name, outtree, str(rep),p_sh_string]) + "\n"
+            #print(outstring)
             os.system("rm " + alnfile + ".*")
 
 with open(outfile, "w") as f:
