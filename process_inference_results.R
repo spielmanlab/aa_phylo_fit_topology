@@ -17,7 +17,8 @@ results <- full_results %>%
             filter(type == "rtree") %>%
             mutate(rf_true_norm = rf_true / max_rf)
             
-sh_results <- read_csv("results_sh_rtree.csv")
+sh_results_rtree <- read_csv("results_sh_rtree.csv")
+sh_results_emp   <- read_csv("results_sh_empirical.csv")
 
 name_levels <- c("Gal4", "LAC", "NP", "HA", "HIV")
 name_labels_nsites <- c("Gal4 (63)", "LAC (262)", "NP (497)", "HA (564)", "HIV (661)")
@@ -119,9 +120,9 @@ results %>%
 #   geom_vline(xintercept=0) + 
 #   facet_wrap(name~model_levels, nrow=5, scales="free_y")
 
-###### FUUUUUUCK 
-sh_results %>% 
-    filter(type == "rtree", tree!="3") %>%
+
+sh_results_rtree %>% 
+    filter(type == "rtree") %>%
     dplyr::select(-type) %>%
     gather(model, pvalue, pogofit:true) %>% 
     mutate(sig = pvalue <= 0.01) %>% 
@@ -134,28 +135,28 @@ sh_results %>%
     facet_wrap(~tree, nrow=1) +
     panel_border()
     
-    , model == "true")
-    mutate(percent_reps_sig = sum(sig == TRUE)) %>% 
-    mutate(model_levels = factor(model, levels=model_levels),
-         tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
-         name_levels  = factor(name, levels=name_levels, labels = name_labels_nsites)) %>%
-    ggplot() + 
-    geom_bar(aes(x = model_levels, y = percent_reps_sig, fill = name_levels), stat="identity", position = position_dodge()) + 
-    geom_text(aes(label=percent_reps_sig, x = model),stat="count")+
-    facet_grid(~tree_levels)
+sh_results_emp %>% 
+    gather(model, pvalue, pogofit:true) %>% 
+    mutate(sig = pvalue <= 0.01) %>% 
+    group_by(tree, model) %>% 
+    tally(sig) %>%
+    ungroup() %>%
+    ggplot(aes(x = model, y = n)) + 
+    geom_bar(stat="identity", position = position_dodge()) + 
+    facet_wrap(~tree, nrow=1) +
+    panel_border()
     
-    
-sh_results %>%
-  filter(type == "rtree", tree!="3") %>%
+  # 
+sh_results_emp %>%
   dplyr::select(-type) %>%
   gather(model, pvalue, pogofit:true) %>%
-  mutate(model_levels = factor(model, levels=model_levels),
-         tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
-         name_levels  = factor(name, levels=name_levels, labels = name_labels_nsites)) %>%
-  filter(tree == "0.75") %>%
+#  mutate(model_levels = factor(model, levels=model_levels),
+#         tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
+#         name_levels  = factor(name, levels=name_levels, labels = name_labels_nsites)) %>%
+#  filter(tree == "0.75") %>%
   ggplot(aes(x = pvalue, fill = name)) + 
   geom_histogram(color = "black") + 
-  facet_grid(name~model_levels, scales="free")
+  facet_grid(tree~model, scales="free")
 
 
 #######################################################################################
