@@ -17,14 +17,19 @@ if (type == "pandit"){
 }
 dat <- read_csv(infile)
 
+
+
+selected_models <- tibble(name = as.character(),
+                          tree = as.character(),
+                          repl = as.character(),  ## since NA's
+                          model = as.character(),
+                          modelq = as.integer())
+ 
+
                              
 
 if (type == "pandit")
 {
-
-    selected_models <- tibble(name = as.character(),
-                              model = as.character(),
-                              modelq = as.integer())
                               
     ## gotta loop since sometimes multiple rows get returned for similarly fitting models
     for (namex in unique(dat$name)){
@@ -35,11 +40,11 @@ if (type == "pandit")
                         diffbic = abs(bic - thisbic)) %>%
                 filter(diffbic == min(diffbic)) %>%
                 ungroup() %>%
-                dplyr::select(name, tree, repl, model) %>%
+                dplyr::select(name, model) %>%
                 mutate(modelq = q) -> tempdat
                 if (nrow(tempdat) >1 )
                 {
-                    tempdat <- tempdat[1,]
+                    tempdat <- tempdat[1,] %>% mutate("tree" = "NA", "repl" = "NA")
                 }
                 selected_models <- bind_rows(selected_models, tempdat)
     }}
@@ -48,13 +53,6 @@ if (type == "pandit")
 
 if (type == "empirical" | type == "rtree")
 {
-
-    selected_models <- tibble(name = as.character(),
-                              tree = as.character(),
-                              repl = as.integer(),
-                              model = as.character(),
-                              modelq = as.integer())
- 
  
     ## gotta loop since sometimes multiple rows get returned for similarly fitting models
     for (namex in unique(dat$name)){
