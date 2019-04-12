@@ -40,10 +40,13 @@ def main():
     threads   = sys.argv[8]
    
     
-    rawname        = name + "_" + tree + "_rep" + repl + "_AA"
-    alignment_file = alignment_path + rawname + ".fasta"
-    true_tree_file = true_tree_path + tree + ".tree"
-
+    if tree == "NA:
+        rawname = name
+        true_tree_file = alignment_path + name + ".tree"
+    else:
+        rawname        = name + "_" + tree + "_rep" + repl + "_AA"
+        true_tree_file = true_tree_path + tree + ".tree"
+        alignment_file = alignment_path + rawname + ".fasta"
   
     with open(model_file, "r") as f: 
         all_models = f.readlines()
@@ -63,16 +66,18 @@ def main():
         #print(modelquant)
         outname = fitted_tree_path + rawname + "_"
         if modelquant == "1":
-             outname1 = outname + "poisson"
-             run_save_iqtree(alignment_file, "AA", "Poisson", outname1, true_tree_file, threads)
+            outname1 = outname + "poisson"
+            run_save_iqtree(alignment_file, "AA", "Poisson", outname1, true_tree_file, threads)
      
-             hbmodel = hb_path + name + "_HB.paml+G+F"
-             outname2 = outname + "hbstyle"
-             run_save_iqtree(alignment_file, "AA", hbmodel, outname2, true_tree_file, threads)
+            if tree != "NA": 
+                hbmodel = hb_path + name + "_HB.paml+G+F"
+                outname2 = outname + "hbstyle"
+                run_save_iqtree(alignment_file, "AA", hbmodel, outname2, true_tree_file, threads)
  
-             pogomodel = pogomodel_path + rawname + ".dat.POGOFIT.paml+G"  ### already has +F
-             outname3 = outname + "pogofit"
-             run_save_iqtree(alignment_file, "AA", pogomodel, outname3, true_tree_file, threads)
+            pogomodel = pogomodel_path + rawname + ".dat.POGOFIT.paml+G"  ### already has +F
+            outname3 = outname + "pogofit"
+            run_save_iqtree(alignment_file, "AA", pogomodel, outname3, true_tree_file, threads)
+        
         outname += "q" + modelquant
         run_save_iqtree(alignment_file, "AA", use_models[modelquant], outname, true_tree_file, threads)
 

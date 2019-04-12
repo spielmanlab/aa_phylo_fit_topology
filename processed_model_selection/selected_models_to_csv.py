@@ -37,34 +37,49 @@ def parse_all_fits(file, prefix):
 
 
 type = sys.argv[1]
-assert(len(sys.argv)==2),"\n specify `empirical` or `rtree`"
+assert(len(sys.argv)==2),"\n specify `empirical`,`rtree`, `pandit`"
 reps  = list(range(1,21))
 if type == "empirical":
     alignment_path = "simulations/empirical_alignments/"
     output_path    = "selected_models_empirical/" ## mv log files here
-    outfile = "all_model_selection_empirical.csv"
+    outfile = "processed_model_selection/all_model_selection_empirical.csv"
     names = ["HA"]
     trees = ["yeast", "greenplant", "greenalga", "opisthokonta", "prum", "ruhfel", "salichos", "dosreis", "anderson"]
-else:
+if type == "rtree":
     alignment_path = "simulations/alignments/"
     output_path    = "selected_models/" ## mv log files here
-    outfile = "all_model_selection.csv"
+    outfile = "processed_model_selection/all_model_selection_rtree.csv"
     names = ["NP", "HA", "HIV", "Gal4", "LAC"]
     trees = ["rtree100_bl0.03_rep1", "rtree100_bl0.3_rep1", "rtree100_bl0.75_rep1", "rtree100_bl1.5_rep1"]
+if type == "pandit":
+    alignment_path = "pandit_aa_alignments/"
+    output_path    = "selected_models_pandit/" ## mv log files here
+    outfile = "processed_model_selection/all_model_selection_pandit.csv"
+    names = [x.replace(".fasta", "") for x in os.listdir(alignment_path) if x.endswith(".fasta")]
     
-outstring = "name,tree,repl,model,logl,df,aic,aicc,bic\n"
-for name in names:
-    for tree in trees:
-        for repli in reps:
 
-            repl = str(repli)
-            rawname = name + "_" + tree + "_rep" + repl + "_AA"
-            prefix  = ",".join([name, tree, repl])
-           # print(prefix)
-            alignment_file       = alignment_path + rawname + ".fasta"
-            model_selection_file = output_path + rawname + ".model_selection_log"
-            #print(model_selection_file)
-            outstring += parse_all_fits(model_selection_file, prefix)
+
+outstring = "name,tree,repl,model,logl,df,aic,aicc,bic\n"
+if type == "rtree" or type == "empirical":
+    for name in names:
+        for tree in trees:
+            for repli in reps:
+
+                repl = str(repli)
+                rawname = name + "_" + tree + "_rep" + repl + "_AA"
+                prefix  = ",".join([name, tree, repl])
+               # print(prefix)
+                alignment_file       = alignment_path + rawname + ".fasta"
+                model_selection_file = output_path + rawname + ".model_selection_log"
+                #print(model_selection_file)
+                outstring += parse_all_fits(model_selection_file, prefix)
+if type == "pandit":
+    for name in names:
+        prefix  = name + ",NA,NA"
+        alignment_file       = alignment_path + name + ".fasta"
+        model_selection_file = output_path + name + ".model_selection_log"
+        outstring += parse_all_fits(model_selection_file, prefix)
+
   
 outstring = outstring.strip()
 with open(outfile, "w") as f:
