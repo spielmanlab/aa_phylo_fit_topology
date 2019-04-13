@@ -1,8 +1,11 @@
+from Bio import SeqIO
 import os
 from urllib.request import urlopen
 
 tree_url = "https://www.ebi.ac.uk/goldman-srv/pandit/pandit.cgi?action=browse&fam=REPLACE&field=rtp-rph"
 
+def clean_string(st):
+    return st.replace("-","").replace("/","").replace("_","").strip()
 
 
 def obtain_source(search_url, type):
@@ -21,6 +24,12 @@ fastas = [x for x in os.listdir(".") if x.endswith("fasta")]
 
 for fasta in fastas:
     print(fasta)
+    
+    records = list(SeqIO.parse(fasta, "fasta"))
+    with open(fasta, "w") as f:
+        for record in records:
+            f.write(">" + clean_string(record.id) + "\n" + str(record.seq) + "\n")
+           
     name = fasta.replace(".fasta", "")
 
     url = tree_url.replace("REPLACE",name)
@@ -33,6 +42,6 @@ for fasta in fastas:
     treefile = name + ".tree"
     datfile  = name + ".dat"
     with open(treefile, "w") as f:    
-        f.write(ts.replace("-","_").strip())
+        f.write(clean_string(ts))
     
     os.system("cat "+ fasta + " " + treefile + " > " + datfile)
