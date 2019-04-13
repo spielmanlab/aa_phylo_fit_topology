@@ -33,6 +33,6 @@ for fasta in fastas:
     treefile = name + ".tree"
     datfile  = name + ".dat"
     with open(treefile, "w") as f:    
-        f.write(ts.strip())
+        f.write(ts.replace("-","_").strip())
     
     os.system("cat "+ fasta + " " + treefile + " > " + datfile)

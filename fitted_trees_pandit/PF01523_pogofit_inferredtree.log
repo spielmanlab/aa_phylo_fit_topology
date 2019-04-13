@@ -1,0 +1,114 @@
+IQ-TREE multicore version 1.6.7 for Linux 64-bit built Aug 23 2018
+Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor,
+Heiko Schmidt, Dominik Schrempf, Michael Woodhams.
+
+Host:    csm-com-006 (AVX2, FMA3, 62 GB RAM)
+Command: iqtree -nt 8 -m /csm_data/spielman_lab/dms_modelselection/pogofit_models_pandit/PF01523.dat.POGOFIT.paml+G -s /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF01523.fasta -st AA
+Seed:    693046 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Fri Apr 12 20:20:41 2019
+Kernel:  AVX+FMA - 8 threads (48 CPU cores detected)
+
+Reading alignment file /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF01523.fasta ... Fasta format detected
+Alignment most likely contains protein sequences
+Alignment has 23 sequences with 327 columns, 325 distinct patterns
+291 parsimony-informative, 19 singleton sites, 17 constant sites
+                     Gap/Ambiguity  Composition  p-value
+   1  Y1322_SYNY3_44_344     7.95%    passed      9.30%
+   2  TLDD_ECOLI_34_332      8.56%    passed      7.22%
+   3  O67819_AQUAE_19_308   11.31%    passed     52.87%
+   4  Y863_SYNY3_22_315     10.09%    failed      0.04%
+   5  Y856_METTH_20_309     11.31%    passed     44.58%
+   6  Y996_METJA_15_309      9.79%    failed      0.00%
+   7  O57984_PYRHO_69_358   11.31%    passed     16.64%
+   8  Y655_ARCFU_2_283      13.76%    passed     29.52%
+   9  O59215_PYRHO_21_315    9.79%    failed      0.62%
+  10  O58578_PYRHO_26_333    5.81%    passed     15.85%
+  11  Q54362_STRLN_21_324    7.03%    failed      0.00%
+  12  P71897_MYCTU_33_345    4.28%    failed      0.03%
+  13  Y231_METJA_15_290     15.60%    passed      7.02%
+  14  O27142_METTH_17_302   12.54%    passed     32.85%
+  15  O29601_ARCFU_1_272    16.82%    passed     34.18%
+  16  O57987_PYRHO_18_303   12.54%    failed      0.01%
+  17  O67719_AQUAE_16_307   10.70%    failed      0.29%
+  18  O59214_PYRHO_16_307   10.70%    passed     26.37%
+  19  Q55361_SYNY3_21_314   10.09%    passed     61.44%
+  20  PMBA_HAEIN_34_327     10.09%    passed     24.24%
+  21  PMBA_ECOLI_34_327     10.09%    passed     52.68%
+  22  P73501_SYNY3_18_295   14.98%    failed      0.03%
+  23  O58579_PYRHO_21_306   12.54%    passed     51.67%
+****  TOTAL                 10.77%  8 sequences failed composition chi2 test (p-value<5%; df=19)
+
+Create initial parsimony tree by phylogenetic likelihood library (PLL)... 0.004 seconds
+Reading model parameters from file /csm_data/spielman_lab/dms_modelselection/pogofit_models_pandit/PF01523.dat.POGOFIT.paml
+
+NOTE: 4 MB RAM (0 GB) is required!
+Estimate model parameters (epsilon = 0.100)
+1. Initial log-likelihood: -15891.396
+2. Current log-likelihood: -15593.939
+3. Current log-likelihood: -15581.450
+Optimal log-likelihood: -15581.353
+Gamma shape alpha: 2.904
+Parameters optimization took 3 rounds (0.048 sec)
+Computing ML distances based on estimated model parameters... 0.219 sec
+Computing BIONJ tree...
+0.001 seconds
+Log-likelihood of BIONJ tree: -15561.037
+--------------------------------------------------------------------
+|             INITIALIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Generating 98 parsimony trees... 0.421 second
+Computing log-likelihood of 98 initial trees ... 0.981 seconds
+Current best score: -15561.037
+
+Do NNI search on 20 best initial trees
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 1: -15548.277
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 2: -15548.170
+Iteration 10 / LogL: -15549.684 / Time: 0h:0m:2s
+Iteration 20 / LogL: -15549.938 / Time: 0h:0m:3s
+Finish initializing candidate tree set (8)
+Current best tree score: -15548.170 / CPU time: 3.092
+Number of iterations: 20
+--------------------------------------------------------------------
+|               OPTIMIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 21: -15547.772
+Iteration 30 / LogL: -15547.951 / Time: 0h:0m:4s (0h:0m:12s left)
+Iteration 40 / LogL: -15547.802 / Time: 0h:0m:4s (0h:0m:10s left)
+Iteration 50 / LogL: -15547.792 / Time: 0h:0m:5s (0h:0m:8s left)
+Iteration 60 / LogL: -15559.860 / Time: 0h:0m:6s (0h:0m:6s left)
+Iteration 70 / LogL: -15548.111 / Time: 0h:0m:7s (0h:0m:5s left)
+Iteration 80 / LogL: -15548.349 / Time: 0h:0m:8s (0h:0m:4s left)
+Iteration 90 / LogL: -15547.831 / Time: 0h:0m:9s (0h:0m:3s left)
+Iteration 100 / LogL: -15548.090 / Time: 0h:0m:10s (0h:0m:2s left)
+Iteration 110 / LogL: -15548.337 / Time: 0h:0m:11s (0h:0m:1s left)
+Iteration 120 / LogL: -15548.341 / Time: 0h:0m:11s (0h:0m:0s left)
+TREE SEARCH COMPLETED AFTER 122 ITERATIONS / Time: 0h:0m:12s
+
+--------------------------------------------------------------------
+|                    FINALIZING TREE SEARCH                        |
+--------------------------------------------------------------------
+Performs final model parameters optimization
+Estimate model parameters (epsilon = 0.010)
+1. Initial log-likelihood: -15547.772
+Optimal log-likelihood: -15547.772
+Gamma shape alpha: 2.955
+Parameters optimization took 1 rounds (0.010 sec)
+BEST SCORE FOUND : -15547.772
+Total tree length: 30.199
+
+Total number of iterations: 122
+CPU time used for tree search: 94.674 sec (0h:1m:34s)
+Wall-clock time used for tree search: 12.073 sec (0h:0m:12s)
+Total CPU time used: 95.613 sec (0h:1m:35s)
+Total wall-clock time used: 12.203 sec (0h:0m:12s)
+
+Analysis results written to: 
+  IQ-TREE report:                /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF01523.fasta.iqtree
+  Maximum-likelihood tree:       /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF01523.fasta.treefile
+  Likelihood distances:          /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF01523.fasta.mldist
+  Screen log file:               /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF01523.fasta.log
+
+Date and Time: Fri Apr 12 20:20:53 2019

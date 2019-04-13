@@ -40,27 +40,27 @@ def main():
     threads   = sys.argv[8]
    
     
-    if tree == "NA:
+    if tree == "NA":
         rawname = name
         true_tree_file = alignment_path + name + ".tree"
     else:
         rawname        = name + "_" + tree + "_rep" + repl + "_AA"
         true_tree_file = true_tree_path + tree + ".tree"
-        alignment_file = alignment_path + rawname + ".fasta"
+    alignment_file = alignment_path + rawname + ".fasta"
   
     with open(model_file, "r") as f: 
         all_models = f.readlines()
-    #print(all_models)   
+    print(all_models)   
     use_models = {}
     # LAC,btree64_bl3.0.tree,5,HIVw,5
-    #print (name + "," + tree + "," + repl)
+    print (name + "," + tree + "," + repl)
     for line in all_models:
         if line.startswith(name + "," + tree + "," + repl):
             line2 = line.split(",")
             model = line2[3].strip()
             q = line2[4].strip()
             use_models[q] = model
-    #print(use_models)
+    print(use_models)
             
     for modelquant in use_models:
         #print(modelquant)
