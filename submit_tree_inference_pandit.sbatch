@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=48
 #SBATCH --mem-per-cpu=100
 #SBATCH -p csm
-#SBATCH --array=1-100
+#SBATCH --array=1-38
 
 LINE=${SLURM_ARRAY_TASK_ID}
 
