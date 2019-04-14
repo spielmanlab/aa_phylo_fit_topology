@@ -19,11 +19,7 @@ dat <- read_csv(infile)
 
 
 
-selected_models <- tibble(name = as.character(),
-                          tree = as.character(),
-                          repl = as.character(),  ## since NA's
-                          model = as.character(),
-                          modelq = as.integer())
+
  
 
                              
@@ -31,6 +27,12 @@ selected_models <- tibble(name = as.character(),
 if (type == "pandit")
 {
                               
+    selected_models <- tibble(name = as.character(),
+                          tree = as.character(),
+                          repl = as.character(),  ## since NA's
+                          model = as.character(),
+                          modelq = as.integer())
+                          
     ## gotta loop since sometimes multiple rows get returned for similarly fitting models
     for (namex in unique(dat$name)){
         dat %>% filter(name == namex) -> subdat
@@ -53,7 +55,14 @@ if (type == "pandit")
 
 if (type == "empirical" | type == "rtree")
 {
- 
+
+    selected_models <- tibble(name = as.character(),
+                          tree = as.character(),
+                          repl = as.integer(),  ## since NOT NA's
+                          model = as.character(),
+                          modelq = as.integer())
+                          
+                           
     ## gotta loop since sometimes multiple rows get returned for similarly fitting models
     for (namex in unique(dat$name)){
         for(treex in unique(dat$tree)){
