@@ -7,15 +7,16 @@ max_seq = 500
 min_len = 100
 max_len = 1000
 
-choose  = 100
+choose  = 200
 outdir = "use_pandit/"
-fastas = [x for x in os.listdir(".") if x.endswith("fasta")]
+indir = "pandit_fasta_aa/"
+fastas = [x for x in os.listdir(indir) if x.endswith("fasta")]
 
 contenders_sites = {}
 contenders_seqs  = {}
 contenders = []
 for fasta in fastas:
-    with open(fasta, "r") as f:
+    with open(indir) + fasta, "r") as f:
         recs = list(SeqIO.parse(f, "fasta"))
     nseq = len(recs)
     nsites = len(recs[0])
@@ -26,15 +27,15 @@ for fasta in fastas:
         contenders.append(fasta)
         contenders_sites[fasta] = str(nsites)
         contenders_seqs[fasta] = str(nseq)
-        
+     
 
 keepers = random.sample(list(range(len(contenders))), choose)
 
 with open(outdir + "info.csv", "w") as f:
-    f.write("pfam,nsites,nseq\n")
+    f.write("name,nsites,nseq\n")
     for i in keepers:
         fasta = contenders[i]
-        os.system("cp " + fasta + " " + outdir)
+        os.system("cp " + indir + fasta + " " + outdir)
         f.write(fasta.replace(".fasta", "") + "," + contenders_sites[fasta] + "," + contenders_seqs[fasta] + "\n")
 
     
