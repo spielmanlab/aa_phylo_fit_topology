@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=10
 #SBATCH --mem-per-cpu=100
 #SBATCH -p csm
-#SBATCH --array=1-100
+#SBATCH --array=1-200
 
 
 LINE=${SLURM_ARRAY_TASK_ID}
@@ -19,9 +19,11 @@ mkdir -p $OUTPATH
 FILE=${ALNPATH}/names.txt
 INLINE=$(sed "${LINE}q;d" ${FILE})
 IFS=',' read -r NAME <<< "$INLINE"
-
-iqtree -nt 8 -m TESTONLY -s ${ALNPATH}/${NAME}.fasta -st AA
-mv ${ALNPATH}/${NAME}.fasta.log $OUTPATH/${NAME}.model_selection_log
-rm $ALNPATH/${NAME}.fasta.*
-
+echo $NAME
+echo $OUTPATH/${NAME}.model_selection_log
+if [ ! -f $OUTPATH/${NAME}.model_selection_log ]; then
+  iqtree -nt 8 -m TESTONLY -s ${ALNPATH}/${NAME}.fasta -st AA
+  mv ${ALNPATH}/${NAME}.fasta.log $OUTPATH/${NAME}.model_selection_log
+  rm $ALNPATH/${NAME}.fasta.*
+fi
 

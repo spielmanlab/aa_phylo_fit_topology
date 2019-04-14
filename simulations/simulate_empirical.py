@@ -30,16 +30,16 @@ translation_table = {
  
 
 
-name = "HA"
 mudict = {'AC':1.,  'CA':1.,  'AG':1.,  'GA':1.,  'AT':1.,  'TA':1.,  'CG':1.,  'GC':1.,  'CT':1.,  'TC':1.,  'GT':1.,  'TG':1.}
 
-simrep = sys.argv[1] ## 1-10
+name   = sys.argv[1]
+simrep = sys.argv[2]
 
-treepath = "true_trees/times3/" ## since simulating nucleotide level but want BL to describe, more or less, protein divergence
+treepath = "true_trees/" ## since simulating nucleotide level but want BL to describe, more or less, protein divergence
 prefpath = "preferences/"
 simpath  = "alignments_empirical/"
-trees = [x for x in os.listdir(treepath) if x.endswith(".tree")] ## 9 trees
-
+trees = [x for x in os.listdir(treepath) if x.endswith("_resolved.tree")] ## 10 trees
+print(trees)
 prefs = np.loadtxt(prefpath + name + "_prefs.csv", delimiter=",")
 partitions = []
 
@@ -54,21 +54,23 @@ for siteprefs in prefs:
 for tree in trees:
     with open(treepath + tree, "r") as f:
         treestring = f.read().strip()
-    
-    pytree = pyvolve.read_tree(tree = treestring)
-    treename = tree.replace(".tree", "").replace("times3_","")
+    print(tree) 
+    pytree = pyvolve.read_tree(tree = treestring, scale_tree=3)
+    treename = tree.replace("_resolved.tree","")
     print("Simulating along", treename)
     
-    outname = simpath + name + "_" + treename + "_rep" + str(simrep) + "_CODON.fasta" ##### CODON
-    outname1 = outname.replace("_CODON", "_DNA")               ##### NUCLEOTIDE (same as codon but naming is convenient downstream)
-    outname2 = outname.replace("_CODON", "_AA")                ###### AMINO ACID
-    outname3 = outname2.replace(".fasta", ".dat")              ###### AMINO ACID
-
+    #outname = simpath + name + "_" + treename + "_rep" + str(simrep) + "_CODON.fasta" ##### CODON
+    #outname1 = outname.replace("_CODON", "_DNA")               ##### NUCLEOTIDE (same as codon but naming is convenient downstream)
+    outname = simpath + name + "_" + treename + "_rep" + str(simrep) + "_AA.fasta"
+    outname_dat = outname.replace(".fasta", ".dat")    
+    
     if os.path.exists(outname):
         continue
-
+    #else:
+    #    print(outname)
+    #continue
     e = pyvolve.Evolver(partitions = deepcopy(partitions), tree = deepcopy(pytree))
-    e(seqfile = outname, seqfmt = "fasta", ratefile = None, infofile = None)
+    e(seqfile = outname.replace("AA", "CODON"), seqfmt = "fasta", ratefile = None, infofile = None)
 
     nucseqs = e.get_sequences()
     aaseqs = {}
@@ -80,15 +82,13 @@ for tree in trees:
             protein += translation_table[codon]
         aaseqs[id] = protein
 
-    os.system("cp " + outname + " " + outname1)
-
     aa_out = ""
     for record in aaseqs:
         aa_out += ">" + str(record) + "\n" + str(aaseqs[record]) + "\n"
 
-    with open(outname2, "w") as f:
+    with open(outname, "w") as f:
         f.write(aa_out)
 
-    with open(outname3, "w") as f:
+    with open(outname_dat, "w") as f:
         f.write(aa_out)
         f.write("\n" + treestring) 

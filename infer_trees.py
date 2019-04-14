@@ -74,9 +74,9 @@ def main():
                 outname2 = outname + "hbstyle"
                 run_save_iqtree(alignment_file, "AA", hbmodel, outname2, true_tree_file, threads)
  
-            pogomodel = pogomodel_path + rawname + ".dat.POGOFIT.paml+G"  ### already has +F
-            outname3 = outname + "pogofit"
-            run_save_iqtree(alignment_file, "AA", pogomodel, outname3, true_tree_file, threads)
+                pogomodel = pogomodel_path + rawname + ".dat.POGOFIT.paml+G"  ### already has +F
+                outname3 = outname + "pogofit"
+                run_save_iqtree(alignment_file, "AA", pogomodel, outname3, true_tree_file, threads)
         
         outname += "q" + modelquant
         run_save_iqtree(alignment_file, "AA", use_models[modelquant], outname, true_tree_file, threads)

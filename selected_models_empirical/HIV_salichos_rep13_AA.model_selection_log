@@ -1,0 +1,162 @@
+IQ-TREE multicore version 1.6.7 for Linux 64-bit built Aug 23 2018
+Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor,
+Heiko Schmidt, Dominik Schrempf, Michael Woodhams.
+
+Host:    csm-com-011 (AVX2, FMA3, 62 GB RAM)
+Command: iqtree -nt 8 -m TESTONLY -s /csm_data/spielman_lab/dms_modelselection/simulations/alignments_empirical/HIV_salichos_rep13_AA.fasta -st AA
+Seed:    148037 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Sat Apr 13 17:43:06 2019
+Kernel:  AVX+FMA - 8 threads (48 CPU cores detected)
+
+Reading alignment file /csm_data/spielman_lab/dms_modelselection/simulations/alignments_empirical/HIV_salichos_rep13_AA.fasta ... Fasta format detected
+Alignment most likely contains protein sequences
+Alignment has 23 sequences with 661 columns, 661 distinct patterns
+646 parsimony-informative, 15 singleton sites, 0 constant sites
+      Gap/Ambiguity  Composition  p-value
+   1  Agos    0.00%    passed     26.69%
+   2  Klac    0.00%    passed     94.38%
+   3  Calb    0.00%    passed     46.56%
+   4  Cdub    0.00%    passed     47.78%
+   5  Ctro    0.00%    passed     33.58%
+   6  Cpar    0.00%    passed     45.81%
+   7  Lelo    0.00%    passed      8.85%
+   8  Psti    0.00%    passed      6.23%
+   9  Cgui    0.00%    passed     91.31%
+  10  Dhan    0.00%    failed      1.99%
+  11  Clus    0.00%    passed     67.66%
+  12  Cgla    0.00%    passed     99.24%
+  13  Sbay    0.00%    passed     69.56%
+  14  Scer    0.00%    passed     99.78%
+  15  Spar    0.00%    passed     97.24%
+  16  Smik    0.00%    passed     96.56%
+  17  Skud    0.00%    passed     98.40%
+  18  Scas    0.00%    passed     97.14%
+  19  Kpol    0.00%    passed     37.00%
+  20  Zrou    0.00%    passed     24.13%
+  21  Kthe    0.00%    passed     78.55%
+  22  Kwal    0.00%    passed     77.54%
+  23  Sklu    0.00%    passed     64.47%
+****  TOTAL    0.00%  1 sequences failed composition chi2 test (p-value<5%; df=19)
+
+
+Create initial parsimony tree by phylogenetic likelihood library (PLL)... 0.006 seconds
+NOTE: ModelFinder requires 9 MB RAM!
+ModelFinder will test 84 protein models (sample size: 661) ...
+ No. Model         -LnL         df  AIC          AICc         BIC
+  1  Dayhoff       31249.858    43  62585.715    62591.848    62778.947
+  2  Dayhoff+G4    31061.020    44  62210.039    62216.468    62407.764
+  3  Dayhoff+F     30680.370    62  61484.739    61497.803    61763.352
+  4  Dayhoff+F+G4  30503.369    63  61132.738    61146.246    61415.845
+  5  mtMAM         33459.341    43  67004.682    67010.815    67197.914
+  6  mtMAM+G4      32792.024    44  65672.048    65678.476    65869.773
+  7  mtMAM+F       31994.599    62  64113.197    64126.261    64391.810
+  8  mtMAM+F+G4    31533.678    63  63193.356    63206.863    63476.462
+  9  JTT           30338.578    43  60763.156    60769.289    60956.387
+ 10  JTT+G4        30228.867    44  60545.734    60552.163    60743.459
+ 11  JTT+F         30088.477    62  60300.954    60314.017    60579.566
+ 12  JTT+F+G4      29976.820    63  60079.640    60093.147    60362.746
+ 13  WAG           30669.412    43  61424.824    61430.957    61618.055
+ 14  WAG+G4        30573.140    44  61234.280    61240.709    61432.006
+ 15  WAG+F         30279.932    62  60683.863    60696.927    60962.476
+ 16  WAG+F+G4      30183.802    63  60493.604    60507.111    60776.710
+ 17  cpREV         30898.235    43  61882.469    61888.602    62075.701
+ 18  cpREV+G4      30741.397    44  61570.795    61577.223    61768.520
+ 19  cpREV+F       30557.504    62  61239.008    61252.071    61517.620
+ 20  cpREV+F+G4    30396.682    63  60919.364    60932.872    61202.471
+ 21  mtREV         32632.284    43  65350.568    65356.701    65543.799
+ 22  mtREV+G4      32201.983    44  64491.966    64498.395    64689.691
+ 23  mtREV+F       31261.577    62  62647.154    62660.218    62925.767
+ 24  mtREV+F+G4    30943.431    63  62012.863    62026.370    62295.969
+ 25  rtREV         31588.997    43  63263.995    63270.128    63457.226
+ 26  rtREV+G4      31429.792    44  62947.584    62954.013    63145.310
+ 27  rtREV+F       31168.748    62  62461.495    62474.559    62740.108
+ 28  rtREV+F+G4    30977.641    63  62081.282    62094.790    62364.389
+ 29  mtART         34301.336    43  68688.672    68694.804    68881.903
+ 30  mtART+G4      33416.328    44  66920.657    66927.085    67118.382
+ 31  mtART+F       32845.832    62  65815.663    65828.727    66094.276
+ 32  mtART+F+G4    32135.266    63  64396.533    64410.040    64679.639
+ 33  mtZOA         32998.883    43  66083.767    66089.900    66276.998
+ 34  mtZOA+G4      32380.749    44  64849.499    64855.928    65047.224
+ 35  mtZOA+F       31973.321    62  64070.641    64083.705    64349.254
+ 36  mtZOA+F+G4    31483.668    63  63093.336    63106.843    63376.442
+ 37  VT            30647.422    43  61380.844    61386.976    61574.075
+ 38  VT+G4         30568.513    44  61225.026    61231.455    61422.752
+ 39  VT+F          30305.602    62  60735.204    60748.267    61013.816
+ 40  VT+F+G4       30222.332    63  60570.663    60584.171    60853.770
+ 41  LG            31168.391    43  62422.783    62428.916    62616.014
+ 42  LG+G4         31017.329    44  62122.659    62129.087    62320.384
+ 43  LG+F          30836.881    62  61797.762    61810.825    62076.374
+ 44  LG+F+G4       30662.333    63  61450.666    61464.174    61733.773
+ 45  DCMut         31245.782    43  62577.563    62583.696    62770.794
+ 46  DCMut+G4      31058.415    44  62204.831    62211.260    62402.556
+ 47  DCMut+F       30677.009    62  61478.017    61491.081    61756.630
+ 48  DCMut+F+G4    30501.226    63  61128.451    61141.959    61411.558
+ 49  PMB           30792.451    43  61670.902    61677.035    61864.134
+ 50  PMB+G4        30707.602    44  61503.205    61509.633    61700.930
+ 51  PMB+F         30625.729    62  61375.458    61388.522    61654.071
+ 52  PMB+F+G4      30534.173    63  61194.347    61207.854    61477.453
+ 53  HIVb          30609.172    43  61304.344    61310.477    61497.576
+ 54  HIVb+G4       30436.976    44  60961.951    60968.380    61159.676
+ 55  HIVb+F        30354.171    62  60832.342    60845.406    61110.955
+ 56  HIVb+F+G4     30171.879    63  60469.759    60483.266    60752.865
+ 57  HIVw          31760.914    43  63607.827    63613.960    63801.059
+ 58  HIVw+G4       31561.768    44  63211.535    63217.964    63409.260
+ 59  HIVw+F        30741.600    62  61607.200    61620.263    61885.812
+ 60  HIVw+F+G4     30577.392    63  61280.785    61294.293    61563.891
+ 61  JTTDCMut      30370.658    43  60827.316    60833.449    61020.547
+ 62  JTTDCMut+G4   30259.498    44  60606.996    60613.425    60804.721
+ 63  JTTDCMut+F    30106.099    62  60336.199    60349.262    60614.812
+ 64  JTTDCMut+F+G4 29993.435    63  60112.871    60126.378    60395.977
+ 65  FLU           31393.497    43  62872.994    62879.127    63066.225
+ 66  FLU+G4        31210.154    44  62508.309    62514.737    62706.034
+ 67  FLU+F         30829.432    62  61782.865    61795.928    62061.477
+ 68  FLU+F+G4      30648.636    63  61423.272    61436.779    61706.378
+ 69  Blosum62      31057.240    43  62200.479    62206.612    62393.711
+ 70  Blosum62+G4   30957.198    44  62002.396    62008.825    62200.122
+ 71  Blosum62+F    30756.347    62  61636.693    61649.757    61915.306
+ 72  Blosum62+F+G4 30649.366    63  61424.732    61438.239    61707.838
+ 73  mtMet         32504.801    43  65095.601    65101.734    65288.832
+ 74  mtMet+G4      32124.887    44  64337.774    64344.202    64535.499
+ 75  mtMet+F       31001.432    62  62126.864    62139.928    62405.477
+ 76  mtMet+F+G4    30729.461    63  61584.923    61598.430    61868.029
+ 77  mtVer         32438.695    43  64963.390    64969.523    65156.622
+ 78  mtVer+G4      32041.171    44  64170.341    64176.770    64368.066
+ 79  mtVer+F       31022.264    62  62168.528    62181.591    62447.141
+ 80  mtVer+F+G4    30767.978    63  61661.956    61675.463    61945.062
+ 81  mtInv         32795.001    43  65676.002    65682.135    65869.234
+ 82  mtInv+G4      32466.753    44  65021.507    65027.936    65219.232
+ 83  mtInv+F       30946.284    62  62016.569    62029.632    62295.181
+ 84  mtInv+F+G4    30688.112    63  61502.223    61515.731    61785.330
+Akaike Information Criterion:           JTT+F+G4
+Corrected Akaike Information Criterion: JTT+F+G4
+Bayesian Information Criterion:         JTT+F+G4
+Best-fit model: JTT+F+G4 chosen according to BIC
+
+All model information printed to /csm_data/spielman_lab/dms_modelselection/simulations/alignments_empirical/HIV_salichos_rep13_AA.fasta.model.gz
+CPU time for ModelFinder: 26.412 seconds (0h:0m:26s)
+Wall-clock time for ModelFinder: 3.322 seconds (0h:0m:3s)
+
+NOTE: 9 MB RAM (0 GB) is required!
+Estimate model parameters (epsilon = 0.010)
+1. Initial log-likelihood: -30231.880
+2. Current log-likelihood: -29983.269
+3. Current log-likelihood: -29976.856
+4. Current log-likelihood: -29976.819
+Optimal log-likelihood: -29976.819
+Gamma shape alpha: 6.033
+Parameters optimization took 4 rounds (0.099 sec)
+BEST SCORE FOUND : -29976.819
+Total tree length: 16.915
+
+Total number of iterations: 0
+CPU time used for tree search: 0.000 sec (0h:0m:0s)
+Wall-clock time used for tree search: 0.000 sec (0h:0m:0s)
+Total CPU time used: 0.869 sec (0h:0m:0s)
+Total wall-clock time used: 0.109 sec (0h:0m:0s)
+
+Analysis results written to: 
+  IQ-TREE report:                /csm_data/spielman_lab/dms_modelselection/simulations/alignments_empirical/HIV_salichos_rep13_AA.fasta.iqtree
+  Tree used for ModelFinder:     /csm_data/spielman_lab/dms_modelselection/simulations/alignments_empirical/HIV_salichos_rep13_AA.fasta.treefile
+  Screen log file:               /csm_data/spielman_lab/dms_modelselection/simulations/alignments_empirical/HIV_salichos_rep13_AA.fasta.log
+
+Date and Time: Sat Apr 13 17:43:09 2019

@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=10
 #SBATCH --mem-per-cpu=100
 #SBATCH -p csm
-#SBATCH --array=11-21
+#SBATCH --array=1-20
 
 REP=${SLURM_ARRAY_TASK_ID}
 TOPPATH=/csm_data/spielman_lab/dms_modelselection/
@@ -13,7 +13,7 @@ POGOPATH=${TOPPATH}/pogofit_models_empirical/
 OUTPATH=${TOPPATH}/fitted_trees_empirical/
 NAME=HA
 cd $TOPPATH
-for TREE in yeast greenplant greenalga opisthokonta prum ruhfel salichos dosreis anderson; do
+for TREE in yeast greenplant greenalga opisthokonta prum ruhfel salichos dosreis anderson oconnell; do
    python3 infer_trees.py $NAME $TREE $REP $OUTPATH $ALNPATH $POGOPATH processed_model_selection/quantile_model_selection_empirical.csv 8
 done
 

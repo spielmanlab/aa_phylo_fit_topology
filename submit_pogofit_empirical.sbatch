@@ -4,10 +4,10 @@
 #SBATCH --ntasks-per-node=48
 #SBATCH --mem-per-cpu=100
 #SBATCH -p csm
-#SBATCH --array=11-20
+#SBATCH --array=1-20
 
 REP=${SLURM_ARRAY_TASK_ID}
-NAME=HA
+NAME=$1
 source ~/.bash_profile
 
 HYPATH=/csm_data/spielman_lab/bin/hyphy
