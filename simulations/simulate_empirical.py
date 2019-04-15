@@ -54,7 +54,7 @@ for siteprefs in prefs:
 for tree in trees:
     with open(treepath + tree, "r") as f:
         treestring = f.read().strip()
-    pytree = pyvolve.read_tree(tree = treestring, scale_tree=3)
+    pytree = pyvolve.read_tree(tree = treestring)#, scale_tree=3)
     treename = tree.replace("_resolved.tree","")
     print("Simulating along", treename)
     
