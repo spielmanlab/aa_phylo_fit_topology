@@ -44,14 +44,7 @@ if type == "empirical":
     output_path    = "selected_models_empirical/" ## mv log files here
     outfile = "processed_model_selection/all_model_selection_empirical.csv"
     names = ["HA"]
-    trees = ["yeast", "greenplant", "greenalga", "opisthokonta", "prum", "ruhfel", "salichos", "dosreis", "anderson", "oconnell"]
-
-if type == "rtree":
-    alignment_path = "simulations/alignments/"
-    output_path    = "selected_models/" ## mv log files here
-    outfile = "processed_model_selection/all_model_selection_rtree.csv"
-    names = ["NP", "HA", "HIV", "Gal4", "LAC"]
-    trees = ["rtree100_bl0.03_rep1", "rtree100_bl0.3_rep1", "rtree100_bl0.75_rep1", "rtree100_bl1.5_rep1"]
+    trees = ["yeast", "greenplant", "greenalga", "opisthokonta", "prum", "ruhfel", "salichos", "dosreis", "andersen", "spiralia", "rayfinned"]
 
 if type == "pandit":
     alignment_path = "pandit_aa_alignments/"
@@ -62,7 +55,7 @@ if type == "pandit":
 
 
 outstring = "name,tree,repl,model,logl,df,aic,aicc,bic\n"
-if type == "rtree" or type == "empirical":
+if type == "empirical":
     for name in names:
         for tree in trees:
             for repli in reps:

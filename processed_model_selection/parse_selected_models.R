@@ -7,10 +7,6 @@ if (type == "empirical"){
     infile <- "processed_model_selection/all_model_selection_empirical.csv"
     outfile <- "processed_model_selection/quantile_model_selection_empirical.csv"
 }
-if (type == "rtree"){
-    infile <- "processed_model_selection/all_model_selection_rtree.csv"
-    outfile <- "processed_model_selection/quantile_model_selection_rtree.csv"
-}
 if (type == "pandit"){
     infile <- "processed_model_selection/all_model_selection_pandit.csv"
     outfile <- "processed_model_selection/quantile_model_selection_pandit.csv"
@@ -53,7 +49,7 @@ if (type == "pandit")
 
 }
 
-if (type == "empirical" | type == "rtree")
+if (type == "empirical")
 {
 
     selected_models <- tibble(name = as.character(),
