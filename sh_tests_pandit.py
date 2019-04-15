@@ -10,10 +10,10 @@ quantilefile   = "processed_model_selection/quantile_model_selection_pandit.csv"
 
 iqtree_topline = ['Tree', 'logL', 'deltaL', 'bp-RELL', 'p-KH', 'p-SH', 'c-ELW']
 
-model_order    = ["pogofit", "q1", "q2", "q3", "q4", "q5", "poisson"]
+model_order    = ["q1", "q2", "q3", "q4", "q5", "poisson"]
 
 outfile   = "results_sh_pandit.csv"
-outstring = "name,pogofit,q1,q2,q3,q4,q5,poisson,pandit\n"
+outstring = "name,q1,q2,q3,q4,q5,poisson,pandit\n"
 
 
 
@@ -66,14 +66,15 @@ for name in list(fitmodels.keys()):
             break
         x+=1
     start = x + 2
-    stop = x + len(model_order) + 3
+    stop = x + len(model_order) + 2
     p_sh = []
     for i in range(start, stop):
+        #print(output[i])
         p_sh.append( re.split("\s+", output[i])[8] )
     p_sh_string = ",".join(p_sh)
-    
+    #print(p_sh_string)
+        
     outstring += ",".join([name,p_sh_string]) + "\n"
-    #print(outstring)
     os.system("rm " + alnfile + ".*")
 
 with open(outfile, "w") as f:
