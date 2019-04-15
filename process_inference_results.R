@@ -7,24 +7,16 @@ library(broom)
 
 dms <- tibble(name = c("Gal4", "LAC", "NP", "HA", "HIV"), nsites=c(63, 262, 497, 564, 661))
 
-max_rf <- 194 ## 2n - 6
 emp_tips <- read_csv("empirical_trees_ntaxa.csv") %>% mutate(max_rf = 2*ntaxa - 6)
 
 
-full_results <- read_csv("inference_results.csv",guess_max = 10000) 
-
-results <- full_results %>% 
-            filter(type == "rtree") %>%
-            mutate(rf_true_norm = rf_true / max_rf)
-            
-sh_results_rtree <- read_csv("results_sh_rtree.csv")
-sh_results_emp   <- read_csv("results_sh_empirical.csv")
+results    <- read_csv("inference_results.csv",guess_max = 10000) 
+sh_results <- read_csv("results_sh_empirical.csv")
 
 name_levels <- c("Gal4", "LAC", "NP", "HA", "HIV")
 name_labels_nsites <- c("Gal4 (63)", "LAC (262)", "NP (497)", "HA (564)", "HIV (661)")
-model_levels <- c("pogofit", "hbstyle", "q1", "q2", "q3", "q4", "q5", "poisson")
-model_labels <- c("Self-trained", "HB-style", "Selected Q1", "Selected Q2", "Selected Q3", "Selected Q4", "Selected Q5", "Poisson")
-model_labels_short <- c("Self", "HB", "Q1", "Q2", "Q3", "Q4", "Q5", "Poisson")
+model_levels <- c("q1", "q2", "q3", "q4", "q5", "poisson")
+model_labels <- c("Selected M1", "Selected M2", "Selected M3", "Selected M4", "Selected M5", "Poisson")
 tree_levels  <- c(0.03, 0.3, 0.75, 1.5) ## -> 0.1, 0.25,  0.5, 1.0
 tree_labels  <- c("Low divergence", "Medium divergence", "High divergence", "Extra-high divergence") 
  
@@ -83,7 +75,7 @@ rf_models %>%
 
 results %>%
   filter(optim == "inferredtree") %>%
-  mutate(model_levels = factor(model, levels=model_levels, labels = model_labels_short),
+  mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
          tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
          name_levels  = factor(name, levels=name_levels, labels = name_labels_nsites)) %>%
   ggplot(aes(x = model_levels, y = rf_true_norm, fill = model_levels)) + 
@@ -169,7 +161,7 @@ results <- full_results %>%
             
 results %>%
   filter(optim == "inferredtree") %>%
-  mutate(model_levels = factor(model, levels=model_levels, labels = model_labels_short)) %>%
+  mutate(model_levels = factor(model, levels=model_levels, labels = model_labels)) %>%
   ggplot(aes(x = model_levels, y = rf_true_norm, fill = model_levels)) + 
   geom_boxplot(outlier.shape = " ") + 
   scale_fill_brewer(palette = "RdYlBu", name = "Protein Model", labels = model_labels) +

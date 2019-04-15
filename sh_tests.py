@@ -3,25 +3,16 @@ import sys
 import re
 import pprint
     
-    
-assert(len(sys.argv)==2), "ERROR: Specify arg `rtree` or `empirical`"
-type = sys.argv[1]
+
 
 sim_path    = "simulations/"
 true_tree_path = sim_path + "true_trees/"
 
-inferencepaths = {"rtree": "fitted_trees/", "empirical": "fitted_trees_empirical/"}
-alignmentpaths = {"rtree": sim_path + "alignments/", "empirical": sim_path + "alignments_empirical/"}
-quantilefile   = {"rtree": "quantile_model_selection.csv", "empirical": "quantile_model_selection_empirical.csv"}
-dms_list       = {"rtree": ["NP", "LAC", "Gal4", "HA", "HIV"], "empirical": ["HA"]}
-treenames      = {"rtree": ["rtree100_bl0.03_rep1", "rtree100_bl0.3_rep1", "rtree100_bl1.5_rep1", "rtree100_bl0.75_rep1"],
-                  "empirical": ["anderson", "dosreis", "greenalga", "greenplant", "opisthokonta", "prum", "ruhfel", "salichos", "yeast"]       
-                 }
-outtrees      = {"rtree100_bl0.3_rep1": "0.3",
-                 "rtree100_bl0.03_rep1": "0.03",
-                 "rtree100_bl1.5_rep1": "1.5",
-                 "rtree100_bl0.75_rep1": "0.75"}
-    
+inferencepaths = "fitted_trees_empirical/
+alignmentpath = sim_path + "alignments_empirical/
+quantilefile   = "quantile_model_selection_empirical.csv"
+dms_list       = ["NP", "LAC", "Gal4", "HA", "HIV"]
+treenames      = ["anderson", "dosreis", "greenalga", "greenplant", "opisthokonta", "prum", "ruhfel", "salichos", "yeast", "oconnell"]       
 reps           = 20
 
 
@@ -29,8 +20,8 @@ iqtree_topline = ['Tree', 'logL', 'deltaL', 'bp-RELL', 'p-KH', 'p-SH', 'c-ELW']
 
 model_order    = ["pogofit", "hb", "q1", "q2", "q3", "q4", "q5", "poisson"]
 
-outfile   = "results_sh_" + type + ".csv"
-outstring = "type,name,tree,repl,pogofit,hb,q1,q2,q3,q4,q5,poisson,true\n"
+outfile   = "results_sh_empirical.csv"
+outstring = "name,tree,repl,q1,q2,q3,q4,q5,poisson,true\n"
 
 
 
@@ -39,7 +30,7 @@ outstring = "type,name,tree,repl,pogofit,hb,q1,q2,q3,q4,q5,poisson,true\n"
 # NP,rtree100_bl0.3_rep1,1,JTT+F+I+G4,1
 print("Determing all best-fitting models")
 fitmodels = {}
-with open(quantilefile[type], "r") as f:
+with open(quantilefile, "r") as f:
     qlines = f.readlines()
 for qline in qlines:
     name = qline.split(",")[0]
@@ -54,22 +45,22 @@ for qline in qlines:
 
 
 print("Testing galore")
-for name in dms_list[type]:
+for name in dms_list:
     print(name)
-    for tree in treenames[type]:
+    for tree in treenames:
         print("  ", tree)
         for rep in range(1,reps+1):
             print("  ", rep)
             rawname = "_".join([name, tree, "rep" + str(rep), "AA"])
             #print(rawname)
             ## Create input file with all trees in order of model_order, and then the true tree
-            inferred_trees_raw = [x for x in os.listdir(inferencepaths[type]) if x.startswith(rawname) and x.endswith("inferredtree.treefile")]
+            inferred_trees_raw = [x for x in os.listdir(inferencepath) if x.startswith(rawname) and x.endswith("inferredtree.treefile")]
             inferred_trees_ordered = [] ### order based on replicate, model
             for model in model_order:
                 for inftree in inferred_trees_raw:
                     if model in inftree:
                         #print(model)
-                        with open(inferencepaths[type] + inftree, "r") as f:
+                        with open(inferencepath + inftree, "r") as f:
                             ts = f.read().strip()
                         inferred_trees_ordered.append(ts)
             with open(true_tree_path + tree + ".tree", "r") as f:
@@ -80,7 +71,7 @@ for name in dms_list[type]:
                     f.write(ts +"\n")
     
             ## Call the SH test
-            alnfile = alignmentpaths[type] + rawname + ".fasta"
+            alnfile = alignmentpath + rawname + ".fasta"
             os.system("iqtree -quiet -nt 4 -s " + alnfile + " -m " + fitmodels[rawname] + " -z treelist.trees -n 0 -zb 1000 -redo")
 
             ## Parse out p-values
@@ -98,13 +89,8 @@ for name in dms_list[type]:
                 p_sh.append( re.split("\s+", output[i])[8] )
             p_sh_string = ",".join(p_sh)
 
-            outtree = None
-            try:
-                outtree = outtrees[tree]
-            except:
-                outtree = tree
-            
-            outstring += type + "," + ",".join([name, outtree, str(rep),p_sh_string]) + "\n"
+
+            outstring += ",".join([name, tree, str(rep),p_sh_string]) + "\n"
             #print(outstring)
             os.system("rm " + alnfile + ".*")
 

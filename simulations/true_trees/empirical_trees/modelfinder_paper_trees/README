@@ -1,38 +1,3 @@
-+ `MLTreeswBLandBS_2Dec.zip` from [https://bmcevolbiol.biomedcentral.com/articles/10.1186/1471-2148-14-23](https://bmcevolbiol.biomedcentral.com/articles/10.1186/1471-2148-14-23)
-	+ Used variety of datatypes to infer green plant phylogeny from plastid genomes
-
-+ `Dryad` from [https://datadryad.org/resource/doi:10.5061/dryad.q8n0v](https://datadryad.org/resource/doi:10.5061/dryad.q8n0v)
-
-+ `G3` from [http://www.g3journal.org/content/6/12/3927](http://www.g3journal.org/content/6/12/3927) 
-
-------------------
-Ray finned ,https://datadryad.org/resource/doi:10.5061/dryad.5b85783c
-spiralia, https://www.sciencedirect.com/science/article/pii/S0960982218315410
-
-+ `yeast.tre` is the G3 "1233AA_concatenation_ML.tre"
-+ `opisthokonta.tre` is "RAxML_bipartitions.meta50.rax.opisthokonta.best_wbs.pruned.tre" using EST data from Ryan ctenophore genome paper
-+ `greenalga.tre` is RAxML_bestTree.concat-aa2.tre from the Dryad repo, this tree is the concatenated amino acid tree.  Fucikova et al.
-+ `greenplant.tre` From algae to angiosperms–inferring the phylogeny of green plants (Viridiplantae) from 360 plastid genomes
-
-
-
-
-
-l> library(ape)
-t> t <- read.tree("greenalga.tree")
-> sum(t$edge.length)
-[1] 2.481443
-> t <- read.tree("greenplant.tree")
-> sum(t$edge.length)
-[1] 43.05466
-> t <- read.tree("opisthokonta.tree")
-> sum(t$edge.length)
-[1] 20.92042
-> sum(t$edge.length)
-[1] 35.57072
-
-
-----------------------------------------------------------
 THIS FILE AND THE ASSOCIATED FILES AND FOLDERS PERTAIN TO TABLE 1 OF:
 
 Kalyaanamoorthy S, Minh BQ, Wong TFK, von Haeseler A & Jermiin LS. ModelFinder: Fast model selection for accurate phylogenetic estimates. Nature Methods ??, ??? (2017).
