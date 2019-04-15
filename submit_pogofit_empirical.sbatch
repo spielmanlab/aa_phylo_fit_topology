@@ -20,7 +20,7 @@ OUTPATH=/csm_data/spielman_lab/dms_modelselection/pogofit_models_empirical
 mkdir -p $OUTPATH
 
 ALNPATH=/csm_data/spielman_lab/dms_modelselection/simulations/alignments_empirical
-for TREE in yeast greenplant greenalga opisthokonta prum ruhfel salichos dosreis andersen; do
+for TREE in yeast greenalga opisthokonta prum ruhfel salichos dosreis andersen rayfinned spiralia; do
     DAT=${NAME}_${TREE}_rep${REP}_AA.dat
     echo $DAT
     if [ ! -f ${OUTPATH}/${DAT}.POGOFIT.json ]; then

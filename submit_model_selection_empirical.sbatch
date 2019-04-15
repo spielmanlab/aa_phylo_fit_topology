@@ -12,7 +12,7 @@ ALNPATH=${TOPPATH}/simulations/alignments_empirical
 OUTPATH=${TOPPATH}/selected_models_empirical
 mkdir -p $OUTPATH
 for NAME in HA Gal4 LAC NP HIV; do 
-    for TREE in yeast greenplant greenalga opisthokonta prum ruhfel salichos dosreis andersen oconnell; do
+    for TREE in yeast greenalga opisthokonta prum ruhfel salichos dosreis andersen rayfinned spiralia; do
        X=${NAME}_${TREE}_rep${REP}_AA
        if [ ! -f $OUTPATH/${X}.model_selection_log ]; then
          iqtree -nt 8 -m TESTONLY -s ${ALNPATH}/${X}.fasta -st AA
