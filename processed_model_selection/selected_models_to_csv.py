@@ -43,7 +43,7 @@ if type == "empirical":
     alignment_path = "simulations/empirical_alignments/"
     output_path    = "selected_models_empirical/" ## mv log files here
     outfile = "processed_model_selection/all_model_selection_empirical.csv"
-    names = ["HA"]
+    names = ["HA", "NP", "HIV", "LAC", "Gal4"]
     trees = ["yeast", "greenplant", "greenalga", "opisthokonta", "prum", "ruhfel", "salichos", "dosreis", "andersen", "spiralia", "rayfinned"]
 
 if type == "pandit":
