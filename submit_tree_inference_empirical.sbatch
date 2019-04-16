@@ -13,7 +13,7 @@ POGOPATH=${TOPPATH}/pogofit_models_empirical/
 OUTPATH=${TOPPATH}/fitted_trees_empirical/
 NAME=HA
 cd $TOPPATH
-for TREE in yeast greenalga opisthokonta prum ruhfel salichos dosreis andersen rayfinned spiralia; do
+for TREE in greenalga opisthokonta prum ruhfel salichos dosreis andersen rayfinned spiralia; do
    python3 infer_trees.py $NAME $TREE $REP $OUTPATH $ALNPATH $POGOPATH processed_model_selection/quantile_model_selection_empirical.csv 8
 done
 

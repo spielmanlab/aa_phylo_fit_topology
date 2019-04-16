@@ -1,6 +1,6 @@
 library(ape)
 
-tnames <- c("andersen", "dosreis", "greenalga", "opisthokonta", "prum", "salichos", "yeast", "ruhfel", "rayfinned", "spiralia")
+tnames <- c("andersen", "dosreis", "greenalga", "opisthokonta", "prum", "salichos", "ruhfel", "rayfinned", "spiralia")
 
 for (t in tnames)
 {

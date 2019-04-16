@@ -12,7 +12,7 @@ inferencepaths = "fitted_trees_empirical/
 alignmentpath = sim_path + "alignments_empirical/
 quantilefile   = "quantile_model_selection_empirical.csv"
 dms_list       = ["NP", "LAC", "Gal4", "HA", "HIV"]
-treenames      = ["anderson", "dosreis", "greenalga", "greenplant", "opisthokonta", "prum", "ruhfel", "salichos", "yeast", "oconnell"]       
+treenames      = ["anderson", "dosreis", "greenalga", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]       
 reps           = 20
 
 

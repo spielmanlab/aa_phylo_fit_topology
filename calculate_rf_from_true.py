@@ -8,7 +8,7 @@ sim_path       = "simulations/"
 truepath       = sim_path + "true_trees/"
 inferencepath  = "fitted_trees_empirical/
 dms_list       = ["NP", "LAC", "Gal4", "HA", "HIV"]
-treenames      = ["andersen", "dosreis", "greenalga", "greenplant", "opisthokonta", "prum", "ruhfel", "salichos", "yeast", "oconnell"]       
+treenames      = ["anderson", "dosreis", "greenalga", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]       
 reps           = 20
 
 

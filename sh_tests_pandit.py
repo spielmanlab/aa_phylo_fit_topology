@@ -52,7 +52,7 @@ for name in list(fitmodels.keys()):
     with open("treelist.trees", "w") as f:
         for ts in inferred_trees_ordered:
            f.write(ts +"\n")
-    
+    #assert 1==3
     ## Call the SH test
     alnfile = alignmentpath + name + ".fasta"
     os.system("iqtree -quiet -nt 4 -s " + alnfile + " -m " + fitmodels[name] + " -z treelist.trees -n 0 -zb 1000 -redo")
@@ -66,7 +66,7 @@ for name in list(fitmodels.keys()):
             break
         x+=1
     start = x + 2
-    stop = x + len(model_order) + 2
+    stop = x + len(model_order) + 3
     p_sh = []
     for i in range(start, stop):
         #print(output[i])
