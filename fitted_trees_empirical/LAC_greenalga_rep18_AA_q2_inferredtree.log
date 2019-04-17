@@ -1,0 +1,107 @@
+IQ-TREE multicore version 1.6.7 for Linux 64-bit built Aug 23 2018
+Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor,
+Heiko Schmidt, Dominik Schrempf, Michael Woodhams.
+
+Host:    csm-com-004 (AVX2, FMA3, 62 GB RAM)
+Command: iqtree -nt 8 -m VT+F+I -s /csm_data/spielman_lab/dms_modelselection//simulations/alignments_empirical/LAC_greenalga_rep18_AA.fasta -st AA
+Seed:    115100 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Tue Apr 16 19:52:41 2019
+Kernel:  AVX+FMA - 8 threads (48 CPU cores detected)
+
+Reading alignment file /csm_data/spielman_lab/dms_modelselection//simulations/alignments_empirical/LAC_greenalga_rep18_AA.fasta ... Fasta format detected
+Alignment most likely contains protein sequences
+Alignment has 23 sequences with 262 columns, 233 distinct patterns
+165 parsimony-informative, 52 singleton sites, 45 constant sites
+                                Gap/Ambiguity  Composition  p-value
+   1  Schizomeris_leibleinii            0.00%    passed     98.94%
+   2  Stigeoclonium_helveticum          0.00%    passed     99.04%
+   3  Floydiella_terrestris             0.00%    passed     95.53%
+   4  Oedogonium_cardiacum              0.00%    passed     97.97%
+   5  Dunaliella_salina                 0.00%    passed     97.11%
+   6  Chlamydomonas_reinhardtii         0.00%    passed    100.00%
+   7  Gonium_pectorale                  0.00%    passed    100.00%
+   8  Pleodorina_starrii                0.00%    passed    100.00%
+   9  Volvox_carteri                    0.00%    passed     99.99%
+  10  Bracteacoccus_aerius              0.00%    passed     99.22%
+  11  Bracteacoccus_minor               0.00%    passed     99.30%
+  12  Mychonastes_homosphaera           0.00%    passed     99.38%
+  13  Pseudomuriella_schumacherensis    0.00%    passed     99.85%
+  14  Kirchneriella_aperta              0.00%    passed     99.97%
+  15  Ourococcus_multisporus            0.00%    passed     99.94%
+  16  Pediastrum_duplex                 0.00%    passed    100.00%
+  17  Chlorotetraedron_incus            0.00%    passed     99.89%
+  18  Neochloris_aquatica               0.00%    passed     99.99%
+  19  Scenedesmus_obliquus              0.00%    passed     99.98%
+  20  Rotundella_rotunda                0.00%    passed     99.98%
+  21  Chromochloris_zofingiensis        0.00%    passed     99.99%
+  22  Atractomorpha_echinata            0.00%    passed     99.35%
+  23  Ankyra_judai                      0.00%    passed     97.27%
+****  TOTAL                             0.00%  0 sequences failed composition chi2 test (p-value<5%; df=19)
+
+Create initial parsimony tree by phylogenetic likelihood library (PLL)... 0.001 seconds
+
+NOTE: 0 MB RAM (0 GB) is required!
+Estimate model parameters (epsilon = 0.100)
+1. Initial log-likelihood: -4638.790
+2. Current log-likelihood: -4616.018
+3. Current log-likelihood: -4615.862
+Optimal log-likelihood: -4615.856
+Proportion of invariable sites: 0.122
+Parameters optimization took 3 rounds (0.016 sec)
+Computing ML distances based on estimated model parameters... 0.037 sec
+Computing BIONJ tree...
+0.001 seconds
+Log-likelihood of BIONJ tree: -4613.320
+--------------------------------------------------------------------
+|             INITIALIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Generating 98 parsimony trees... 0.246 second
+Computing log-likelihood of 98 initial trees ... 0.437 seconds
+Current best score: -4613.320
+
+Do NNI search on 20 best initial trees
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 1: -4612.750
+Iteration 10 / LogL: -4612.792 / Time: 0h:0m:0s
+Iteration 20 / LogL: -4612.756 / Time: 0h:0m:1s
+Finish initializing candidate tree set (1)
+Current best tree score: -4612.750 / CPU time: 1.240
+Number of iterations: 20
+--------------------------------------------------------------------
+|               OPTIMIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Iteration 30 / LogL: -4613.539 / Time: 0h:0m:1s (0h:0m:4s left)
+Iteration 40 / LogL: -4612.916 / Time: 0h:0m:2s (0h:0m:3s left)
+Iteration 50 / LogL: -4613.229 / Time: 0h:0m:2s (0h:0m:2s left)
+Iteration 60 / LogL: -4612.758 / Time: 0h:0m:2s (0h:0m:1s left)
+Iteration 70 / LogL: -4612.750 / Time: 0h:0m:3s (0h:0m:1s left)
+Iteration 80 / LogL: -4612.753 / Time: 0h:0m:3s (0h:0m:0s left)
+Iteration 90 / LogL: -4612.751 / Time: 0h:0m:4s (0h:0m:0s left)
+Iteration 100 / LogL: -4612.752 / Time: 0h:0m:4s (0h:0m:0s left)
+TREE SEARCH COMPLETED AFTER 102 ITERATIONS / Time: 0h:0m:4s
+
+--------------------------------------------------------------------
+|                    FINALIZING TREE SEARCH                        |
+--------------------------------------------------------------------
+Performs final model parameters optimization
+Estimate model parameters (epsilon = 0.010)
+1. Initial log-likelihood: -4612.750
+Optimal log-likelihood: -4612.750
+Proportion of invariable sites: 0.122
+Parameters optimization took 1 rounds (0.003 sec)
+BEST SCORE FOUND : -4612.750
+Total tree length: 2.942
+
+Total number of iterations: 102
+CPU time used for tree search: 35.526 sec (0h:0m:35s)
+Wall-clock time used for tree search: 4.497 sec (0h:0m:4s)
+Total CPU time used: 35.804 sec (0h:0m:35s)
+Total wall-clock time used: 4.540 sec (0h:0m:4s)
+
+Analysis results written to: 
+  IQ-TREE report:                /csm_data/spielman_lab/dms_modelselection//simulations/alignments_empirical/LAC_greenalga_rep18_AA.fasta.iqtree
+  Maximum-likelihood tree:       /csm_data/spielman_lab/dms_modelselection//simulations/alignments_empirical/LAC_greenalga_rep18_AA.fasta.treefile
+  Likelihood distances:          /csm_data/spielman_lab/dms_modelselection//simulations/alignments_empirical/LAC_greenalga_rep18_AA.fasta.mldist
+  Screen log file:               /csm_data/spielman_lab/dms_modelselection//simulations/alignments_empirical/LAC_greenalga_rep18_AA.fasta.log
+
+Date and Time: Tue Apr 16 19:52:45 2019
