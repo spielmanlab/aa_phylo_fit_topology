@@ -6,32 +6,33 @@ import pprint
 
 sim_path       = "simulations/"
 truepath       = sim_path + "true_trees/"
-inferencepath  = "fitted_trees_empirical/
+inferencepath  = "fitted_trees_empirical/"
 dms_list       = ["NP", "LAC", "Gal4", "HA", "HIV"]
-treenames      = ["anderson", "dosreis", "greenalga", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]       
+treenames      = ["andersen", "dosreis", "greenalga", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]       
 reps           = 20
 
 
 fileinfo_order = ["name", "tree", "rep", "model", "optim"]
 fitinfo_order  = ["logl", "k", "AIC", "AICc", "BIC"]
 
-outfile = "inference_results_empirical.csv""
+outfile = "inference_results_empirical.csv"
 outstring = ",".join(fileinfo_order) + "," + ",".join(fitinfo_order) +",rf_true,treelength\n"
 
 iqfiles_all = [x for x in os.listdir(inferencepath) if x.endswith(".iqtree")]
 
 for dms in dms_list: 
+    print(dms)
     for repindex in range(1,reps+1): ## files indexed from 1
-        
+        print(repindex)
         treespaces = {}
         truetrees = {}
         for treename in treenames:
             ts = dendropy.TaxonNamespace()
             treespaces[treename] = ts
-            truetrees[treename] = dendropy.Tree.get_from_path(truepath + treename , "newick", taxon_namespace = treespaces[treename], rooting='force-unrooted')
+            truetrees[treename] = dendropy.Tree.get_from_path(truepath + treename +"_resolved.tree", "newick", taxon_namespace = treespaces[treename], rooting='force-unrooted')
         
         for this_treename in treenames:
-        
+            print("  ",this_treename)
             prefix = dms + "_" + this_treename.replace(".tree","") + "_rep" + str(repindex) + "_AA"
             iqfiles = [x for x in iqfiles_all if x.startswith(prefix)]
             
