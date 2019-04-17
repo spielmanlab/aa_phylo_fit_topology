@@ -8,17 +8,17 @@ import pprint
 sim_path    = "simulations/"
 true_tree_path = sim_path + "true_trees/"
 
-inferencepaths = "fitted_trees_empirical/
-alignmentpath = sim_path + "alignments_empirical/
-quantilefile   = "quantile_model_selection_empirical.csv"
+inferencepath = "fitted_trees_empirical/"
+alignmentpath = sim_path + "alignments_empirical/"
+quantilefile   = "processed_model_selection/quantile_model_selection_empirical.csv"
 dms_list       = ["NP", "LAC", "Gal4", "HA", "HIV"]
-treenames      = ["anderson", "dosreis", "greenalga", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]       
+treenames      = ["andersen", "dosreis", "greenalga", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]       
 reps           = 20
 
 
 iqtree_topline = ['Tree', 'logL', 'deltaL', 'bp-RELL', 'p-KH', 'p-SH', 'c-ELW']
 
-model_order    = ["pogofit", "hb", "q1", "q2", "q3", "q4", "q5", "poisson"]
+model_order    = ["q1", "q2", "q3", "q4", "q5", "poisson"]
 
 outfile   = "results_sh_empirical.csv"
 outstring = "name,tree,repl,q1,q2,q3,q4,q5,poisson,true\n"
@@ -63,7 +63,7 @@ for name in dms_list:
                         with open(inferencepath + inftree, "r") as f:
                             ts = f.read().strip()
                         inferred_trees_ordered.append(ts)
-            with open(true_tree_path + tree + ".tree", "r") as f:
+            with open(true_tree_path + tree + "_resolved.tree", "r") as f:
                 truetree = f.read().strip()
             inferred_trees_ordered.append( truetree )
             with open("treelist.trees", "w") as f:
@@ -86,6 +86,7 @@ for name in dms_list:
             stop = x + len(model_order) + 3
             p_sh = []
             for i in range(start, stop):
+                #print(output[i])
                 p_sh.append( re.split("\s+", output[i])[8] )
             p_sh_string = ",".join(p_sh)
 

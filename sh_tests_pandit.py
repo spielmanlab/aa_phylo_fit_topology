@@ -9,7 +9,6 @@ inferencepath = "fitted_trees_pandit/"
 quantilefile   = "processed_model_selection/quantile_model_selection_pandit.csv"
 
 iqtree_topline = ['Tree', 'logL', 'deltaL', 'bp-RELL', 'p-KH', 'p-SH', 'c-ELW']
-
 model_order    = ["q1", "q2", "q3", "q4", "q5", "poisson"]
 
 outfile   = "results_sh_pandit.csv"
@@ -52,7 +51,6 @@ for name in list(fitmodels.keys()):
     with open("treelist.trees", "w") as f:
         for ts in inferred_trees_ordered:
            f.write(ts +"\n")
-    #assert 1==3
     ## Call the SH test
     alnfile = alignmentpath + name + ".fasta"
     os.system("iqtree -quiet -nt 4 -s " + alnfile + " -m " + fitmodels[name] + " -z treelist.trees -n 0 -zb 1000 -redo")
