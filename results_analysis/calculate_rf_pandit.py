@@ -3,8 +3,8 @@ import sys
 import dendropy
 from dendropy.calculate import treecompare
 import pprint
-truepath       = "pandit_aa_alignments/"
-inferencepath = "fitted_trees_pandit/"
+truepath       = "../pandit_aa_alignments/"
+inferencepath = "../fitted_trees_pandit/"
 
 fileinfo_order = ["name", "model", "optim"]
 fitinfo_order  = ["logl", "k", "AIC", "AICc", "BIC"]

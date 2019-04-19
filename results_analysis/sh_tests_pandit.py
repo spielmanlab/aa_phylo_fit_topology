@@ -4,9 +4,9 @@ import re
 import pprint
     
     
-alignmentpath = "pandit_aa_alignments/"
-inferencepath = "fitted_trees_pandit/"
-quantilefile   = "processed_model_selection/quantile_model_selection_pandit.csv"
+alignmentpath = "../pandit_aa_alignments/"
+inferencepath = "../fitted_trees_pandit/"
+quantilefile   = "../processed_model_selection/quantile_model_selection_pandit.csv"
 
 iqtree_topline = ['Tree', 'logL', 'deltaL', 'bp-RELL', 'p-KH', 'p-SH', 'c-ELW']
 model_order    = ["q1", "q2", "q3", "q4", "q5", "poisson"]

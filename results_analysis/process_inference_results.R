@@ -5,33 +5,39 @@ library(multcomp)
 library(broom)
 
 theme_set(theme_bw())
+figure_directory <- "figures/"
 
-
-
-empirical_rf_fit  <- read_csv("inference_results_empirical.csv",guess_max = 10000)
-pandit_rf_fit     <- read_csv("inference_results_pandit.csv",guess_max = 10000) 
-
-emp_info <- read_csv("empirical_trees_ntaxa.csv") 
-pandit_info <- read_csv("pandit_aa_alignments/info.csv")
-
-empirical_sh <- read_csv("results_sh_empirical.csv")
-pandit_sh <- read_csv("results_sh_pandit.csv")
-
-#dms      <- tibble(name = c("Gal4", "LAC", "NP", "HA", "HIV"), nsites=c(63, 262, 497, 564, 661))
+########################## Factor levels and labeling ################################ 
 name_levels <- c("Gal4", "LAC", "NP", "HA", "HIV")
 name_labels_nsites <- c("Gal4 (63)", "LAC (262)", "NP (497)", "HA (564)", "HIV (661)")
 model_levels <- c("q1", "q2", "q3", "q4", "q5", "poisson")
-model_labels <- c("Selected M1", "Selected M2", "Selected M3", "Selected M4", "Selected M5", "Poisson")
+model_labels <- c("M1", "M2", "M3", "M4", "M5", "Poisson")
 tree_levels <- c("ruhfel", "rayfinned", "dosreis", "prum", "andersen", "spiralia", "opisthokonta", "greenalga", "salichos")
 tree_labels <- c("Green Plant", "Ray-finned fish", "Mammals", "Aves", "Lassa Virus", "Spiralia", "Opisthokonta", "Green Algae", "Yeast")
+tree_labels_ntaxa <- c("Green Plant (360)", "Ray-finned fish (305)", "Mammals (274)", "Aves (200)", "Lassa Virus (179)", "Spiralia (103)", "Opisthokonta (70)", "Green Algae (23)", "Yeast (23)")
 
- 
- 
+
+################################### Read in all data ##################################
+
+### RF and xIC results
+empirical_rf_fit  <- read_csv("inference_results_empirical.csv",guess_max = 10000)
+pandit_rf_fit     <- read_csv("inference_results_pandit.csv",guess_max = 10000) 
+
+### basic information about datasets
+emp_info <- read_csv("../simulations/empirical_trees_ntaxa.csv") 
+pandit_info <- read_csv("../pandit_aa_alignments/info.csv")
+
+### SH test results
+empirical_sh <- read_csv("results_sh_empirical.csv")
+pandit_sh <- read_csv("results_sh_pandit.csv")
+
+
+
+######### Normalize RF values #########
 empirical_rf_fit %>% 
     left_join(emp_info) %>%
     mutate(max_rf = 2*ntaxa - 6) %>%
     mutate(rf_true_norm = rf_true/max_rf) -> empirical_rf_fit
-
 
 pandit_rf_fit %>% 
     left_join(pandit_info) %>%
@@ -40,42 +46,11 @@ pandit_rf_fit %>%
            rf_q1_norm     = rf_q1/max_rf) -> pandit_rf_fit
 
 
-empirical_rf_fit %>%
-  filter(optim == "inferredtree") %>%
-  gather(ic, value, AIC, AICc, BIC) %>%
-  dplyr::select(-k,-logl, -optim, -rf_true, -rf_true_norm, -treelength) %>%
-  group_by(ic, name, tree, rep) %>%
-  mutate(ic.rank = as.integer(rank(value))) -> ic.ranks
 
 
-### Fit rank with RANK on the x axis and fill by model. Much clearer than reverse.
-ic.ranks %>%
-    mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
-           tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
-           name_levels  = factor(name, levels=name_levels, labels = name_labels_nsites)) %>%
-    filter(ic == "BIC") %>%
-    ggplot(aes(x = factor(ic.rank), fill = model_levels)) + 
-    geom_bar(color="black", size=.2) + 
-    facet_grid(name_levels~tree_levels) +
-    panel_border() + 
-    scale_fill_brewer(palette = "RdYlBu", name = "Protein Model") +
-    xlab("Model rank by BIC") + ylab("Count") + 
-    theme(strip.text = element_text(size=9))
-    
+############################### Linear models ################################
 
-### Are the ranks differences meaningful here?
-ic.ranks %>%
-    ungroup() %>%
-    filter(ic == "BIC") %>%
-    group_by(name, tree, rep) %>%
-    mutate(minBIC = min(value), diffBIC = abs(minBIC - value)) %>%
-    ggplot(aes(x = ic.rank, y = diffBIC, group = rep)) + 
-        geom_point() + geom_line() + 
-        facet_wrap(name ~ tree, nrow=5, scales="free_y") + 
-        scale_x_continuous(breaks = 1:6, name = "Model rank") + 
-        panel_border() + background_grid() + 
-        ylab("Delta BIC")
-
+######## Model One: RF for simulations
 
 empirical_rf_fit %>% filter(optim == "inferredtree") -> empirical_inferred
 empirical_inferred$model <- factor(empirical_inferred$model, levels=c("q1", "q2", "q3", "q4", "q5", "poisson"))
@@ -100,6 +75,7 @@ glht(fit, linfct=mcp(model='Tukey')) %>% summary()
 # poisson - q5 == 0  -6.0000     2.3360  -2.568   0.1052  
 
 
+######## Model Two: Treelength for simulations
 empirical_rf_fit %>% filter(optim == "inferredtree") -> empirical_inferred
 empirical_inferred$model <- factor(empirical_inferred$model, levels=c("q1", "q2", "q3", "q4", "q5", "poisson"))
 lmer(treelength ~ model + (1|name) + (1|tree), data = empirical_inferred) -> fit
@@ -122,57 +98,15 @@ glht(fit, linfct=mcp(model='Tukey')) %>% summary()
 # poisson - q4 == 0  -4.4809     0.2156 -20.779   <1e-04 ***
 # poisson - q5 == 0  -6.8349     0.2156 -31.695   <1e-04 ***
 
-empirical_rf_fit %>%
-  filter(optim == "inferredtree") %>%
-  mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
-         tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
-         name_levels  = factor(name, levels=name_levels, labels = name_labels_nsites)) %>%
-  ggplot(aes(x = model_levels, y = rf_true_norm, fill = model_levels)) + 
-  #geom_violin(scale="width")+
-  geom_boxplot(outlier.shape = " ", size=0.1) + 
-  scale_fill_brewer(palette = "RdYlBu", name = "Protein Model", labels = model_labels) +
-  #geom_jitter(width=0.3, height=0, size=0.75, alpha=0.7) +
-  #facet_wrap(name_levels~tree_levels, nrow=5, scales="free_y") +
-  facet_grid(name_levels~tree_levels, scales="free_y") +
-  panel_border() +
-  background_grid() +
-  theme(axis.text.x = element_blank(),
-       axis.text.y = element_text(size=7), 
-       axis.ticks.x = element_blank()) + 
-  xlab("Protein Models") + ylab("Normalized RF Distance")
 
 
-
-
-empirical_rf_fit %>%
-  filter(optim == "inferredtree") %>%
-  mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
-         tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
-         name_levels  = factor(name, levels=name_levels, labels = name_labels_nsites)) %>%
-  ggplot(aes(x = model_levels, y = treelength, fill = model_levels)) + 
-  #geom_violin(scale="width")+
-  geom_boxplot(outlier.shape = " ", size=0.1) + 
-  scale_fill_brewer(palette = "RdYlBu", name = "Protein Model", labels = model_labels) +
-  #geom_jitter(width=0.3, height=0, size=0.75, alpha=0.7) +
-  #facet_wrap(name_levels~tree_levels, nrow=5, scales="free_y") +
-  facet_grid(name_levels~tree_levels, scales="free_y") +
-  panel_border() +
-  background_grid() +
-  theme(axis.text.x = element_blank(),
-       axis.text.y = element_text(size=7), 
-       axis.ticks.x = element_blank()) + 
-  xlab("Protein Models") + ylab("Inferred treelength")
-
-
-###########################################################################################
-###########################################################################################
-
-
+######## Model Three: RF against pandit tree for pandit
 pandit_rf_fit %>% filter(optim == "inferredtree") -> pandit_inferred
 pandit_inferred$model <- factor(pandit_inferred$model, levels=c("q1", "q2", "q3", "q4", "q5", "poisson"))
 lmer(rf_pandit ~ model + (1|name), data = pandit_inferred) -> fit
 glht(fit, linfct=mcp(model='Tukey')) %>% summary()
 # Linear Hypotheses:
+#
 # q2 - q1 == 0         1.760      1.198   1.469   0.6840    
 # q3 - q1 == 0        -0.080      1.198  -0.067   1.0000    
 # q4 - q1 == 0         5.250      1.198   4.382   <0.001 ***
@@ -189,10 +123,14 @@ glht(fit, linfct=mcp(model='Tukey')) %>% summary()
 # poisson - q4 == 0    8.250      1.198   6.887   <0.001 ***
 # poisson - q5 == 0   -0.360      1.198  -0.301   0.9997  
 
+
+######## Model Four: RF against q1 tree for pandit
 pandit_rf_fit %>% filter(optim == "inferredtree") -> pandit_inferred
 pandit_inferred$model <- factor(pandit_inferred$model, levels=c("q1", "q2", "q3", "q4", "q5", "poisson"))
 lmer(rf_q1 ~ model + (1|name), data = pandit_inferred) -> fit
 glht(fit, linfct=mcp(model='Tukey')) %>% summary()
+# Linear Hypotheses:
+#
 # q2 - q1 == 0         84.25       4.27  19.732  < 0.001 ***
 # q3 - q1 == 0         91.79       4.27  21.498  < 0.001 ***
 # q4 - q1 == 0        100.36       4.27  23.506  < 0.001 ***
@@ -210,11 +148,13 @@ glht(fit, linfct=mcp(model='Tukey')) %>% summary()
 # poisson - q5 == 0    -2.12       4.27  -0.497  0.99631 
 
 
+######## Model Five: treelength for pandit
 pandit_rf_fit %>% filter(optim == "inferredtree") -> pandit_inferred
 pandit_inferred$model <- factor(pandit_inferred$model, levels=c("q1", "q2", "q3", "q4", "q5", "poisson"))
 lmer(treelength ~ model + (1|name) , data = pandit_inferred) -> fit
 glht(fit, linfct=mcp(model='Tukey')) %>% summary()
 # Linear Hypotheses:
+#
 #                   Estimate Std. Error z value Pr(>|z|)    
 # q2 - q1 == 0         4.598      4.961   0.927    0.940    
 # q3 - q1 == 0         3.009      4.961   0.607    0.991    
@@ -232,13 +172,102 @@ glht(fit, linfct=mcp(model='Tukey')) %>% summary()
 # poisson - q4 == 0  -56.131      4.961 -11.314   <1e-04 ***
 # poisson - q5 == 0 -100.163      4.961 -20.189   <1e-04 ***
 
+
+
+
+############################### Figures ################################
+
+######## Empirical RF Boxplots
+empirical_rf_fit %>%
+  filter(optim == "inferredtree") %>%
+  mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
+         tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
+         name_levels  = factor(name, levels=name_levels, labels = name_labels_nsites)) %>%
+  ggplot(aes(x = model_levels, y = rf_true_norm, fill = model_levels)) + 
+  geom_boxplot(outlier.shape = " ", size=0.1) + 
+  scale_fill_brewer(palette = "RdYlBu", name = "Protein Model", labels = model_labels) +
+  facet_grid(name_levels~tree_levels, scales="free_y") +
+  panel_border() +
+  background_grid() +
+  theme(axis.text.x = element_blank(),
+       axis.text.y = element_text(size=7), 
+       axis.ticks.x = element_blank()) + 
+  xlab("Protein Models") + ylab("Normalized RF Distance") -> empirical_rf_boxplot
+save_plot(paste0(figure_directory,"empirical_rf_boxplot_all.pdf"), empirical_rf_boxplot, base_width = 10.5)
+
+
+######## Empirical RF Boxplots, NP only
+empirical_rf_fit %>%
+  filter(optim == "inferredtree") %>%
+  mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
+         tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels_ntaxa)) %>%
+  filter(name == "NP") %>%
+  ggplot(aes(x = model_levels, y = rf_true_norm, fill = model_levels)) + 
+  geom_boxplot(outlier.shape = " ", size=0.1) + 
+  scale_fill_brewer(palette = "RdYlBu", name = "Protein Model", labels = model_labels) +
+  facet_wrap(~tree_levels, scales="free_y", nrow = 3) +
+  panel_border() +
+  background_grid() +
+  theme(axis.text.x = element_blank(),
+       axis.text.y = element_text(size=7), 
+       axis.ticks.x = element_blank()) + 
+  xlab("Protein Models") + ylab("Normalized RF Distance") -> empirical_rf_boxplot_np
+save_plot(paste0(figure_directory,"empirical_rf_boxplot_NP.pdf"), empirical_rf_boxplot_np, base_width = 8)
+
+
+
+
+######## Empirical treelength Boxplots
+empirical_rf_fit %>%
+  filter(optim == "inferredtree") %>%
+  mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
+         tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
+         name_levels  = factor(name, levels=name_levels, labels = name_labels_nsites)) %>%
+  ggplot(aes(x = model_levels, y = treelength, fill = model_levels)) + 
+  geom_boxplot(outlier.shape = " ", size=0.1) + 
+  scale_fill_brewer(palette = "RdYlBu", name = "Protein Model", labels = model_labels) +
+  facet_grid(name_levels~tree_levels, scales="free") +
+  panel_border() +
+  background_grid() +
+  theme(axis.text.x = element_blank(),
+       axis.text.y = element_text(size=7), 
+       axis.ticks.x = element_blank()) + 
+  xlab("Protein Models") + ylab("Inferred treelength") -> empirical_tl_boxplot
+save_plot(paste0(figure_directory,"empirical_tl_boxplot_all.pdf"), empirical_tl_boxplot, base_width = 10.5)
+
+
+######## Empirical treelength Boxplots, NP only
+empirical_rf_fit %>%
+  filter(optim == "inferredtree") %>%
+  mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
+         tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels_ntaxa)) %>%
+  filter(name == "NP") %>%
+  ggplot(aes(x = model_levels, y = treelength, fill = model_levels)) + 
+  geom_boxplot(outlier.shape = " ", size=0.1) + 
+  scale_fill_brewer(palette = "RdYlBu", name = "Protein Model", labels = model_labels) +
+  facet_wrap(~tree_levels, scales="free_y", nrow = 3) +
+  panel_border() +
+  background_grid() +
+  theme(axis.text.x = element_blank(),
+       axis.text.y = element_text(size=7), 
+       axis.ticks.x = element_blank()) + 
+  xlab("Protein Models") + ylab("Inferred treelength") -> empirical_tl_boxplot_np
+save_plot(paste0(figure_directory,"empirical_tl_boxplot_NP.pdf"), empirical_tl_boxplot_np, base_width = 8)
+
+
+
+###########################################################################################
+###########################################################################################
+
+
+######## Pandit RF Boxplots
 pandit_rf_fit %>%
   filter(optim == "inferredtree") %>%
   mutate(model_levels = factor(model, levels=model_levels, labels = model_labels)) %>%
   ggplot(aes(x = model_levels, y = rf_q1_norm, fill = model_levels)) + 
   geom_boxplot() + 
   scale_fill_brewer(palette = "RdYlBu", name = "Protein Model", labels = model_labels) +
-  xlab("Protein Models") + ylab("Normalized RF Distance from M1 tree") +
+  xlab("Protein Models") + ylab("Normalized RF (M1)") +
   theme(legend.position = "none",
         axis.title.y = element_text(size=8))-> rf_q1_plot
 
@@ -248,12 +277,14 @@ pandit_rf_fit %>%
   ggplot(aes(x = model_levels, y = rf_pandit_norm, fill = model_levels)) + 
   geom_boxplot() + 
   scale_fill_brewer(palette = "RdYlBu", name = "Protein Model", labels = model_labels) +
-  xlab("Protein Models") + ylab("Normalized RF Distance from PANDIT tree") +
+  xlab("Protein Models") + ylab("Normalized RF (PANDIT)") +
   theme(legend.position = "none",
         axis.title.y = element_text(size=8)) -> rf_pandit_plot
-plot_grid(rf_q1_plot, rf_pandit_plot, ncol=1, labels = "auto")
+        
+pandit_rf_plot <- plot_grid(rf_q1_plot, rf_pandit_plot, ncol=1, labels = "auto")
+save_plot(paste0(figure_directory,"pandit_rf_boxplots.pdf"), pandit_rf_plot, base_height = 4.5)
   
-
+######## Pandit RF Boxplots
 pandit_rf_fit %>%
   filter(optim == "inferredtree") %>%
   group_by(name) %>%
@@ -263,13 +294,13 @@ pandit_rf_fit %>%
   unique() %>%
   mutate(size = nsites*ntaxa) -> pandit_tl_summary
 
-pandit_tl_summary %>%  
-  ggplot(aes(x = size, y = range_treelength)) +
-  geom_point() +
-  scale_x_log10() + scale_y_log10() + 
-  geom_smooth(method = "lm") + 
-  xlab("Dataset size") + 
-  ylab("Range of inferred treelengths")-> range_tl_plot
+# pandit_tl_summary %>%  
+#   ggplot(aes(x = size, y = range_treelength)) +
+#   geom_point() +
+#   scale_x_log10() + scale_y_log10() + 
+#   geom_smooth(method = "lm") + 
+#   xlab("Dataset size") + 
+#   ylab("Range of inferred treelengths")-> range_tl_plot
 
 pandit_tl_summary %>%  
   ggplot(aes(x = size, y = sd_treelength)) +
@@ -278,28 +309,14 @@ pandit_tl_summary %>%
   geom_smooth(method = "lm") + 
   xlab("Dataset size") + 
   ylab("Std. dev. of inferred treelengths") -> sd_tl_plot
+save_plot(paste0(figure_directory,"pandit_treelength_sd_plot.pdf"), sd_tl_plot)
   
-tl_plots <- plot_grid(sd_tl_plot, range_tl_plot, labels = "auto")
+# tl_plots <- plot_grid(sd_tl_plot, range_tl_plot, labels = "auto")
 
 
-# > lm(sd_treelength ~ size, data = pandit_tl_summary) %>% tidy()
-# # A tibble: 2 x 5
-#   term         estimate std.error statistic  p.value
-#   <chr>           <dbl>     <dbl>     <dbl>    <dbl>
-# 1 (Intercept) 16.7      2.99           5.58 7.98e- 8
-# 2 size         0.000703 0.0000550     12.8  1.10e-27
-# > lm(log(sd_treelength) ~ log(size), data = pandit_tl_summary) %>% tidy()
-# # A tibble: 2 x 5
-#   term        estimate std.error statistic  p.value
-#   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
-# 1 (Intercept)   -3.76     0.420      -8.95 2.52e-16
-# 2 log(size)      0.708    0.0420     16.9  3.46e-40
+################################## SH tests ################################
 
-###########################################################################################
-###########################################################################################
-###########################################################################################
-
-
+#### Empirical results
 empirical_sh %>%
     gather(model, pvalue, q1:true) %>% 
     filter(pvalue <= 0.01) %>%
@@ -346,6 +363,9 @@ empirical_sh %>%
 # 40 Gal4    rayfinned   19  true  0.003
 # 41 Gal4     spiralia    9  true  0.008
 
+
+
+#### PANDIT results
 pandit_sh %>%
     gather(model, pvalue, q1:pandit) %>% 
     mutate(sig = pvalue <= 0.01) %>%
@@ -363,17 +383,12 @@ pandit_sh %>%
 ## 40% q5 differs
 
 
-
-pandit_sh %>%
-    gather(model, pvalue, q1:pandit) %>% 
-    mutate(sig = pvalue <= 0.01) %>%
-    left_join(pandit_info)
-
+##################### Descriptive plot of where models came from ################
 
 
 #### Plot schematic for q1-q5
-msel <- read_csv("processed_model_selection/quantile_model_selection_empirical.csv")
-all_sel <- read_csv("processed_model_selection/all_model_selection_empirical.csv")
+msel <- read_csv("../processed_model_selection/quantile_model_selection_empirical.csv")
+all_sel <- read_csv("../processed_model_selection/all_model_selection_empirical.csv")
 
 scheme_name <- "HA"
 scheme_tree <- "spiralia"
@@ -387,11 +402,54 @@ all_sel %>%
     theme(axis.ticks.x = element_blank(),
           panel.border = element_blank(),
           axis.line = element_line(color = 'black'))-> p
-save_plot("bic_dist_raw.pdf", p) ## annotated in Graphic
+save_plot(paste0(figure_directory,"bic_dist_raw.pdf"), p) ## annotated in Graphic
 
         
     
     
+    
+    
+    
+    
+    
+    
+    
+    
+# empirical_rf_fit %>%
+#   filter(optim == "inferredtree") %>%
+#   gather(ic, value, AIC, AICc, BIC) %>%
+#   dplyr::select(-k,-logl, -optim, -rf_true, -rf_true_norm, -treelength) %>%
+#   group_by(ic, name, tree, rep) %>%
+#   mutate(ic.rank = as.integer(rank(value))) -> ic.ranks
+# 
+# 
+# ### Fit rank with RANK on the x axis and fill by model. Much clearer than reverse.
+# ic.ranks %>%
+#     mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
+#            tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
+#            name_levels  = factor(name, levels=name_levels, labels = name_labels_nsites)) %>%
+#     filter(ic == "BIC") %>%
+#     ggplot(aes(x = factor(ic.rank), fill = model_levels)) + 
+#     geom_bar(color="black", size=.2) + 
+#     facet_grid(name_levels~tree_levels) +
+#     panel_border() + 
+#     scale_fill_brewer(palette = "RdYlBu", name = "Protein Model") +
+#     xlab("Model rank by BIC") + ylab("Count") + 
+#     theme(strip.text = element_text(size=9))
+#     
+# 
+# ## Are the ranks differences meaningful here?
+# ic.ranks %>%
+#     ungroup() %>%
+#     filter(ic == "BIC") %>%
+#     group_by(name, tree, rep) %>%
+#     mutate(minBIC = min(value), diffBIC = abs(minBIC - value)) %>%
+#     ggplot(aes(x = ic.rank, y = diffBIC, group = rep)) + 
+#         geom_point() + geom_line() + 
+#         facet_wrap(name ~ tree, nrow=5, scales="free_y") + 
+#         scale_x_continuous(breaks = 1:6, name = "Model rank") + 
+#         panel_border() + background_grid() + 
+#         ylab("Delta BIC")
     
     
     

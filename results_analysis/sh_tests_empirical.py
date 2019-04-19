@@ -5,12 +5,12 @@ import pprint
     
 
 
-sim_path    = "simulations/"
+sim_path    = "../simulations/"
 true_tree_path = sim_path + "true_trees/"
 
-inferencepath = "fitted_trees_empirical/"
+inferencepath = "../fitted_trees_empirical/"
 alignmentpath = sim_path + "alignments_empirical/"
-quantilefile   = "processed_model_selection/quantile_model_selection_empirical.csv"
+quantilefile   = "../processed_model_selection/quantile_model_selection_empirical.csv"
 dms_list       = ["NP", "LAC", "Gal4", "HA", "HIV"]
 treenames      = ["andersen", "dosreis", "greenalga", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]       
 reps           = 20

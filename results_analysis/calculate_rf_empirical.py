@@ -4,9 +4,9 @@ import dendropy
 from dendropy.calculate import treecompare
 import pprint
 
-sim_path       = "simulations/"
+sim_path       = "../simulations/"
 truepath       = sim_path + "true_trees/"
-inferencepath  = "fitted_trees_empirical/"
+inferencepath  = "../fitted_trees_empirical/"
 dms_list       = ["NP", "LAC", "Gal4", "HA", "HIV"]
 treenames      = ["andersen", "dosreis", "greenalga", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]       
 reps           = 20
