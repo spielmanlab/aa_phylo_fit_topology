@@ -284,35 +284,22 @@ pandit_rf_fit %>%
 pandit_rf_plot <- plot_grid(rf_q1_plot, rf_pandit_plot, ncol=1, labels = "auto")
 save_plot(paste0(figure_directory,"pandit_rf_boxplots.pdf"), pandit_rf_plot, base_height = 4.5)
   
-######## Pandit RF Boxplots
+######## Pandit tree length COV
 pandit_rf_fit %>%
   filter(optim == "inferredtree") %>%
   group_by(name) %>%
-  mutate(sd_treelength = sd(treelength), 
-         range_treelength = range(treelength)[2] - range(treelength)[1]) %>%
-  dplyr::select(name, sd_treelength, range_treelength, nsites, ntaxa) %>%
-  unique() %>%
-  mutate(size = nsites*ntaxa) -> pandit_tl_summary
-
-# pandit_tl_summary %>%  
-#   ggplot(aes(x = size, y = range_treelength)) +
-#   geom_point() +
-#   scale_x_log10() + scale_y_log10() + 
-#   geom_smooth(method = "lm") + 
-#   xlab("Dataset size") + 
-#   ylab("Range of inferred treelengths")-> range_tl_plot
-
-pandit_tl_summary %>%  
-  ggplot(aes(x = size, y = sd_treelength)) +
-  geom_point() +
-  scale_x_log10() + scale_y_log10() + 
-  geom_smooth(method = "lm") + 
-  xlab("Dataset size") + 
-  ylab("Std. dev. of inferred treelengths") -> sd_tl_plot
-save_plot(paste0(figure_directory,"pandit_treelength_sd_plot.pdf"), sd_tl_plot)
+  summarize(cov_treelength = sd(treelength)/mean(treelength)) %>%
+  ggplot(aes(x = cov_treelength)) +
+  geom_histogram(fill = "grey75", color = "black") +
+  scale_x_continuous(limits=c(0.1, 0.75), breaks=seq(0.1, 0.8, 0.1)) + 
+  scale_y_continuous(expand=c(0,0))+
+  xlab("Coefficient of Variance of inferred tree lengths") +
   
-# tl_plots <- plot_grid(sd_tl_plot, range_tl_plot, labels = "auto")
+  ylab("Count") -> cov_tl_histogram
 
+  
+save_plot(paste0(figure_directory,"cov_tl_histogram.pdf"), cov_tl_histogram)
+  
 
 ################################## SH tests ################################
 
