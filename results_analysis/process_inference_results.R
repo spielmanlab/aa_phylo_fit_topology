@@ -291,10 +291,9 @@ pandit_rf_fit %>%
   summarize(cov_treelength = sd(treelength)/mean(treelength)) %>%
   ggplot(aes(x = cov_treelength)) +
   geom_histogram(fill = "grey75", color = "black") +
-  scale_x_continuous(limits=c(0.1, 0.75), breaks=seq(0.1, 0.8, 0.1)) + 
+  scale_x_continuous(breaks=seq(0.1, 0.8, 0.1)) + 
   scale_y_continuous(expand=c(0,0))+
   xlab("Coefficient of Variance of inferred tree lengths") +
-  
   ylab("Count") -> cov_tl_histogram
 
   
