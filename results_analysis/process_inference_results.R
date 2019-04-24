@@ -14,6 +14,7 @@ model_levels <- c("q1", "q2", "q3", "q4", "q5", "poisson")
 model_labels <- c("M1", "M2", "M3", "M4", "M5", "Poisson")
 tree_levels <- c("ruhfel", "rayfinned", "dosreis", "prum", "andersen", "spiralia", "opisthokonta", "greenalga", "salichos")
 tree_labels <- c("Green Plant", "Ray-finned fish", "Mammals", "Aves", "Lassa Virus", "Spiralia", "Opisthokonta", "Green Algae", "Yeast")
+tree_labels_twolines <- c("Green\nPlant", "Ray-finned\nfish", "Mammals", "Aves", "Lassa\nVirus", "Spiralia", "Opisthokonta", "Green\nAlgae", "Yeast")
 tree_labels_ntaxa <- c("Green Plant (360)", "Ray-finned fish (305)", "Mammals (274)", "Aves (200)", "Lassa Virus (179)", "Spiralia (103)", "Opisthokonta (70)", "Green Algae (23)", "Yeast (23)")
 
 
@@ -389,6 +390,27 @@ all_sel %>%
           panel.border = element_blank(),
           axis.line = element_line(color = 'black'))-> p
 save_plot(paste0(figure_directory,"bic_dist_raw.pdf"), p) ## annotated in Graphic
+
+
+msel %>%
+    filter(modelq == 1) %>%
+    rowwise() %>%
+    mutate(model_matrix = str_split(model, "\\+")[[1]][1]) %>%
+    group_by(name, tree, model_matrix) %>%
+    tally() %>% 
+    mutate(tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels_twolines),
+           name_levels  = factor(name, levels=name_levels),
+           model_matrix_levels = factor(model_matrix, levels=c("JTT", "HIVb", "WAG"))) %>%
+    ggplot(aes(x = tree_levels, y = n, fill = model_matrix_levels)) + 
+    geom_bar(stat="identity") +
+    facet_wrap(~name_levels) + 
+    xlab("Simulation tree") + 
+    ylab("Count") + 
+    labs(fill = "M1 Model Matrix") + 
+    theme(axis.text.x = element_text(size=7)) -> selected_m1_plot
+save_plot(paste0(figure_directory,"selected_m1_empirical_barplot.pdf"), selected_m1_plot, base_width=16, base_height = 6) 
+    
+    
 
         
     
