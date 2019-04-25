@@ -42,7 +42,8 @@ def main():
     
     if tree == "NA":
         rawname = name
-        true_tree_file = alignment_path + name + ".tree"
+        ###### !!!!!!!!! q1 tree here !!!!!!!!!
+        true_tree_file = fitted_tree_path + name + "_q1_inferredtree.treefile"
     else:
         rawname        = name + "_" + tree + "_rep" + repl + "_AA"
         true_tree_file = true_tree_path + tree + ".tree"
@@ -62,24 +63,15 @@ def main():
             q = line2[4].strip()
             use_models[q] = model
     print(use_models)
-            
-    for modelquant in use_models:
-        #print(modelquant)
-        outname = fitted_tree_path + rawname + "_"
-        if modelquant == "1":
-            outname1 = outname + "poisson"
-            run_save_iqtree(alignment_file, "AA", "Poisson", outname1, true_tree_file, threads)
-     
-           # if tree != "NA": 
-           #     hbmodel = hb_path + name + "_HB.paml+G+F"
-           #     outname2 = outname + "hbstyle"
-           #     run_save_iqtree(alignment_file, "AA", hbmodel, outname2, true_tree_file, threads)
- #
- #               pogomodel = pogomodel_path + rawname + ".dat.POGOFIT.paml+G"  ### already has +F
- #               outname3 = outname + "pogofit"
- #               run_save_iqtree(alignment_file, "AA", pogomodel, outname3, true_tree_file, threads)
         
-        outname += "q" + modelquant
-        run_save_iqtree(alignment_file, "AA", use_models[modelquant], outname, true_tree_file, threads)
+    # quartile models    
+    for modelquant in range(1,6):
+        modelquant = str(int_modelquant)
+        outname = fitted_tree_path + rawname + "_q" + str(modelquant)
+        run_save_iqtree(alignment_file, "AA", use_models[str(modelquant)], outname, true_tree_file, threads)
+    ## poisson
+    outname = fitted_tree_path + rawname + "_poisson"
+    run_save_iqtree(alignment_file, "AA", "Poisson", outname1, true_tree_file, threads)
+             
 
 main()
