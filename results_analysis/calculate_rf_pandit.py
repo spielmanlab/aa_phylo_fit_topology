@@ -6,7 +6,7 @@ import pprint
 truepath       = "../pandit_aa_alignments/"
 inferencepath = "../fitted_trees_pandit/"
 
-fileinfo_order = ["name", "model", "optim"]
+fileinfo_order = ["name", "model"]
 fitinfo_order  = ["logl", "k", "AIC", "AICc", "BIC"]
 
 outstring = ",".join(fileinfo_order) + "," + ",".join(fitinfo_order) +",rf_q1,rfw_q1,treelength\n"
@@ -19,13 +19,12 @@ for pandit in pandits:
     ts = dendropy.TaxonNamespace()
     q1_tree   = dendropy.Tree.get_from_path(inferencepath + pandit + "_q1_inferredtree.treefile" , "newick", taxon_namespace = ts, rooting='force-unrooted')
     
-    iqfiles = [x for x in os.listdir(inferencepath) if x.endswith(".iqtree") and x.startswith(pandit)]
+    iqfiles = [x for x in os.listdir(inferencepath) if x.endswith("inferredtree.iqtree") and x.startswith(pandit)]
 
    # print(pandit, len(iqfiles))
     for iqfile in iqfiles:
         fileinfo = iqfile.split("_")
         model = fileinfo[1]
-        optim = fileinfo[2].split(".")[0]
         treefile = iqfile.replace(".iqtree", ".treefile")
         inftree = dendropy.Tree.get_from_path(
                     inferencepath + treefile,
@@ -49,7 +48,7 @@ for pandit in pandits:
                 fitinfo["AICc"] = line.split(" ")[-1].strip()
             if line.startswith("Bayesian information criterion"):
                 fitinfo["BIC"] = line.split(" ")[-1].strip()
-        part = ",".join([pandit, model, optim]) + "," + ",".join([fitinfo[x] for x in fitinfo_order]) + "," + rf_q1 + "," + rfw_q1 + "," + tl  + "\n"
+        part = ",".join([pandit, model]) + "," + ",".join([fitinfo[x] for x in fitinfo_order]) + "," + rf_q1 + "," + rfw_q1 + "," + tl  + "\n"
         outstring += part
      
 with open("inference_results_pandit.csv", "w") as f:

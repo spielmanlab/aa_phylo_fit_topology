@@ -12,13 +12,13 @@ treenames      = ["andersen", "dosreis", "greenalga", "opisthokonta", "prum", "r
 reps           = 20
 
 
-fileinfo_order = ["name", "tree", "rep", "model", "optim"]
+fileinfo_order = ["name", "tree", "rep", "model"]
 fitinfo_order  = ["logl", "k", "AIC", "AICc", "BIC"]
 
 outfile = "inference_results_empirical.csv"
 outstring = ",".join(fileinfo_order) + "," + ",".join(fitinfo_order) +",rf_true,treelength\n"
 
-iqfiles_all = [x for x in os.listdir(inferencepath) if x.endswith(".iqtree")]
+iqfiles_all = [x for x in os.listdir(inferencepath) if x.endswith("inferredtree.iqtree")]
 
 for dms in dms_list: 
     print(dms)
@@ -40,13 +40,12 @@ for dms in dms_list:
                 name = iqfile.replace(".iqtree","")
                 treefile = name + ".treefile"
 
-                fileinfo = {"name": None, "treerep": None, "tree": None, "model": None, "optim": None}
+                fileinfo = {"name": None, "treerep": None, "tree": None, "model": None}
                 components  = name.split("_")
                 fileinfo["name"]  = components[0]
                 fileinfo["tree"]  = components[1]
                 fileinfo["rep"]   =  components[2].replace("rep","")
                 fileinfo["model"]   = components[4]
-                fileinfo["optim"]   = components[5]
 
                 inftree = dendropy.Tree.get_from_path(
                             inferencepath + treefile,
