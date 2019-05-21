@@ -292,7 +292,7 @@ for (m in 1:5) {
                model_matrix_levels = fct_reorder(model_matrix, n)) %>%
         ggplot(aes(x = tree_levels, y = n, fill = model_matrix_levels)) + 
         geom_bar(stat="identity") +
-        facet_wrap(~name_levels) + 
+        facet_wrap(~name_levels, nrow=1) + 
         xlab("Simulation tree") + 
         ylab("Count") + 
         labs(fill = paste(mname, "Model Matrix")) + 
@@ -305,6 +305,8 @@ for (m in 1:5) {
     
     
 msel <- read_csv("../processed_model_selection/quantile_model_selection_pandit.csv") %>% dplyr::select(-tree, -repl)
+x <- 1
+plot_list <- c()
 for (m in 1:5) {
     mname <- paste0("M", m)
     msel %>%
@@ -316,13 +318,23 @@ for (m in 1:5) {
         mutate(model_matrix_levels = fct_reorder(model_matrix, n)) %>%
         ggplot(aes(x = model_matrix_levels, y = n, fill = model_matrix_levels)) + 
         geom_bar(stat="identity") +
-        geom_text(aes(x = model_matrix_levels, y = n+2, label = n), size=2)+
-        xlab("M1 Model Matrix") + 
+        geom_text(aes(x = model_matrix_levels, y = n+2, label = n), size=3)+
+        xlab("") + 
+        ggtitle(paste(mname, "Model Matrix")) + 
         ylab("Count") + 
         #labs(fill = paste(mname, "Model Matrix")) + 
-        theme(axis.text.x = element_text(size=7),legend.position = "none") -> selected_m_plot
-    save_plot(paste0(figure_directory, "selected_", mname, "_pandit_barplot.pdf"), selected_m_plot, base_width=6, base_height = 3.5) 
+        theme(axis.text.x = element_text(size=8, angle=30, vjust=0.75),legend.position = "none") -> selected_m_plot
+    if (m == 1) {
+        selected_m_plot <- selected_m_plot + ggtitle("") + xlab(paste(mname, "Model Matrix")) 
+        save_plot(paste0(figure_directory, "selected_", mname, "_pandit_barplot.pdf"), selected_m_plot, base_width=5, base_height = 3.25) 
+    }
+    if (m > 1) {
+        plot_list[[x]] <- selected_m_plot
+        x <- x+1
+    } 
 }
+selected_grid <- plot_grid(plotlist = plot_list, nrow=2, labels = "auto")
+save_plot(paste0(figure_directory, "selected_models_m2-5_pandit.pdf"), selected_grid, base_width=11, base_height=6) 
 
 
 
