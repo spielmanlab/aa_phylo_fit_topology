@@ -90,7 +90,9 @@ empirical_rf_fit %>%
   background_grid() +
   theme(axis.text.x = element_blank(),
        strip.text.y = element_text(size=8), 
-       axis.ticks.x = element_blank()) + 
+       axis.ticks.x = element_blank(), 
+       legend.position = "bottom") + 
+  guides(fill = guide_legend(nrow = 1)) +
   xlab("Protein Models") + ylab("Normalized RF Distance") -> empirical_rf_boxplot
 save_plot(paste0(figure_directory,"empirical_rf_boxplot_all.pdf"), empirical_rf_boxplot, base_height=8)
 
@@ -117,7 +119,7 @@ save_plot(paste0(figure_directory,"empirical_rf_boxplot_NP.pdf"), empirical_rf_b
 
 ######## Empirical treelength Boxplots
 empirical_rf_fit %>%
-  filter(optim == "optimizedtruetree") %>%
+  filter(optim == "inferredtree") %>%
   mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
          tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels_twolines),
          name_levels  = factor(name, levels=name_levels, labels = name_labels_nsites)) %>%
@@ -129,14 +131,16 @@ empirical_rf_fit %>%
   background_grid() +
   theme(axis.text.x = element_blank(),
        strip.text.y = element_text(size=8), 
-       axis.ticks.x = element_blank()) + 
+       axis.ticks.x = element_blank(), 
+       legend.position = "bottom") +
+    guides(fill = guide_legend(nrow = 1)) +
   xlab("Protein Models") + ylab("Inferred treelength") -> empirical_tl_boxplot
 save_plot(paste0(figure_directory,"empirical_tl_boxplot_all.pdf"), empirical_tl_boxplot, base_height=8)
 
 
 ######## Empirical treelength Boxplots, NP only
 empirical_rf_fit %>%
-  filter(optim == "optimizedtruetree") %>%
+  filter(optim == "inferredtree") %>%
   mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
          tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels)) %>%
   filter(name == "NP") %>%
@@ -262,20 +266,36 @@ save_plot(paste0(figure_directory,"pandit_fit_rf_tl.pdf"), pandit_grid_withlegen
 msel <- read_csv("../processed_model_selection/quantile_model_selection_empirical.csv")
 all_sel <- read_csv("../processed_model_selection/all_model_selection_empirical.csv")
 
+
+
 scheme_name <- "HA"
 scheme_tree <- "spiralia"
 scheme_rep <- 1
 all_sel %>% 
   dplyr::select(name, tree, model, bic, repl) %>%
-  filter(name == scheme_name, tree == scheme_tree, repl == scheme_rep) %>%
+  filter(name == scheme_name, tree == scheme_tree, repl == scheme_rep) -> scheme_data
+  
+quant <- quantile(scheme_data$bic)
+scheme_data %>%
   ggplot(aes(x = "", y = bic)) + 
     geom_boxplot(fill = "firebrick3") +
-    xlab("") + ylab("BIC Distribution from ModelFinder") +
+    xlab("") + ylab("BIC values across all tested models") +
     theme(axis.ticks.x = element_blank(),
           panel.border = element_blank(),
-          axis.line = element_line(color = 'black'))-> p
-save_plot(paste0(figure_directory,"bic_dist_raw.pdf"), p) ## annotated in Graphic
-
+          axis.line = element_line(color = 'black'), 
+          plot.margin = margin(0.5, 1, 0, 0.5, "cm")) +
+    geom_segment(x = 1.5, y = quant[[1]], xend = 1.02, yend = quant[[1]], color = "grey40", arrow = arrow(length = unit(0.03, "npc"), type = "closed")) +
+    annotate(geom = "text", x = 1.55, y = min(scheme_data$bic), label = "M1") +
+    geom_segment(x = 1.5, y = quant[[2]], xend = 1.4, yend = quant[[2]], color = "grey40", arrow = arrow(length = unit(0.03, "npc"), type = "closed")) +
+    annotate(geom = "text", x = 1.55, y = quant[[2]], label = "M2") +
+    geom_segment(x = 1.5, y = quant[[3]], xend = 1.4, yend = quant[[3]], color = "grey40", arrow = arrow(length = unit(0.03, "npc"), type = "closed")) +
+    annotate(geom = "text", x = 1.55, y = quant[[3]], label = "M3") +
+    geom_segment(x = 1.5, y = quant[[4]], xend = 1.4, yend = quant[[4]], color = "grey40", arrow = arrow(length = unit(0.03, "npc"), type = "closed")) +
+    annotate(geom = "text", x = 1.55, y = quant[[4]], label = "M4") +
+    geom_segment(x = 1.5, y = quant[[5]], xend = 1.02, yend = quant[[5]], color = "grey40", arrow = arrow(length = unit(0.03, "npc"), type = "closed")) +
+    annotate(geom = "text", x = 1.55, y = quant[[5]], label = "M5")  -> scheme_plot
+   
+save_plot(paste0(figure_directory,"bic_dist_scheme.pdf"), scheme_plot) 
 
 
 
@@ -292,7 +312,7 @@ for (m in 1:5) {
                model_matrix_levels = fct_reorder(model_matrix, n)) %>%
         ggplot(aes(x = tree_levels, y = n, fill = model_matrix_levels)) + 
         geom_bar(stat="identity") +
-        facet_wrap(~name_levels, nrow=1) + 
+        facet_wrap(~name_levels, nrow=2) + 
         xlab("Simulation tree") + 
         ylab("Count") + 
         labs(fill = paste(mname, "Model Matrix")) + 
