@@ -9,7 +9,7 @@
 REP=${SLURM_ARRAY_TASK_ID}
 TOPPATH=/csm_data/spielman_lab/dms_modelselection/
 ALNPATH=${TOPPATH}/simulations/alignments_empirical/
-OUTPATH=${TOPPATH}/fitted_trees_empirical/
+OUTPATH=${TOPPATH}/fitted_trees_empirical_range/
 NAME=$1
 cd $TOPPATH
 for TREE in greenalga opisthokonta prum ruhfel salichos dosreis andersen rayfinned spiralia; do

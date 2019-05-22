@@ -38,6 +38,12 @@ pandit_info <- read_csv("../pandit_aa_alignments/info.csv")
 empirical_sh <- read_csv("results_sh_empirical.csv")
 pandit_sh <- read_csv("results_sh_pandit.csv")
 
+## actual selected models
+msel_empirical <- read_csv("../processed_model_selection/quantile_model_selection_empirical.csv")
+all_sel <- read_csv("../processed_model_selection/all_model_selection_empirical.csv")
+msel_pandit <- read_csv("../processed_model_selection/quantile_model_selection_pandit.csv") %>% dplyr::select(-tree, -repl)
+
+
 
 
 ######### Normalize RF values #########
@@ -53,8 +59,6 @@ pandit_rf_fit %>%
 
 
 ############################### Simulation figures ################################
-
-
 
 #### Empirical fit results
 empirical_rf_fit %>%
@@ -146,15 +150,42 @@ empirical_rf_fit %>%
   filter(name == "NP") %>%
   ggplot(aes(x = model_levels, y = treelength, fill = model_levels)) + 
   geom_boxplot(outlier.size = 0.3, size=0.1) + 
-  scale_fill_brewer(palette = "RdYlBu", name = "Protein Model", labels = model_labels) +
+  scale_fill_brewer(palette = "RdYlBu", name = "", labels = model_labels) +
   facet_wrap(~tree_levels, scales="free_y", nrow = 3) +
   panel_border() +
   background_grid() +
   theme(axis.text.x = element_blank(),
        axis.text.y = element_text(size=7), 
-       axis.ticks.x = element_blank()) + 
+       axis.ticks.x = element_blank(), legend.position = "bottom") + 
+    guides(fill = guide_legend(nrow=1)) +
   xlab("Protein Models") + ylab("Inferred treelength") -> empirical_tl_boxplot_np
-save_plot(paste0(figure_directory,"empirical_tl_boxplot_NP.pdf"), empirical_tl_boxplot_np, base_width = 8)
+  
+
+msel_empirical %>% 
+    filter(name == "NP", tree == "opisthokonta") %>% 
+    rowwise() %>% 
+    mutate(model_matrix = str_split(model, "\\+")[[1]][1],
+           model = paste0("q", modelq)) %>%
+    dplyr::select(-modelq) %>% 
+    rename(rep = repl) -> np_models
+
+empirical_rf_fit %>% 
+    filter(name == "NP", optim == "inferredtree", tree == "opisthokonta") %>%
+    dplyr::select(name, tree, rep, treelength, model, BIC) %>%
+    left_join(np_models) %>%
+    mutate(model_matrix = ifelse(is.na(model_matrix), "Poisson", model_matrix)) %>%
+    mutate(model_levels = factor(model, levels = model_levels, labels = model_labels)) %>%
+    ggplot(aes(x = model_levels, y = treelength, group = rep)) + 
+    geom_point(aes(color = model_matrix), alpha = 0.9)  + geom_line(alpha=0.5, color="grey70") +
+    xlab("Protein Model") + ylab("Inferred treelength") + 
+    theme(legend.position = "bottom", legend.spacing.x = unit(0.01, 'cm'), legend.key.size = unit(0.45, 'cm'), legend.key = element_rect(size=0.5), legend.text = element_text(size=6), legend.title= element_text(size=8) ) + 
+    panel_border() + 
+    guides(color = guide_legend(nrow=2)) + labs(color = "Model matrix") +
+    ggtitle("NP simulation replicates along the Opisthokonta tree") -> np_opis_tl_lineplot
+    
+bl_plots <- plot_grid(empirical_tl_boxplot_np, np_opis_tl_lineplot, nrow=1, labels="auto", scale=0.95)
+
+save_plot(paste0(figure_directory,"empirical_tl_np_panels.pdf"), bl_plots, base_width = 12)
 
 
 
@@ -262,13 +293,9 @@ save_plot(paste0(figure_directory,"pandit_fit_rf_tl.pdf"), pandit_grid_withlegen
 
 
 
+
 #### Plot schematic for q1-q5
-msel <- read_csv("../processed_model_selection/quantile_model_selection_empirical.csv")
-all_sel <- read_csv("../processed_model_selection/all_model_selection_empirical.csv")
-
-
-
-scheme_name <- "HA"
+scheme_name <- "NP"
 scheme_tree <- "spiralia"
 scheme_rep <- 1
 all_sel %>% 
@@ -301,7 +328,7 @@ save_plot(paste0(figure_directory,"bic_dist_scheme.pdf"), scheme_plot)
 
 for (m in 1:5) {
     mname <- paste0("M", m)
-    msel %>%
+    msel_empirical %>%
         filter(modelq == m) %>%
         rowwise() %>%
         mutate(model_matrix = str_split(model, "\\+")[[1]][1]) %>%
@@ -320,16 +347,13 @@ for (m in 1:5) {
     save_plot(paste0(figure_directory, "selected_", mname, "_empirical_barplot.pdf"), selected_m_plot, base_width=16, base_height = 6) 
 }
 
+      
     
-    
-    
-    
-msel <- read_csv("../processed_model_selection/quantile_model_selection_pandit.csv") %>% dplyr::select(-tree, -repl)
 x <- 1
 plot_list <- c()
 for (m in 1:5) {
     mname <- paste0("M", m)
-    msel %>%
+    msel_pandit %>%
         filter(modelq == m) %>%
         rowwise() %>%
         mutate(model_matrix = str_split(model, "\\+")[[1]][1]) %>%
