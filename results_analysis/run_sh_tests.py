@@ -9,14 +9,16 @@ sh_index = iqtree_topline.index("p-SH")
 model_order    = ["r1", "r2", "r3", "r4", "r5", "poisson"]
 
 type = sys.argv[1]
+replicate = sys.argv[2]
+
+outfile        = "results_sh_" + type + "empirical_range_" + replicate + ".csv"
+treelist_name  = type + ".trees"
 
 if type == "pandit":
     alignmentpath = "../pandit_aa_alignments/"
     inferencepath = "../fitted_trees_pandit_range/"
     quantilefile  = "../processed_model_selection/range_model_selection_pandit.csv"
-    treelist_name = "treelist_pandit.trees"
-    outfile       = "results_sh_pandit_range.csv"
-
+    
 
 
 elif type == "empirical":
@@ -27,10 +29,8 @@ elif type == "empirical":
     quantilefile   = "../processed_model_selection/range_model_selection_empirical.csv"
     dms_list       = ["Gal4", "LAC", "NP", "HA", "HIV"]
     treenames      = ["greenalga", "andersen", "dosreis", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]       
-    reps           = 20
-    treelist_name  = "treelist_empirical.trees"
-    outfile        = "results_sh_empirical_range.csv"
-    
+   # reps           = 20
+    replicate      = int(replicate)
   
 
 def determine_best_models(type, quantilefile):
@@ -61,7 +61,7 @@ def determine_best_models(type, quantilefile):
 def run_tests(alnfile, model, name, outstring):
 
     ## Call the SH test
-    os.system("iqtree -quiet -nt 4 -s " + alnfile + " -m " + model + " -z " + treelist_name + " -zb 1000 -redo")
+    os.system("iqtree -quiet -nt 6 -s " + alnfile + " -m " + model + " -z " + treelist_name + " -zb 1000 -redo")
 
     ## Parse out p-values
     with open(alnfile + ".iqtree", "r") as f:
@@ -92,7 +92,7 @@ def run_tests(alnfile, model, name, outstring):
 def loop_over_tests(type):
 
     if type == "pandit":
-        outstring = "name,r1,r2,r3,r4,r5,poisson\n"
+        #outstring = "name,r1,r2,r3,r4,r5,poisson\n"
         for name in list(fitmodels.keys()):
             print(name)
             inferred_trees_raw = [x for x in os.listdir(inferencepath) if x.startswith(name) and x.endswith("inferredtree.treefile")]
@@ -110,12 +110,12 @@ def loop_over_tests(type):
 
 
     if type == "empirical":
-        outstring  = "name,tree,repl,r1,r2,r3,r4,r5,poisson,true\n"
+        #outstring  = "name,tree,repl,r1,r2,r3,r4,r5,poisson,true\n"
         for name in dms_list:
             print(name)
             for tree in treenames:
                 print("  ", tree)
-                for rep in range(1,reps+1):
+                for rep in range(replicate,replicate+1):
                     print("  ", rep)
                     rawname = "_".join([name, tree, "rep" + str(rep), "AA"])
                     inferred_trees_raw = [x for x in os.listdir(inferencepath) if x.startswith(rawname) and x.endswith("inferredtree.treefile")]
