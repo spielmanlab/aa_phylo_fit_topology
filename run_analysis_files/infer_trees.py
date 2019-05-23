@@ -37,7 +37,7 @@ def main():
     if tree == "NA":
         rawname = name
         ###### !!!!!!!!! q1 tree here !!!!!!!!!
-        true_tree_file = fitted_tree_path + name + "_q1_inferredtree.treefile"
+        true_tree_file = fitted_tree_path + name + "_r1_inferredtree.treefile"
     else:
         rawname        = name + "_" + tree + "_rep" + repl + "_AA"
         true_tree_file =  "simulations/true_trees/" + tree + ".tree"
@@ -49,17 +49,17 @@ def main():
     for line in all_models:
         if line.startswith(name + "," + tree + "," + repl):
             line2 = line.split(",")
-            model = line2[3].strip()
-            q = line2[4].strip()
+            model = line2[4].strip()
+            q = line2[5].strip()
             use_models[q] = model
         
     # quartile models    
-    for modelquant in range(1,6):
-        outname = fitted_tree_path + rawname + "_q" + str(modelquant)
+    for modelquant in range(2,5): ## only run 2,3,4 as 1/5 are the same as previously
+        outname = fitted_tree_path + rawname + "_r" + str(modelquant)
         run_save_iqtree(alignment_file, "AA", use_models[str(modelquant)], outname, true_tree_file, threads)
     ## poisson
-    outname = fitted_tree_path + rawname + "_poisson"
-    run_save_iqtree(alignment_file, "AA", "Poisson", outname, true_tree_file, threads)
+    #outname = fitted_tree_path + rawname + "_poisson"
+    #run_save_iqtree(alignment_file, "AA", "Poisson", outname, true_tree_file, threads)
              
 
 main()

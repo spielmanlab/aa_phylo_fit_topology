@@ -1,0 +1,107 @@
+IQ-TREE multicore version 1.6.7 for Linux 64-bit built Aug 23 2018
+Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor,
+Heiko Schmidt, Dominik Schrempf, Michael Woodhams.
+
+Host:    csm-com-009 (AVX2, FMA3, 62 GB RAM)
+Command: iqtree -nt 8 -m Blosum62+F+I -s /csm_data/spielman_lab/dms_modelselection//simulations/alignments_empirical/HA_greenalga_rep5_AA.fasta -st AA
+Seed:    282677 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Thu May 23 11:02:19 2019
+Kernel:  AVX+FMA - 8 threads (48 CPU cores detected)
+
+Reading alignment file /csm_data/spielman_lab/dms_modelselection//simulations/alignments_empirical/HA_greenalga_rep5_AA.fasta ... Fasta format detected
+Alignment most likely contains protein sequences
+Alignment has 23 sequences with 564 columns, 504 distinct patterns
+393 parsimony-informative, 96 singleton sites, 75 constant sites
+                                Gap/Ambiguity  Composition  p-value
+   1  Schizomeris_leibleinii            0.00%    passed     96.93%
+   2  Stigeoclonium_helveticum          0.00%    passed     96.86%
+   3  Floydiella_terrestris             0.00%    passed     74.99%
+   4  Oedogonium_cardiacum              0.00%    passed     99.54%
+   5  Dunaliella_salina                 0.00%    passed     98.19%
+   6  Chlamydomonas_reinhardtii         0.00%    passed     99.82%
+   7  Gonium_pectorale                  0.00%    passed     99.71%
+   8  Pleodorina_starrii                0.00%    passed     98.26%
+   9  Volvox_carteri                    0.00%    passed     99.82%
+  10  Bracteacoccus_aerius              0.00%    passed    100.00%
+  11  Bracteacoccus_minor               0.00%    passed     99.84%
+  12  Mychonastes_homosphaera           0.00%    passed     99.75%
+  13  Pseudomuriella_schumacherensis    0.00%    passed     99.99%
+  14  Kirchneriella_aperta              0.00%    passed     99.80%
+  15  Ourococcus_multisporus            0.00%    passed     98.92%
+  16  Pediastrum_duplex                 0.00%    passed     99.93%
+  17  Chlorotetraedron_incus            0.00%    passed    100.00%
+  18  Neochloris_aquatica               0.00%    passed     99.08%
+  19  Scenedesmus_obliquus              0.00%    passed     97.41%
+  20  Rotundella_rotunda                0.00%    passed     97.70%
+  21  Chromochloris_zofingiensis        0.00%    passed    100.00%
+  22  Atractomorpha_echinata            0.00%    passed     99.63%
+  23  Ankyra_judai                      0.00%    passed     99.44%
+****  TOTAL                             0.00%  0 sequences failed composition chi2 test (p-value<5%; df=19)
+
+Create initial parsimony tree by phylogenetic likelihood library (PLL)... 0.004 seconds
+
+NOTE: 1 MB RAM (0 GB) is required!
+Estimate model parameters (epsilon = 0.100)
+1. Initial log-likelihood: -11615.058
+2. Current log-likelihood: -11573.204
+3. Current log-likelihood: -11572.846
+Optimal log-likelihood: -11572.835
+Proportion of invariable sites: 0.099
+Parameters optimization took 3 rounds (0.057 sec)
+Computing ML distances based on estimated model parameters... 0.070 sec
+Computing BIONJ tree...
+0.002 seconds
+Log-likelihood of BIONJ tree: -11584.234
+--------------------------------------------------------------------
+|             INITIALIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Generating 98 parsimony trees... 0.444 second
+Computing log-likelihood of 98 initial trees ... 0.655 seconds
+Current best score: -11572.835
+
+Do NNI search on 20 best initial trees
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 1: -11572.835
+Iteration 10 / LogL: -11572.846 / Time: 0h:0m:1s
+Iteration 20 / LogL: -11573.600 / Time: 0h:0m:2s
+Finish initializing candidate tree set (1)
+Current best tree score: -11572.835 / CPU time: 1.947
+Number of iterations: 20
+--------------------------------------------------------------------
+|               OPTIMIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Iteration 30 / LogL: -11572.837 / Time: 0h:0m:2s (0h:0m:6s left)
+Iteration 40 / LogL: -11572.843 / Time: 0h:0m:3s (0h:0m:4s left)
+Iteration 50 / LogL: -11572.848 / Time: 0h:0m:3s (0h:0m:3s left)
+Iteration 60 / LogL: -11572.865 / Time: 0h:0m:4s (0h:0m:3s left)
+Iteration 70 / LogL: -11573.015 / Time: 0h:0m:4s (0h:0m:2s left)
+Iteration 80 / LogL: -11572.852 / Time: 0h:0m:5s (0h:0m:1s left)
+Iteration 90 / LogL: -11572.836 / Time: 0h:0m:6s (0h:0m:0s left)
+Iteration 100 / LogL: -11651.305 / Time: 0h:0m:6s (0h:0m:0s left)
+TREE SEARCH COMPLETED AFTER 102 ITERATIONS / Time: 0h:0m:6s
+
+--------------------------------------------------------------------
+|                    FINALIZING TREE SEARCH                        |
+--------------------------------------------------------------------
+Performs final model parameters optimization
+Estimate model parameters (epsilon = 0.010)
+1. Initial log-likelihood: -11572.835
+Optimal log-likelihood: -11572.835
+Proportion of invariable sites: 0.099
+Parameters optimization took 1 rounds (0.008 sec)
+BEST SCORE FOUND : -11572.835
+Total tree length: 3.410
+
+Total number of iterations: 102
+CPU time used for tree search: 51.857 sec (0h:0m:51s)
+Wall-clock time used for tree search: 6.728 sec (0h:0m:6s)
+Total CPU time used: 52.620 sec (0h:0m:52s)
+Total wall-clock time used: 6.863 sec (0h:0m:6s)
+
+Analysis results written to: 
+  IQ-TREE report:                /csm_data/spielman_lab/dms_modelselection//simulations/alignments_empirical/HA_greenalga_rep5_AA.fasta.iqtree
+  Maximum-likelihood tree:       /csm_data/spielman_lab/dms_modelselection//simulations/alignments_empirical/HA_greenalga_rep5_AA.fasta.treefile
+  Likelihood distances:          /csm_data/spielman_lab/dms_modelselection//simulations/alignments_empirical/HA_greenalga_rep5_AA.fasta.mldist
+  Screen log file:               /csm_data/spielman_lab/dms_modelselection//simulations/alignments_empirical/HA_greenalga_rep5_AA.fasta.log
+
+Date and Time: Thu May 23 11:02:26 2019
