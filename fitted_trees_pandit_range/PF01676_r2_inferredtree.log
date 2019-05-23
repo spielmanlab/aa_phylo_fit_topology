@@ -1,0 +1,129 @@
+IQ-TREE multicore version 1.6.7 for Linux 64-bit built Aug 23 2018
+Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor,
+Heiko Schmidt, Dominik Schrempf, Michael Woodhams.
+
+Host:    csm-gpu-001 (AVX2, FMA3, 62 GB RAM)
+Command: iqtree -nt 8 -m FLU+I+G4 -s /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF01676.fasta -st AA
+Seed:    810627 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Wed May 22 21:16:21 2019
+Kernel:  AVX+FMA - 8 threads (48 CPU cores detected)
+
+Reading alignment file /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF01676.fasta ... Fasta format detected
+Alignment most likely contains protein sequences
+Alignment has 28 sequences with 130 columns, 127 distinct patterns
+110 parsimony-informative, 10 singleton sites, 10 constant sites
+                   Gap/Ambiguity  Composition  p-value
+   1  GPMIPORPU371486     10.77%    failed      4.95%
+   2  GPMISYNY3368483     10.77%    passed     83.76%
+   3  GPMIANTSP369484     10.77%    failed      0.27%
+   4  O44742CAEEL396511   10.77%    passed     24.90%
+   5  GPMIBACSU372487     10.77%    passed     61.21%
+   6  GPMIPSESM369485     10.00%    passed     65.70%
+   7  GPMIECOLI373489     10.00%    passed     78.84%
+   8  PMGITOBAC400527      1.54%    passed     94.78%
+   9  PMGIMESCR400527      1.54%    passed     82.97%
+  10  PMGIRICCO397524      1.54%    passed     36.09%
+  11  PMGIMAIZE400527      1.54%    passed     94.03%
+  12  GPMIMYCPN367482     10.77%    failed      0.88%
+  13  GPMIMYCGE367482     10.77%    failed      0.32%
+  14  GPMIHELPY356471     10.77%    passed     61.84%
+  15  YHFWECOLI268376     16.15%    passed     10.71%
+  16  DEOBECOLI276385     15.38%    failed      2.53%
+  17  DEOBHELPY276385     15.38%    passed     24.03%
+  18  DEOBLACLC276385     15.38%    passed     63.99%
+  19  DEOBBACST257366     15.38%    passed     39.79%
+  20  DEOBBACSU258367     15.38%    passed     73.07%
+  21  APGM2METTH267375    16.15%    passed     14.30%
+  22  APGM2ARCFU253361    16.15%    passed     12.18%
+  23  APGMPYRHO275382     16.92%    passed     99.28%
+  24  APGM1METJA274381    16.92%    passed     36.89%
+  25  APGM1ARCFU272378    17.69%    passed     54.47%
+  26  APGM1METTH276379    20.00%    passed     20.91%
+  27  APGM2METJA273378    18.46%    passed     20.64%
+  28  APGMAQUAE273377     19.23%    failed      0.45%
+****  TOTAL               12.39%  6 sequences failed composition chi2 test (p-value<5%; df=19)
+
+Create initial parsimony tree by phylogenetic likelihood library (PLL)... 0.004 seconds
+
+NOTE: 2 MB RAM (0 GB) is required!
+WARNING: Number of threads seems too high for short alignments. Use -nt AUTO to determine best number of threads.
+Estimate model parameters (epsilon = 0.100)
+Thoroughly optimizing +I+G parameters from 10 start values...
+Init pinv, alpha: 0.000, 1.000 / Estimate: 0.046, 1.636 / LogL: -6011.831
+Init pinv, alpha: 0.009, 1.000 / Estimate: 0.046, 1.642 / LogL: -6011.839
+Init pinv, alpha: 0.017, 1.000 / Estimate: 0.046, 1.641 / LogL: -6011.836
+Init pinv, alpha: 0.026, 1.000 / Estimate: 0.046, 1.640 / LogL: -6011.835
+Init pinv, alpha: 0.034, 1.000 / Estimate: 0.046, 1.639 / LogL: -6011.835
+Init pinv, alpha: 0.043, 1.000 / Estimate: 0.046, 1.639 / LogL: -6011.834
+Init pinv, alpha: 0.051, 1.000 / Estimate: 0.046, 1.639 / LogL: -6011.834
+Init pinv, alpha: 0.060, 1.000 / Estimate: 0.046, 1.639 / LogL: -6011.834
+Init pinv, alpha: 0.068, 1.000 / Estimate: 0.046, 1.638 / LogL: -6011.833
+Init pinv, alpha: 0.077, 1.000 / Estimate: 0.046, 1.638 / LogL: -6011.833
+Optimal pinv,alpha: 0.046, 1.636 / LogL: -6011.831
+
+Parameters optimization took 0.461 sec
+Computing ML distances based on estimated model parameters... 0.348 sec
+Computing BIONJ tree...
+0.002 seconds
+Log-likelihood of BIONJ tree: -5999.591
+--------------------------------------------------------------------
+|             INITIALIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Generating 98 parsimony trees... 0.316 second
+Computing log-likelihood of 98 initial trees ... 0.877 seconds
+Current best score: -5989.146
+
+Do NNI search on 20 best initial trees
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 1: -5981.794
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 7: -5980.290
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 10: -5979.929
+Iteration 10 / LogL: -5979.929 / Time: 0h:0m:2s
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 12: -5979.241
+Iteration 20 / LogL: -5986.301 / Time: 0h:0m:2s
+Finish initializing candidate tree set (12)
+Current best tree score: -5979.241 / CPU time: 2.342
+Number of iterations: 20
+--------------------------------------------------------------------
+|               OPTIMIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Iteration 30 / LogL: -5983.551 / Time: 0h:0m:3s (0h:0m:10s left)
+Iteration 40 / LogL: -6034.793 / Time: 0h:0m:4s (0h:0m:8s left)
+Iteration 50 / LogL: -5979.930 / Time: 0h:0m:5s (0h:0m:7s left)
+Iteration 60 / LogL: -5979.342 / Time: 0h:0m:6s (0h:0m:6s left)
+Iteration 70 / LogL: -5979.930 / Time: 0h:0m:8s (0h:0m:4s left)
+Iteration 80 / LogL: -5979.241 / Time: 0h:0m:8s (0h:0m:3s left)
+Iteration 90 / LogL: -5981.075 / Time: 0h:0m:10s (0h:0m:2s left)
+Iteration 100 / LogL: -5979.712 / Time: 0h:0m:11s (0h:0m:1s left)
+Iteration 110 / LogL: -5979.342 / Time: 0h:0m:12s (0h:0m:0s left)
+TREE SEARCH COMPLETED AFTER 113 ITERATIONS / Time: 0h:0m:12s
+
+--------------------------------------------------------------------
+|                    FINALIZING TREE SEARCH                        |
+--------------------------------------------------------------------
+Performs final model parameters optimization
+Estimate model parameters (epsilon = 0.010)
+1. Initial log-likelihood: -5979.241
+Optimal log-likelihood: -5979.241
+Proportion of invariable sites: 0.045
+Gamma shape alpha: 1.720
+Parameters optimization took 1 rounds (0.008 sec)
+BEST SCORE FOUND : -5979.241
+Total tree length: 23.948
+
+Total number of iterations: 113
+CPU time used for tree search: 94.092 sec (0h:1m:34s)
+Wall-clock time used for tree search: 11.916 sec (0h:0m:11s)
+Total CPU time used: 98.433 sec (0h:1m:38s)
+Total wall-clock time used: 12.474 sec (0h:0m:12s)
+
+Analysis results written to: 
+  IQ-TREE report:                /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF01676.fasta.iqtree
+  Maximum-likelihood tree:       /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF01676.fasta.treefile
+  Likelihood distances:          /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF01676.fasta.mldist
+  Screen log file:               /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF01676.fasta.log
+
+Date and Time: Wed May 22 21:16:34 2019
