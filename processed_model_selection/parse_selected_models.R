@@ -81,7 +81,7 @@ if (type == "empirical")
                         mutate(thisbic = min(bic) + (r-1)*r_step, 
                             diffbic = abs(bic - thisbic)) %>%
                         filter(diffbic == min(diffbic)) %>%
-                        dplyr::select(name, tree, repl, model) %>%
+                        dplyr::select(name, tree, repl, model, bic) %>%
                         mutate(modelr = r) -> tempdat
                         if (nrow(tempdat) >1 )
                         {

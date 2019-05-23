@@ -6,30 +6,30 @@ import re
 
 iqtree_topline = ['Tree', 'logL', 'deltaL', 'bp-RELL', 'p-KH', 'p-SH', 'c-ELW']
 sh_index = iqtree_topline.index("p-SH")
-model_order    = ["q1", "q2", "q3", "q4", "q5", "poisson"]
+model_order    = ["r1", "r2", "r3", "r4", "r5", "poisson"]
 
 type = sys.argv[1]
 
 if type == "pandit":
     alignmentpath = "../pandit_aa_alignments/"
-    inferencepath = "../fitted_trees_pandit/"
-    quantilefile  = "../processed_model_selection/quantile_model_selection_pandit.csv"
+    inferencepath = "../fitted_trees_pandit_range/"
+    quantilefile  = "../processed_model_selection/range_model_selection_pandit.csv"
     treelist_name = "treelist_pandit.trees"
-    outfile       = "results_sh_pandit.csv"
+    outfile       = "results_sh_pandit_range.csv"
 
 
 
 elif type == "empirical":
     sim_path       = "../simulations/"
     true_tree_path = sim_path + "true_trees/"
-    inferencepath  = "../fitted_trees_empirical/"
+    inferencepath  = "../fitted_trees_empirical_range/"
     alignmentpath  = sim_path + "alignments_empirical/"
-    quantilefile   = "../processed_model_selection/quantile_model_selection_empirical.csv"
+    quantilefile   = "../processed_model_selection/range_model_selection_empirical.csv"
     dms_list       = ["Gal4", "LAC", "NP", "HA", "HIV"]
     treenames      = ["greenalga", "andersen", "dosreis", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]       
     reps           = 20
     treelist_name  = "treelist_empirical.trees"
-    outfile        = "results_sh_empirical.csv"
+    outfile        = "results_sh_empirical_range.csv"
     
   
 
@@ -41,8 +41,8 @@ def determine_best_models(type, quantilefile):
     if type == "pandit":
         for qline in qlines:
             name = qline.split(",")[0]
-            model = qline.split(",")[3]
-            quant = qline.split(",")[4].strip()
+            model = qline.split(",")[4]
+            quant = qline.split(",")[5].strip()
             if quant == "1":
                 fitmodels[name] = model
     if type == "empirical":
@@ -51,8 +51,8 @@ def determine_best_models(type, quantilefile):
             tree = qline.split(",")[1]
             rep = "rep" + qline.split(",")[2]
             prefix = "_".join([name, tree, rep, "AA"])
-            model = qline.split(",")[3]
-            quant = qline.split(",")[4].strip()
+            model = qline.split(",")[4]
+            quant = qline.split(",")[5].strip()
             if quant == "1":
                 fitmodels[prefix] = model
     return(fitmodels)
@@ -92,8 +92,9 @@ def run_tests(alnfile, model, name, outstring):
 def loop_over_tests(type):
 
     if type == "pandit":
-        outstring = "name,q1,q2,q3,q4,q5,poisson\n"
+        outstring = "name,r1,r2,r3,r4,r5,poisson\n"
         for name in list(fitmodels.keys()):
+            print(name)
             inferred_trees_raw = [x for x in os.listdir(inferencepath) if x.startswith(name) and x.endswith("inferredtree.treefile")]
             inferred_trees_ordered = [] 
             for model in model_order:
@@ -109,8 +110,9 @@ def loop_over_tests(type):
 
 
     if type == "empirical":
-        outstring  = "name,tree,repl,q1,q2,q3,q4,q5,poisson,true\n"
+        outstring  = "name,tree,repl,r1,r2,r3,r4,r5,poisson,true\n"
         for name in dms_list:
+            print(name)
             for tree in treenames:
                 print("  ", tree)
                 for rep in range(1,reps+1):
@@ -134,7 +136,7 @@ def loop_over_tests(type):
                             f.write(ts +"\n")
                             
                     outstring += run_tests(alignmentpath + rawname + ".fasta", fitmodels[rawname], ",".join([name, tree, str(rep)]), outstring)
-                    print(outstring)
+                    #print(outstring)
     return(outstring)
 
             
