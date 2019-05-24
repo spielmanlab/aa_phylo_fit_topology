@@ -6,16 +6,16 @@ import pprint
 
 sim_path       = "../simulations/"
 truepath       = sim_path + "true_trees/"
-inferencepath  = "../fitted_trees_empirical/"
+inferencepath  = "../fitted_trees_empirical_range/"
 dms_list       = ["NP", "LAC", "Gal4", "HA", "HIV"]
-treenames      = ["andersen", "dosreis", "greenalga", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]       
+treenames      = ["andersen", "dosreis", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]       
 reps           = 20
 
 
 fileinfo_order = ["name", "tree", "rep", "model", "optim"]
 fitinfo_order  = ["logl", "k", "AIC", "AICc", "BIC"]
 
-outfile = "inference_results_empirical.csv"
+outfile = "inference_results_empirical_range.csv"
 outstring = ",".join(fileinfo_order) + "," + ",".join(fitinfo_order) +",rf_true,treelength\n"
 
 iqfiles_all = [x for x in os.listdir(inferencepath) if x.endswith(".iqtree")]

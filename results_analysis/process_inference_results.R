@@ -18,10 +18,10 @@ model_labels <- c("M1", "M2", "M3", "M4", "M5", "Poisson")
 model_levels_noq1 <- c("q2", "q3", "q4", "q5", "poisson")
 model_labels_noq1 <- c("M2", "M3", "M4", "M5", "Poisson")
 
-tree_levels <- c("ruhfel", "rayfinned", "dosreis", "prum", "andersen", "spiralia", "opisthokonta", "greenalga", "salichos")
-tree_labels <- c("Green Plant", "Ray-finned fish", "Mammals", "Aves", "Lassa Virus", "Spiralia", "Opisthokonta", "Green Algae", "Yeast")
-tree_labels_twolines <- c("Green\nPlant", "Ray-finned\nfish", "Mammals", "Aves", "Lassa\nVirus", "Spiralia", "Opisthokonta", "Green\nAlgae", "Yeast")
-tree_labels_ntaxa <- c("Green Plant (360)", "Ray-finned fish (305)", "Mammals (274)", "Aves (200)", "Lassa Virus (179)", "Spiralia (103)", "Opisthokonta (70)", "Green Algae (23)", "Yeast (23)")
+tree_levels <- c("ruhfel", "rayfinned", "dosreis", "prum", "andersen", "spiralia", "opisthokonta", "salichos")
+tree_labels <- c("Green Plant", "Ray-finned fish", "Mammals", "Aves", "Lassa Virus", "Spiralia", "Opisthokonta", "Yeast")
+tree_labels_twolines <- c("Green\nPlant", "Ray-finned\nfish", "Mammals", "Aves", "Lassa\nVirus", "Spiralia", "Opisthokonta", "Yeast")
+tree_labels_ntaxa <- c("Green Plant (360)", "Ray-finned fish (305)", "Mammals (274)", "Aves (200)", "Lassa Virus (179)", "Spiralia (103)", "Opisthokonta (70)", "Yeast (23)")
 
 
 ################################### Read in all data ##################################
@@ -49,6 +49,7 @@ msel_pandit <- read_csv("../processed_model_selection/quantile_model_selection_p
 ######### Normalize RF values #########
 empirical_rf_fit %>% 
     left_join(emp_info) %>%
+    filter(tree != "greenalga") %>%
     mutate(max_rf = 2*ntaxa - 6) %>%
     mutate(rf_true_norm = rf_true/max_rf) -> empirical_rf_fit
 
@@ -75,8 +76,17 @@ empirical_rf_fit %>%
     panel_border() + 
     scale_fill_brewer(palette = "RdYlBu", name = "Protein Model") +
     xlab("Model rank by BIC") + ylab("Count") + 
-    theme(strip.text = element_text(size=9)) -> model_fit_empirical_bars
-save_plot(paste0(figure_directory,"model_fit_empirical_bars.pdf"), model_fit_empirical_bars, base_width=10)
+    theme(strip.text = element_text(size=8), 
+          legend.position = "bottom", 
+          legend.key.size = unit(4, "pt"), 
+          legend.text = element_text(size=6), 
+          legend.title = element_text(size=7), 
+          axis.text = element_text(size=7), 
+          axis.title = element_text(size=8)) +
+    guides(fill = guide_legend(nrow=1)) -> model_fit_empirical_bars
+l <- get_legend(model_fit_empirical_bars)
+both <- plot_grid(model_fit_empirical_bars + theme(legend.position = "none"), l, nrow=2, rel_heights=c(1,0.05))
+save_plot(paste0(figure_directory,"model_fit_empirical_bars.pdf"), both, base_width=7)
   
   
   
@@ -109,14 +119,15 @@ empirical_rf_fit %>%
   ggplot(aes(x = model_levels, y = rf_true_norm, fill = model_levels)) + 
   geom_boxplot(outlier.size = 0.3, size=0.1) + 
   scale_fill_brewer(palette = "RdYlBu", name = "Protein Model", labels = model_labels) +
-  facet_wrap(~tree_levels, scales="free_y", nrow = 3) +
+  facet_wrap(~tree_levels, scales="free_y", nrow = 2) +
   panel_border() +
   background_grid() +
   theme(axis.text.x = element_blank(),
        axis.text.y = element_text(size=7), 
-       axis.ticks.x = element_blank()) +
+       axis.ticks.x = element_blank(), legend.position = "bottom") +
+  guides(fill = guide_legend(nrow = 1)) +
   xlab("Protein Models") + ylab("Normalized RF Distance") -> empirical_rf_boxplot_np
-save_plot(paste0(figure_directory,"empirical_rf_boxplot_NP.pdf"), empirical_rf_boxplot_np, base_width = 8)
+save_plot(paste0(figure_directory,"empirical_rf_boxplot_NP.pdf"), empirical_rf_boxplot_np, base_width = 10)
 
 
 
@@ -151,7 +162,7 @@ empirical_rf_fit %>%
   ggplot(aes(x = model_levels, y = treelength, fill = model_levels)) + 
   geom_boxplot(outlier.size = 0.3, size=0.1) + 
   scale_fill_brewer(palette = "RdYlBu", name = "", labels = model_labels) +
-  facet_wrap(~tree_levels, scales="free_y", nrow = 3) +
+  facet_wrap(~tree_levels, scales="free_y", nrow = 2) +
   panel_border() +
   background_grid() +
   theme(axis.text.x = element_blank(),
@@ -165,8 +176,8 @@ msel_empirical %>%
     filter(name == "NP", tree == "opisthokonta") %>% 
     rowwise() %>% 
     mutate(model_matrix = str_split(model, "\\+")[[1]][1],
-           model = paste0("q", modelq)) %>%
-    dplyr::select(-modelq) %>% 
+           model = paste0("r", modelr)) %>%
+    dplyr::select(-modelr) %>% 
     rename(rep = repl) -> np_models
 
 empirical_rf_fit %>% 
@@ -235,10 +246,10 @@ pandit_rf_fit %>%
     ggplot(aes(x = factor(ic.rank), fill = model_levels)) + 
     geom_bar(color="black", size=.2) + 
     panel_border() + 
-    scale_fill_brewer(palette = "RdYlBu", name = "") +
+    scale_fill_brewer(palette = "RdYlBu", name = "Protein Models") +
     xlab("Model rank by BIC") + ylab("Count") + 
     theme(strip.text = element_text(size=9), legend.position = "bottom") +
-    guides( fill = guide_legend(nrow=1)) -> model_fit_pandit_bars
+    guides( fill = guide_legend(nrow=1, title.position = "top", title.hjust = 0.5)) -> model_fit_pandit_bars
 #save_plot(paste0(figure_directory,"model_fit_pandit_bars.pdf"), model_fit_pandit_bars, base_width=6)
   
   
@@ -278,13 +289,39 @@ pandit_rf_fit %>%
     scale_fill_manual(values = c("#FC8D59", "#FEE090", "#E0F3F8" ,"#91BFDB", "#4575B4"), name = "Protein Model", labels = model_labels_noq1) +
     xlab("Protein Models") + ylab("Normalized treelength") +
     theme(legend.position = "none") -> pandit_tl_norm
-    
+
+#### PANDIT results
+pandit_sh %>%
+    gather(model, pvalue, q1:poisson) %>% 
+    mutate(notsig = pvalue >= 0.01) %>%
+    group_by(model, notsig) %>%
+    tally() %>%
+    mutate(perc_in_conf=n/200) %>%
+    mutate(model_levels = factor(model, levels=model_levels, labels = model_labels)) -> pandit_sh_summary
+
+pandit_sh_summary  %>% filter(notsig == FALSE) %>% mutate(label = paste0(100*(perc_in_conf), "%")) -> pandit_sh_summary_false
+pandit_sh_summary %>%
+  mutate(notsig = factor(notsig, levels=c("TRUE", "FALSE"))) %>%
+    ggplot(aes(x = model_levels, y = perc_in_conf, fill = notsig)) + 
+        geom_col() +
+        geom_text(data = pandit_sh_summary_false, aes(x = model_levels, y = perc_in_conf -.015, label = label), size=2) + 
+        scale_fill_hue(l=60, name = "In M1 confidence set") +
+        xlab("Models") + ylab("Percent of trees") +
+        theme(legend.position = "bottom") + 
+        guides(fill = guide_legend(nrow=1, title.position = "top", title.hjust = 0.5))-> pandit_sh_barplot
+        
   
 model_fit_legend <- get_legend(model_fit_pandit_bars)
 model_fit_pandit_bars_nolegend <- model_fit_pandit_bars + theme(legend.position = "none")
-pandit_grid <- plot_grid(model_fit_pandit_bars_nolegend, rf_q1_pandit_plot, pandit_tl_norm, scale=0.92, nrow=1, labels="auto")
-pandit_grid_withlegend <- plot_grid(pandit_grid, model_fit_legend, nrow=2, rel_heights=c(1, 0.1))
-save_plot(paste0(figure_directory,"pandit_fit_rf_tl.pdf"), pandit_grid_withlegend, base_width=12, base_height=3.5)
+pandit_sh_barplot_legend <- get_legend(pandit_sh_barplot)
+pandit_sh_barplot_nolegend <- pandit_sh_barplot + theme(legend.position = "none")
+
+
+toprow <- plot_grid(model_fit_pandit_bars_nolegend, rf_q1_pandit_plot, pandit_sh_barplot_nolegend, scale=0.92, nrow=1, labels="auto")
+legendrow <- plot_grid(model_fit_legend, pandit_sh_barplot_legend, nrow=1, rel_widths=c(0.7, 0.3))
+pandit_plots <- plot_grid(toprow, legendrow, nrow=2, rel_heights=c(0.8, 0.15) )
+
+save_plot(paste0(figure_directory,"pandit_fit_rf_m1set.pdf"), pandit_plots, base_width=12)
 
 
 
@@ -296,33 +333,68 @@ save_plot(paste0(figure_directory,"pandit_fit_rf_tl.pdf"), pandit_grid_withlegen
 
 #### Plot schematic for q1-q5
 scheme_name <- "NP"
-scheme_tree <- "spiralia"
+scheme_tree <- "opisthokonta"
 scheme_rep <- 1
 all_sel %>% 
   dplyr::select(name, tree, model, bic, repl) %>%
   filter(name == scheme_name, tree == scheme_tree, repl == scheme_rep) -> scheme_data
   
-quant <- quantile(scheme_data$bic)
-scheme_data %>%
-  ggplot(aes(x = "", y = bic)) + 
-    geom_boxplot(fill = "firebrick3") +
-    xlab("") + ylab("BIC values across all tested models") +
-    theme(axis.ticks.x = element_blank(),
-          panel.border = element_blank(),
-          axis.line = element_line(color = 'black'), 
-          plot.margin = margin(0.5, 1, 0, 0.5, "cm")) +
-    geom_segment(x = 1.5, y = quant[[1]], xend = 1.02, yend = quant[[1]], color = "grey40", arrow = arrow(length = unit(0.03, "npc"), type = "closed")) +
-    annotate(geom = "text", x = 1.55, y = min(scheme_data$bic), label = "M1") +
-    geom_segment(x = 1.5, y = quant[[2]], xend = 1.4, yend = quant[[2]], color = "grey40", arrow = arrow(length = unit(0.03, "npc"), type = "closed")) +
-    annotate(geom = "text", x = 1.55, y = quant[[2]], label = "M2") +
-    geom_segment(x = 1.5, y = quant[[3]], xend = 1.4, yend = quant[[3]], color = "grey40", arrow = arrow(length = unit(0.03, "npc"), type = "closed")) +
-    annotate(geom = "text", x = 1.55, y = quant[[3]], label = "M3") +
-    geom_segment(x = 1.5, y = quant[[4]], xend = 1.4, yend = quant[[4]], color = "grey40", arrow = arrow(length = unit(0.03, "npc"), type = "closed")) +
-    annotate(geom = "text", x = 1.55, y = quant[[4]], label = "M4") +
-    geom_segment(x = 1.5, y = quant[[5]], xend = 1.02, yend = quant[[5]], color = "grey40", arrow = arrow(length = unit(0.03, "npc"), type = "closed")) +
-    annotate(geom = "text", x = 1.55, y = quant[[5]], label = "M5")  -> scheme_plot
-   
-save_plot(paste0(figure_directory,"bic_dist_scheme.pdf"), scheme_plot) 
+msel_empirical %>%
+    filter(name == scheme_name, tree == scheme_tree, repl == scheme_rep) %>%
+    mutate(model_levels= factor(modelr, labels=c("M1", "M2", "M3", "M4", "M5"))) -> chunks
+#full_range <- max(chunks$bic) - min(chunks$bic) # 18607.68
+#standard_chunk <- full_range / 4                # 4651.92
+
+msel2 <- read_csv("../processed_model_selection/quantile_model_selection_empirical.csv")
+msel2 %>%
+  filter(name == scheme_name, tree == scheme_tree, repl == scheme_rep) %>%
+  mutate(model_levels= factor(modelq, labels=c("M1", "M2", "M3", "M4", "M5"))) %>%
+  rowwise() %>%
+  mutate(model_levels_matrix = paste0(model_levels, " (", model, ")")) %>%
+  left_join(scheme_data) -> chunks
+
+ggplot(scheme_data, aes(x = "", y = bic)) + 
+    geom_violin(scale="width", fill="grey80", color = "grey70", alpha=0.6) + 
+  geom_point(alpha = 0.3, size=2) +
+  geom_point(data = chunks, aes(x = 1, y = bic, color = model_levels_matrix), size=2) + 
+    geom_text(data = chunks, x = 1.02, hjust="outward", aes(y = bic+250, color = model_levels_matrix, label = model_levels_matrix), size=5, fontface = "bold") + 
+    scale_color_brewer(palette = "RdYlBu") +
+    theme(legend.position = "none", axis.ticks.x = element_blank()) +
+    xlab("") + ylab("BIC values across all tested models")-> range_scheme_plot
+
+ggsave(paste0(figure_directory, "bic_dist_scheme_qviolin.pdf"), range_scheme_plot, width = 6, height=7)
+    
+
+  
+  
+  
+  
+  
+  
+  
+  
+#### Box plot version  
+# quant <- quantile(scheme_data$bic)
+# scheme_data %>%
+#   ggplot(aes(x = "", y = bic)) + 
+#     geom_boxplot(fill = "firebrick3") +
+#     xlab("") + ylab("BIC values across all tested models") +
+#     theme(axis.ticks.x = element_blank(),
+#           panel.border = element_blank(),
+#           axis.line = element_line(color = 'black'), 
+#           plot.margin = margin(0.5, 1, 0, 0.5, "cm")) +
+#     geom_segment(x = 1.5, y = quant[[1]], xend = 1.02, yend = quant[[1]], color = "grey40", arrow = arrow(length = unit(0.03, "npc"), type = "closed")) +
+#     annotate(geom = "text", x = 1.55, y = min(scheme_data$bic), label = "M1") +
+#     geom_segment(x = 1.5, y = quant[[2]], xend = 1.4, yend = quant[[2]], color = "grey40", arrow = arrow(length = unit(0.03, "npc"), type = "closed")) +
+#     annotate(geom = "text", x = 1.55, y = quant[[2]], label = "M2") +
+#     geom_segment(x = 1.5, y = quant[[3]], xend = 1.4, yend = quant[[3]], color = "grey40", arrow = arrow(length = unit(0.03, "npc"), type = "closed")) +
+#     annotate(geom = "text", x = 1.55, y = quant[[3]], label = "M3") +
+#     geom_segment(x = 1.5, y = quant[[4]], xend = 1.4, yend = quant[[4]], color = "grey40", arrow = arrow(length = unit(0.03, "npc"), type = "closed")) +
+#     annotate(geom = "text", x = 1.55, y = quant[[4]], label = "M4") +
+#     geom_segment(x = 1.5, y = quant[[5]], xend = 1.02, yend = quant[[5]], color = "grey40", arrow = arrow(length = unit(0.03, "npc"), type = "closed")) +
+#     annotate(geom = "text", x = 1.55, y = quant[[5]], label = "M5")  -> scheme_plot
+#    
+# save_plot(paste0(figure_directory,"bic_dist_scheme.pdf"), scheme_plot) 
 
 
 
@@ -393,7 +465,7 @@ save_plot(paste0(figure_directory, "selected_models_m2-5_pandit.pdf"), selected_
 #### Empirical results
 empirical_sh %>%
     gather(model, pvalue, q1:true) %>% 
-    filter(pvalue <= 0.01) %>%
+    filter(pvalue < 0.01) %>%
     group_by(name, tree, model) %>%
     tally() %>% 
     arrange(model, name) %>%
@@ -461,20 +533,9 @@ empirical_sh %>%
 # \end{tabular}
 # \end{table}
 
-#### PANDIT results
-pandit_sh %>%
-    gather(model, pvalue, q1:poisson) %>% 
-    mutate(sig = pvalue <= 0.01) %>%
-    group_by(model, sig) %>%
-    tally() %>%
-    filter(sig==TRUE) %>% 
-    mutate(perc_in_conf= 1 - n/200)
-#   model   sig       n perc_in_conf
-#   <chr>   <lgl> <int>        <dbl>
-# 1 poisson TRUE     70        0.65 
-# 2 q4      TRUE      7        0.965
-# 3 q5      TRUE     80        0.6  
 
+    
+  
 
 
 

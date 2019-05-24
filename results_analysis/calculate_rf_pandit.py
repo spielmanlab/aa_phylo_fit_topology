@@ -4,12 +4,12 @@ import dendropy
 from dendropy.calculate import treecompare
 import pprint
 truepath       = "../pandit_aa_alignments/"
-inferencepath = "../fitted_trees_pandit/"
+inferencepath = "../fitted_trees_pandit_range/"
 
 fileinfo_order = ["name", "model", "optim"]
 fitinfo_order  = ["logl", "k", "AIC", "AICc", "BIC"]
 
-outstring = ",".join(fileinfo_order) + "," + ",".join(fitinfo_order) +",rf_q1,wrf_q1,treelength\n"
+outstring = ",".join(fileinfo_order) + "," + ",".join(fitinfo_order) +",rf_r1,wrf_r1,treelength\n"
 
 pandits  = [x.replace(".fasta", "") for x in os.listdir(truepath) if x.endswith("fasta")]
 
@@ -18,7 +18,7 @@ for pandit in pandits:
     ts = dendropy.TaxonNamespace()
     
     for optim in ["inferredtree", "optimizedtruetree"]:
-        q1_tree = dendropy.Tree.get_from_path(inferencepath + pandit + "_q1_" + optim + ".treefile" , "newick", taxon_namespace = ts, rooting='force-unrooted')
+        r1_tree = dendropy.Tree.get_from_path(inferencepath + pandit + "_r1_" + optim + ".treefile" , "newick", taxon_namespace = ts, rooting='force-unrooted')
     
         iqfiles = [x for x in os.listdir(inferencepath) if x.endswith(optim + ".iqtree") and x.startswith(pandit)]
 
@@ -31,8 +31,8 @@ for pandit in pandits:
                         inferencepath + treefile,
                         "newick", 
                         taxon_namespace = ts)
-            rf_q1 = str( treecompare.symmetric_difference( q1_tree, inftree) )
-            rfw_q1 = str( treecompare.weighted_robinson_foulds_distance( q1_tree, inftree) )
+            rf_r1 = str( treecompare.symmetric_difference( r1_tree, inftree) )
+            rfw_r1 = str( treecompare.weighted_robinson_foulds_distance( r1_tree, inftree) )
             tl = str(inftree.length())
 
             fitinfo = {"logl": None, "k": None, "AIC": None, "AICc": None, "BIC": None}
@@ -49,10 +49,10 @@ for pandit in pandits:
                     fitinfo["AICc"] = line.split(" ")[-1].strip()
                 if line.startswith("Bayesian information criterion"):
                     fitinfo["BIC"] = line.split(" ")[-1].strip()
-            part = ",".join([pandit, model, optim]) + "," + ",".join([fitinfo[x] for x in fitinfo_order]) + "," + rf_q1 + "," + rfw_q1 + "," + tl  + "\n"
+            part = ",".join([pandit, model, optim]) + "," + ",".join([fitinfo[x] for x in fitinfo_order]) + "," + rf_r1 + "," + rfw_r1 + "," + tl  + "\n"
             outstring += part
 
-with open("inference_results_pandit.csv", "w") as f:
+with open("inference_results_pandit_range.csv", "w") as f:
     f.write(outstring.strip())
     
     
