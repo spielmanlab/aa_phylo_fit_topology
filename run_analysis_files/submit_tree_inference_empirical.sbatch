@@ -8,12 +8,12 @@
 
 REP=${SLURM_ARRAY_TASK_ID}
 TOPPATH=/csm_data/spielman_lab/dms_modelselection/
-ALNPATH=${TOPPATH}/simulations/alignments_empirical/
-OUTPATH=${TOPPATH}/fitted_trees_empirical_range/
+ALNPATH=${TOPPATH}/simulations/alignments_simulation/
+OUTPATH=${TOPPATH}/fitted_trees_simulation/
 NAME=$1
 cd $TOPPATH
-for TREE in greenalga opisthokonta prum ruhfel salichos dosreis andersen rayfinned spiralia; do
-   python3 run_analysis_files/infer_trees.py $NAME $TREE $REP $OUTPATH $ALNPATH processed_model_selection/range_model_selection_empirical.csv 8
+for TREE in opisthokonta prum ruhfel salichos dosreis andersen rayfinned spiralia; do
+   python3 run_analysis_files/infer_trees.py $NAME $TREE $REP $OUTPATH $ALNPATH processed_model_selection/quantile_model_selection_simulation.csv 8
 done
 
 

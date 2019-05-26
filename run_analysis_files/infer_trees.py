@@ -26,19 +26,21 @@ def run_save_iqtree(alignment_file, data_type, model, outname, true_tree, thread
 
 
 def main():
-    name      = sys.argv[1]
-    tree      = sys.argv[2] 
-    repl      = sys.argv[3]
-    fitted_tree_path   = sys.argv[4]
-    alignment_path = sys.argv[5]
-    model_file = sys.argv[6]
-    threads   = sys.argv[7]
+    name                = sys.argv[1]
+    tree                = sys.argv[2] 
+    repl                = sys.argv[3]
+    fitted_tree_path    = sys.argv[4]
+    alignment_path      = sys.argv[5]
+    model_file          = sys.argv[6]
+    threads             = sys.argv[7]
    
+   
+    ##pandit
     if tree == "NA":
         rawname = name
-        ###### !!!!!!!!! q1 tree here !!!!!!!!!
-        true_tree_file = fitted_tree_path + name + "_r1_inferredtree.treefile"
-    else:
+        ###### !!!!!!!!! m1 tree here !!!!!!!!!
+        true_tree_file = fitted_tree_path + name + "_m1_inferredtree.treefile"
+    else: ## simulation
         rawname        = name + "_" + tree + "_rep" + repl + "_AA"
         true_tree_file =  "simulations/true_trees/" + tree + ".tree"
     alignment_file = alignment_path + rawname + ".fasta"
@@ -54,12 +56,12 @@ def main():
             use_models[q] = model
         
     # quartile models    
-    for modelquant in range(2,5): ## only run 2,3,4 as 1/5 are the same as previously
-        outname = fitted_tree_path + rawname + "_r" + str(modelquant)
+    for modelquant in range(1,6): 
+        outname = fitted_tree_path + rawname + "_m" + str(modelquant)
         run_save_iqtree(alignment_file, "AA", use_models[str(modelquant)], outname, true_tree_file, threads)
     ## poisson
-    #outname = fitted_tree_path + rawname + "_poisson"
-    #run_save_iqtree(alignment_file, "AA", "Poisson", outname, true_tree_file, threads)
+    outname = fitted_tree_path + rawname + "_poisson"
+    run_save_iqtree(alignment_file, "AA", "Poisson", outname, true_tree_file, threads)
              
 
 main()

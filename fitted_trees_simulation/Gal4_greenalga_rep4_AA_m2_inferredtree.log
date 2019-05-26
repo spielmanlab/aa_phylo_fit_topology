@@ -1,0 +1,109 @@
+IQ-TREE multicore version 1.6.7 for Linux 64-bit built Aug 23 2018
+Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor,
+Heiko Schmidt, Dominik Schrempf, Michael Woodhams.
+
+Host:    csm-com-006 (AVX2, FMA3, 62 GB RAM)
+Command: iqtree -nt 8 -m VT -s /csm_data/spielman_lab/dms_modelselection//simulations/alignments/Gal4_greenalga_rep4_AA.fasta -st AA
+Seed:    544296 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Tue Apr 16 08:08:19 2019
+Kernel:  AVX+FMA - 8 threads (48 CPU cores detected)
+
+Reading alignment file /csm_data/spielman_lab/dms_modelselection//simulations/alignments/Gal4_greenalga_rep4_AA.fasta ... Fasta format detected
+Alignment most likely contains protein sequences
+Alignment has 23 sequences with 64 columns, 60 distinct patterns
+36 parsimony-informative, 10 singleton sites, 18 constant sites
+                                Gap/Ambiguity  Composition  p-value
+   1  Schizomeris_leibleinii            0.00%    passed     99.18%
+   2  Stigeoclonium_helveticum          0.00%    passed     98.67%
+   3  Floydiella_terrestris             0.00%    passed     99.09%
+   4  Oedogonium_cardiacum              0.00%    passed     95.20%
+   5  Dunaliella_salina                 0.00%    passed     98.43%
+   6  Chlamydomonas_reinhardtii         0.00%    passed    100.00%
+   7  Gonium_pectorale                  0.00%    passed     99.96%
+   8  Pleodorina_starrii                0.00%    passed    100.00%
+   9  Volvox_carteri                    0.00%    passed     99.92%
+  10  Bracteacoccus_aerius              0.00%    passed     99.98%
+  11  Bracteacoccus_minor               0.00%    passed     99.80%
+  12  Mychonastes_homosphaera           0.00%    passed    100.00%
+  13  Pseudomuriella_schumacherensis    0.00%    passed    100.00%
+  14  Kirchneriella_aperta              0.00%    passed     99.70%
+  15  Ourococcus_multisporus            0.00%    passed     99.94%
+  16  Pediastrum_duplex                 0.00%    passed     99.34%
+  17  Chlorotetraedron_incus            0.00%    passed     97.90%
+  18  Neochloris_aquatica               0.00%    passed     98.86%
+  19  Scenedesmus_obliquus              0.00%    passed     99.37%
+  20  Rotundella_rotunda                0.00%    passed     99.06%
+  21  Chromochloris_zofingiensis        0.00%    passed    100.00%
+  22  Atractomorpha_echinata            0.00%    passed    100.00%
+  23  Ankyra_judai                      0.00%    passed    100.00%
+****  TOTAL                             0.00%  0 sequences failed composition chi2 test (p-value<5%; df=19)
+
+Create initial parsimony tree by phylogenetic likelihood library (PLL)... 0.001 seconds
+
+NOTE: 0 MB RAM (0 GB) is required!
+WARNING: Number of threads seems too high for short alignments. Use -nt AUTO to determine best number of threads.
+Estimate model parameters (epsilon = 0.100)
+1. Initial log-likelihood: -1038.255
+Optimal log-likelihood: -1028.600
+Parameters optimization took 1 rounds (0.004 sec)
+Computing ML distances based on estimated model parameters... 0.045 sec
+Computing BIONJ tree...
+0.001 seconds
+Log-likelihood of BIONJ tree: -1027.467
+--------------------------------------------------------------------
+|             INITIALIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Generating 98 parsimony trees... 0.158 second
+Computing log-likelihood of 98 initial trees ... 0.338 seconds
+Current best score: -1026.115
+
+Do NNI search on 20 best initial trees
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 1: -1025.704
+BETTER TREE FOUND at iteration 7: -1025.704
+Iteration 10 / LogL: -1027.467 / Time: 0h:0m:0s
+UPDATE BEST LOG-LIKELIHOOD: -1025.704
+UPDATE BEST LOG-LIKELIHOOD: -1025.704
+Iteration 20 / LogL: -1027.702 / Time: 0h:0m:0s
+Finish initializing candidate tree set (5)
+Current best tree score: -1025.704 / CPU time: 0.951
+Number of iterations: 20
+--------------------------------------------------------------------
+|               OPTIMIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Iteration 30 / LogL: -1027.467 / Time: 0h:0m:1s (0h:0m:3s left)
+UPDATE BEST LOG-LIKELIHOOD: -1025.704
+Iteration 40 / LogL: -1026.140 / Time: 0h:0m:1s (0h:0m:2s left)
+Iteration 50 / LogL: -1026.135 / Time: 0h:0m:2s (0h:0m:2s left)
+Iteration 60 / LogL: -1027.467 / Time: 0h:0m:2s (0h:0m:1s left)
+Iteration 70 / LogL: -1025.704 / Time: 0h:0m:2s (0h:0m:1s left)
+Iteration 80 / LogL: -1026.135 / Time: 0h:0m:3s (0h:0m:1s left)
+Iteration 90 / LogL: -1027.013 / Time: 0h:0m:3s (0h:0m:0s left)
+UPDATE BEST LOG-LIKELIHOOD: -1025.704
+Iteration 100 / LogL: -1026.134 / Time: 0h:0m:3s (0h:0m:0s left)
+TREE SEARCH COMPLETED AFTER 108 ITERATIONS / Time: 0h:0m:4s
+
+--------------------------------------------------------------------
+|                    FINALIZING TREE SEARCH                        |
+--------------------------------------------------------------------
+Performs final model parameters optimization
+Estimate model parameters (epsilon = 0.010)
+1. Initial log-likelihood: -1025.704
+Optimal log-likelihood: -1025.704
+Parameters optimization took 1 rounds (0.002 sec)
+BEST SCORE FOUND : -1025.704
+Total tree length: 2.278
+
+Total number of iterations: 108
+CPU time used for tree search: 33.205 sec (0h:0m:33s)
+Wall-clock time used for tree search: 4.159 sec (0h:0m:4s)
+Total CPU time used: 33.400 sec (0h:0m:33s)
+Total wall-clock time used: 4.194 sec (0h:0m:4s)
+
+Analysis results written to: 
+  IQ-TREE report:                /csm_data/spielman_lab/dms_modelselection//simulations/alignments/Gal4_greenalga_rep4_AA.fasta.iqtree
+  Maximum-likelihood tree:       /csm_data/spielman_lab/dms_modelselection//simulations/alignments/Gal4_greenalga_rep4_AA.fasta.treefile
+  Likelihood distances:          /csm_data/spielman_lab/dms_modelselection//simulations/alignments/Gal4_greenalga_rep4_AA.fasta.mldist
+  Screen log file:               /csm_data/spielman_lab/dms_modelselection//simulations/alignments/Gal4_greenalga_rep4_AA.fasta.log
+
+Date and Time: Tue Apr 16 08:08:23 2019

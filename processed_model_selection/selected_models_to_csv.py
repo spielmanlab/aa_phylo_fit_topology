@@ -37,25 +37,23 @@ def parse_all_fits(file, prefix):
 
 
 type = sys.argv[1]
-assert(len(sys.argv)==2),"\n specify `empirical`,`rtree`, `pandit`"
+assert(len(sys.argv)==2),"\n specify `simulation`, `pandit`"
 reps  = list(range(1,21))
-if type == "empirical":
-    alignment_path = "simulations/empirical_alignments/"
-    output_path    = "selected_models_empirical/" ## mv log files here
-    outfile = "processed_model_selection/all_model_selection_empirical.csv"
+if type == "simulation":
+    alignment_path = "simulations/simulation_alignments/"
     names = ["HA", "NP", "HIV", "LAC", "Gal4"]
     trees = ["greenalga", "opisthokonta", "prum", "ruhfel", "salichos", "dosreis", "andersen", "spiralia", "rayfinned"]
 
 if type == "pandit":
     alignment_path = "pandit_aa_alignments/"
-    output_path    = "selected_models_pandit/" ## mv log files here
-    outfile = "processed_model_selection/all_model_selection_pandit.csv"
     names = [x.replace(".fasta", "") for x in os.listdir(alignment_path) if x.endswith(".fasta")]
     
 
+output_path    = "selected_models_" + type + "/" ## mv log files here
+outfile = "processed_model_selection/all_model_selection_" + type + ".csv"
 
 outstring = "name,tree,repl,model,logl,df,aic,aicc,bic\n"
-if type == "empirical":
+if type == "simulation":
     for name in names:
         for tree in trees:
             for repli in reps:

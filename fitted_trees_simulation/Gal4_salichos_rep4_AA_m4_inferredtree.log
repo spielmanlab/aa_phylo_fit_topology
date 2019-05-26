@@ -1,0 +1,110 @@
+IQ-TREE multicore version 1.6.7 for Linux 64-bit built Aug 23 2018
+Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor,
+Heiko Schmidt, Dominik Schrempf, Michael Woodhams.
+
+Host:    csm-com-006 (AVX2, FMA3, 62 GB RAM)
+Command: iqtree -nt 8 -m Dayhoff+I -s /csm_data/spielman_lab/dms_modelselection//simulations/alignments/Gal4_salichos_rep4_AA.fasta -st AA
+Seed:    161662 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Tue Apr 16 09:34:35 2019
+Kernel:  AVX+FMA - 8 threads (48 CPU cores detected)
+
+Reading alignment file /csm_data/spielman_lab/dms_modelselection//simulations/alignments/Gal4_salichos_rep4_AA.fasta ... Fasta format detected
+Alignment most likely contains protein sequences
+Alignment has 23 sequences with 64 columns, 64 distinct patterns
+53 parsimony-informative, 8 singleton sites, 3 constant sites
+      Gap/Ambiguity  Composition  p-value
+   1  Agos    0.00%    passed     68.41%
+   2  Klac    0.00%    passed     87.83%
+   3  Calb    0.00%    passed     96.53%
+   4  Cdub    0.00%    passed     97.96%
+   5  Ctro    0.00%    passed     97.59%
+   6  Cpar    0.00%    passed     92.35%
+   7  Lelo    0.00%    passed     99.93%
+   8  Psti    0.00%    passed     99.48%
+   9  Cgui    0.00%    passed     95.78%
+  10  Dhan    0.00%    passed     59.18%
+  11  Clus    0.00%    passed     91.55%
+  12  Cgla    0.00%    passed     91.82%
+  13  Sbay    0.00%    passed     99.95%
+  14  Scer    0.00%    passed     95.76%
+  15  Spar    0.00%    passed     97.14%
+  16  Smik    0.00%    passed     97.34%
+  17  Skud    0.00%    passed     97.41%
+  18  Scas    0.00%    passed     99.78%
+  19  Kpol    0.00%    passed     98.54%
+  20  Zrou    0.00%    passed     95.86%
+  21  Kthe    0.00%    passed     88.24%
+  22  Kwal    0.00%    passed     54.64%
+  23  Sklu    0.00%    passed     91.47%
+****  TOTAL    0.00%  0 sequences failed composition chi2 test (p-value<5%; df=19)
+
+Create initial parsimony tree by phylogenetic likelihood library (PLL)... 0.001 seconds
+
+NOTE: 0 MB RAM (0 GB) is required!
+WARNING: Number of threads seems too high for short alignments. Use -nt AUTO to determine best number of threads.
+Estimate model parameters (epsilon = 0.100)
+1. Initial log-likelihood: -2259.856
+2. Current log-likelihood: -2233.971
+3. Current log-likelihood: -2233.822
+Optimal log-likelihood: -2233.818
+Proportion of invariable sites: 0.046
+Parameters optimization took 3 rounds (0.012 sec)
+Computing ML distances based on estimated model parameters... 0.054 sec
+Computing BIONJ tree...
+0.001 seconds
+Log-likelihood of BIONJ tree: -2212.106
+--------------------------------------------------------------------
+|             INITIALIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Generating 98 parsimony trees... 0.158 second
+Computing log-likelihood of 98 initial trees ... 0.348 seconds
+Current best score: -2203.302
+
+Do NNI search on 20 best initial trees
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 1: -2203.106
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 2: -2202.863
+Iteration 10 / LogL: -2209.059 / Time: 0h:0m:0s
+Iteration 20 / LogL: -2203.873 / Time: 0h:0m:0s
+Finish initializing candidate tree set (8)
+Current best tree score: -2202.863 / CPU time: 0.909
+Number of iterations: 20
+--------------------------------------------------------------------
+|               OPTIMIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Iteration 30 / LogL: -2203.716 / Time: 0h:0m:1s (0h:0m:3s left)
+Iteration 40 / LogL: -2205.413 / Time: 0h:0m:1s (0h:0m:2s left)
+Iteration 50 / LogL: -2203.710 / Time: 0h:0m:1s (0h:0m:2s left)
+Iteration 60 / LogL: -2203.699 / Time: 0h:0m:2s (0h:0m:1s left)
+Iteration 70 / LogL: -2205.397 / Time: 0h:0m:2s (0h:0m:1s left)
+Iteration 80 / LogL: -2203.695 / Time: 0h:0m:2s (0h:0m:0s left)
+Iteration 90 / LogL: -2203.122 / Time: 0h:0m:3s (0h:0m:0s left)
+Iteration 100 / LogL: -2204.053 / Time: 0h:0m:3s (0h:0m:0s left)
+TREE SEARCH COMPLETED AFTER 103 ITERATIONS / Time: 0h:0m:3s
+
+--------------------------------------------------------------------
+|                    FINALIZING TREE SEARCH                        |
+--------------------------------------------------------------------
+Performs final model parameters optimization
+Estimate model parameters (epsilon = 0.010)
+1. Initial log-likelihood: -2202.863
+Optimal log-likelihood: -2202.863
+Proportion of invariable sites: 0.046
+Parameters optimization took 1 rounds (0.002 sec)
+BEST SCORE FOUND : -2202.863
+Total tree length: 8.945
+
+Total number of iterations: 103
+CPU time used for tree search: 29.365 sec (0h:0m:29s)
+Wall-clock time used for tree search: 3.679 sec (0h:0m:3s)
+Total CPU time used: 29.619 sec (0h:0m:29s)
+Total wall-clock time used: 3.719 sec (0h:0m:3s)
+
+Analysis results written to: 
+  IQ-TREE report:                /csm_data/spielman_lab/dms_modelselection//simulations/alignments/Gal4_salichos_rep4_AA.fasta.iqtree
+  Maximum-likelihood tree:       /csm_data/spielman_lab/dms_modelselection//simulations/alignments/Gal4_salichos_rep4_AA.fasta.treefile
+  Likelihood distances:          /csm_data/spielman_lab/dms_modelselection//simulations/alignments/Gal4_salichos_rep4_AA.fasta.mldist
+  Screen log file:               /csm_data/spielman_lab/dms_modelselection//simulations/alignments/Gal4_salichos_rep4_AA.fasta.log
+
+Date and Time: Tue Apr 16 09:34:38 2019
