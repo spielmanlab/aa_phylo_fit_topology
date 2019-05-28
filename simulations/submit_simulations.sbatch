@@ -14,5 +14,5 @@ cd $TOPDIR
 
 #python3 simulate_empirical.py $REP
 for NAME in HA NP LAC Gal4 HIV; do
-  python3 simulatepy $NAME $REP
+  python3 simulate.py $NAME $REP
 done

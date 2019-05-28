@@ -38,7 +38,7 @@ simrep = sys.argv[2]
 treepath = "true_trees/" ## since simulating nucleotide level but want BL to describe, more or less, protein divergence
 prefpath = "preferences/"
 simpath  = "alignments/"
-trees = [x for x in os.listdir(treepath) if x.endswith("_resolved.tree")] ## 10 trees
+trees = [x for x in os.listdir(treepath) if x.endswith("_resolved.tree")] ## 8 trees
 print(trees)
 prefs = np.loadtxt(prefpath + name + "_prefs.csv", delimiter=",")
 partitions = []
