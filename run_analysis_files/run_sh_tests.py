@@ -14,21 +14,24 @@ replicate = sys.argv[2]
 outfile        = "results_sh_" + type + "_" + replicate + ".csv"
 treelist_name  = type + ".trees"
 
+
 if type == "pandit":
     alignmentpath = "../pandit_aa_alignments/"
-    inferencepath = "../fitted_trees_pandit_range/"
-    quantilefile  = "../processed_model_selection/range_model_selection_pandit.csv"
-    
+    inferencepath = "../fitted_trees_pandit/"
+    quantilefile  = "../processed_model_selection/quantile_model_selection_pandit.csv"
+
 elif type == "simulation":
-    alignmentpath  = sys.argv[3]
-    inferencepath  = sys.argv[4]
-    true_tree_path = sim_path + "true_trees/"
-    quantilefile   = sys.argv[5]
+    alignmentpath  = "../simulations/alignments/"
+    inferencepath  = "../fitted_trees_simulation/"
+    true_tree_path = "../simulations/true_trees/"
+    quantilefile   = "../processed_model_selection/quantile_model_selection_simulation.csv"
     dms_list       = ["Gal4", "LAC", "NP", "HA", "HIV"]
-    treenames      = ["greenalga", "andersen", "dosreis", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]       
+    treenames      = ["andersen", "dosreis", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]        
     reps           = 20
     replicate      = int(replicate)
-  
+
+
+
 
 def determine_best_models(type, quantilefile):
     fitmodels = {}

@@ -23,4 +23,4 @@ IFS=',' read -r NAME <<< "$INLINE"
 
 
 cd $SCRIPTPATH
-python3 run_sh_tests.py pandit $NAME $ALNPATH $INFPATH $QFILE
+python3 run_sh_tests_poisson.py pandit $NAME
