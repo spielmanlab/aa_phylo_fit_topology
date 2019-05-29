@@ -16,7 +16,7 @@ contenders_sites = {}
 contenders_seqs  = {}
 contenders = []
 for fasta in fastas:
-    with open(indir) + fasta, "r") as f:
+    with open(indir + fasta, "r") as f:
         recs = list(SeqIO.parse(f, "fasta"))
     nseq = len(recs)
     nsites = len(recs[0])
