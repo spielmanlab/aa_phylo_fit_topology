@@ -4,6 +4,7 @@ library(lme4)
 library(lmerTest)
 library(multcomp)
 library(broom)
+library(ggforce)
 library(xtable)
 
 theme_set(theme_bw())
@@ -59,6 +60,7 @@ pandit_rf_fit %>%
     mutate(rf_m1_norm     = rf_m1/max_rf) -> pandit_rf_fit
 
 
+
 ############################### Simulation figures ################################
 
 #### simulation fit results
@@ -89,46 +91,58 @@ both <- plot_grid(model_fit_simulation_bars + theme(legend.position = "none"), l
 save_plot(paste0(figure_directory,"model_fit_simulation_bars.pdf"), both, base_width=7)
   
   
-  
-######## simulation RF Boxplots
+
+
+######## simulation RF *violins*
 simulation_rf_fit %>%
   filter(optim == "inferredtree") %>%
   mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
-         tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels_twolines),
+         tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels_ntaxa),
          name_levels  = factor(name, levels=name_levels, labels = name_labels_nsites)) %>%
-  ggplot(aes(x = model_levels, y = rf_true_norm, fill = model_levels)) + 
-  geom_boxplot(outlier.size = 0.2, size=0.1) + 
-  scale_fill_brewer(palette = "RdYlBu", name = "Protein Model", labels = model_labels) +
-  facet_grid(tree_levels~name_levels, scales="free_y") +
-  panel_border() +
-  background_grid() +
-  theme(axis.text.x = element_blank(),
-       strip.text.y = element_text(size=8), 
-       axis.ticks.x = element_blank(), 
-       legend.position = "bottom") + 
-  guides(fill = guide_legend(nrow = 1)) +
-  xlab("Protein Models") + ylab("Normalized RF Distance") -> simulation_rf_boxplot
-save_plot(paste0(figure_directory,"simulation_rf_boxplot_all.pdf"), simulation_rf_boxplot, base_height=8)
+        ggplot(aes(x = model_levels, y = rf_true_norm)) + 
+            #geom_boxplot(outlier.shape = "", size=0.15,  aes(fill = name_levels), width=1) + 
+            geom_violin(size=0.15,  aes(fill = name_levels), scale = "width") + 
+            #geom_jitter(position=position_jitterdodge(dodge.width = 0.3), shape = 21, alpha=0.7, color = "grey40", aes(fill = name_levels))  +       
+            #scale_color_brewer(palette = "RdYlBu", name = "Protein Model", labels = model_labels) +
+            #scale_fill_brewer(palette = "Set1", name = "DMS Simulations", labels = name_labels_nsites) +
+            scale_fill_discrete(name = "DMS Parameterization", labels = name_labels_nsites) +
+            background_grid() +
+            #scale_y_continuous(limits = y_limits) + 
+            facet_wrap(~tree_levels, scales = "free_y", nrow=2) +
+            xlab("Protein model") + ylab("Normalized Robinson-Foulds Distance") + 
+            theme(legend.position = "bottom") -> simulation_rf_violin  
+save_plot(paste0(figure_directory,"simulation_rf_violin.pdf"), simulation_rf_violin, base_width=11, base_height=5)
 
 
-######## simulation RF Boxplots, NP only
-simulation_rf_fit %>%
-  filter(name == "NP", optim == "inferredtree") %>%
-  mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
-         tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels_ntaxa)) %>%
-  ggplot(aes(x = model_levels, y = rf_true_norm, fill = model_levels)) + 
-  geom_boxplot(outlier.size = 0.3, size=0.3) + 
-  scale_fill_brewer(palette = "RdYlBu", name = "Protein Model", labels = model_labels) +
-  facet_wrap(~tree_levels, scales="free_y", nrow = 2) +
-  panel_border() +
-  background_grid() +
-  theme(axis.text.x = element_blank(),
-       axis.text.y = element_text(size=7), 
-       axis.ticks.x = element_blank(), legend.position = "bottom") +
-  guides(fill = guide_legend(nrow = 1)) +
-  xlab("Protein Models") + ylab("Normalized RF Distance") -> simulation_rf_boxplot_np
-save_plot(paste0(figure_directory,"simulation_rf_boxplot_NP.pdf"), simulation_rf_boxplot_np, base_width = 10)
-
+# simulation_rf_fit %>% filter(optim == "inferredtree") %>% group_by(name, tree, model) %>% tally(rf_true ==0) %>% filter(n>1) %>% xtable()
+# % latex table generated in R 3.5.1 by xtable 1.8-4 package
+# % Thu Jun  6 12:09:44 2019
+# \begin{table}[ht]
+# \centering
+# \begin{tabular}{rlllr}
+#   \hline
+#  & name & tree & model & n \\ 
+#   \hline
+# 1 & HA & salichos & m1 &   2 \\ 
+#   2 & HA & salichos & m2 &   2 \\ 
+#   3 & HIV & opisthokonta & m1 &   8 \\ 
+#   4 & HIV & opisthokonta & m2 &   9 \\ 
+#   5 & HIV & opisthokonta & m3 &   4 \\ 
+#   6 & HIV & opisthokonta & m4 &   4 \\ 
+#   7 & HIV & opisthokonta & poisson &   6 \\ 
+#   8 & HIV & salichos & m1 &   2 \\ 
+#   9 & HIV & salichos & m2 &   3 \\ 
+#   10 & HIV & salichos & poisson &   3 \\ 
+#   11 & HIV & spiralia & m1 &   3 \\ 
+#   12 & HIV & spiralia & m3 &   3 \\ 
+#   13 & HIV & spiralia & m4 &   4 \\ 
+#   14 & HIV & spiralia & poisson &   4 \\ 
+#   15 & NP & salichos & m1 &   4 \\ 
+#   16 & NP & salichos & m2 &   3 \\ 
+#   17 & NP & salichos & m4 &   2 \\ 
+#    \hline
+# \end{tabular}
+# \end{table}
 
 
 
@@ -170,18 +184,24 @@ save_plot(paste0(figure_directory, "pandit_model_bars.pdf"), pandit_model_grid, 
   
 
 
-
-######## Pandit RF Boxplots
+    
 pandit_rf_fit %>%
   filter(model != "m1", optim == "inferredtree") %>%
-  mutate(model_levels = factor(model, levels=model_levels_nom1, labels = model_labels_nom1)) %>%
+  mutate(model_levels = factor(model, levels=model_levels_nom1, labels = model_labels_nom1)) -> pandit_rf_fit_plotme
+pandit_rf_fit_plotme %>%
+    group_by(model_levels) %>%
+    summarize(meanrf = mean(rf_m1_norm)) -> pandit_rf_fit_plotme_mean
+
+pandit_rf_fit_plotme %>%
   ggplot(aes(x = model_levels, y = rf_m1_norm, fill = model_levels)) + 
-  geom_boxplot() + 
+  geom_violin()+
   panel_border() + 
   scale_fill_manual(values = c("#FC8D59", "#FEE090", "#E0F3F8" ,"#91BFDB", "#4575B4"), name = "Protein Model", labels = model_labels_nom1) +
+  geom_point(data = pandit_rf_fit_plotme_mean, aes(x = model_levels, y = meanrf), size=2.5, color = "grey20") + 
+  geom_path(data = pandit_rf_fit_plotme_mean, aes(x = model_levels, y = meanrf), color = "grey20", group = "") + 
   #scale_fill_brewer(palette = "RdYlBu", name = "Protein Model", labels = model_labels_nom1) +
   xlab("Protein Models") + ylab("Normalized RF distance from M1 tree") +
-  theme(legend.position = "none")-> rf_m1_pandit_plot     
+  theme(legend.position = "none") -> rf_m1_pandit_plot     
 
 
   
@@ -432,22 +452,28 @@ simulation_rf_fit2$model <- factor(simulation_rf_fit2$model, levels=c("m1", "m2"
 lmer(rf_true_norm ~ model + (1|name) + (1|tree), data = simulation_rf_fit2) -> fit
 glht(fit, linfct=mcp(model='Tukey')) %>% summary()
 # Linear Hypotheses:
-#                   Estimate Std. Error z value Pr(>|z|)  
-# m2 - m1 == 0       0.004456   0.002654   1.679   0.5456    
-# m3 - m1 == 0       0.007173   0.002654   2.703   0.0745 .  
-# m4 - m1 == 0       0.008703   0.002654   3.280   0.0134 *  
-# m5 - m1 == 0       0.026298   0.002654   9.911   <0.001 ***
-# poisson - m1 == 0  0.003557   0.002654   1.340   0.7624    
-# m3 - m2 == 0       0.002717   0.002654   1.024   0.9101    
-# m4 - m2 == 0       0.004248   0.002654   1.601   0.5981    
-# m5 - m2 == 0       0.021842   0.002654   8.231   <0.001 ***
-# poisson - m2 == 0 -0.000899   0.002654  -0.339   0.9994    
-# m4 - m3 == 0       0.001530   0.002654   0.577   0.9926    
-# m5 - m3 == 0       0.019124   0.002654   7.207   <0.001 ***
-# poisson - m3 == 0 -0.003616   0.002654  -1.363   0.7493    
-# m5 - m4 == 0       0.017594   0.002654   6.631   <0.001 ***
-# poisson - m4 == 0 -0.005147   0.002654  -1.940   0.3779    
-# poisson - m5 == 0 -0.022741   0.002654  -8.570   <0.001 ***
+# m2 - m1 == 0       0.0045753  0.0025070   1.825   0.4495    
+# m3 - m1 == 0       0.0071323  0.0025070   2.845   0.0506 .  
+# m4 - m1 == 0       0.0084163  0.0025070   3.357   0.0103 *  
+# m5 - m1 == 0       0.0267098  0.0025070  10.654   <0.001 ***
+# poisson - m1 == 0  0.0050639  0.0025070   2.020   0.3308    
+# m3 - m2 == 0       0.0025570  0.0025070   1.020   0.9115    
+# m4 - m2 == 0       0.0038410  0.0025070   1.532   0.6434    
+# m5 - m2 == 0       0.0221345  0.0025070   8.829   <0.001 ***
+# poisson - m2 == 0  0.0004886  0.0025070   0.195   1.0000    
+# m4 - m3 == 0       0.0012840  0.0025070   0.512   0.9957    
+# m5 - m3 == 0       0.0195775  0.0025070   7.809   <0.001 ***
+# poisson - m3 == 0 -0.0020684  0.0025070  -0.825   0.9630    
+# m5 - m4 == 0       0.0182934  0.0025070   7.297   <0.001 ***
+# poisson - m4 == 0 -0.0033525  0.0025070  -1.337   0.7642    
+# poisson - m5 == 0 -0.0216459  0.0025070  -8.634   <0.001 ***
+
+## SIG LINES:
+# m5 - m1 == 0       0.0267098  0.0025070  10.654   <0.001 ***
+# m5 - m2 == 0       0.0221345  0.0025070   8.829   <0.001 ***
+# m5 - m4 == 0       0.0182934  0.0025070   7.297   <0.001 ***
+# poisson - m5 == 0 -0.0216459  0.0025070  -8.634   <0.001 ***
+# m5 - m3 == 0       0.0195775  0.0025070   7.809   <0.001 ***
 
 
 

@@ -19,4 +19,4 @@ INLINE=$(sed "${LINE}q;d" ${FILE})
 IFS=',' read -r NAME <<< "$INLINE"
 
 cd $TOPPATH
-python3 run_analysis_files/infer_trees.py $NAME NA NA $OUTPATH $ALNPATH processed_model_selection/range_model_selection_pandit.csv 8
+python3 run_analysis_files/infer_trees.py $NAME NA NA $OUTPATH $ALNPATH processed_model_selection/quantile_model_selection_pandit.csv 8
