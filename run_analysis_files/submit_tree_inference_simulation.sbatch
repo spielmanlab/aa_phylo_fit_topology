@@ -8,7 +8,7 @@
 
 REP=${SLURM_ARRAY_TASK_ID}
 TOPPATH=/csm_data/spielman_lab/dms_modelselection/
-ALNPATH=${TOPPATH}/simulations/alignments_simulation/
+ALNPATH=${TOPPATH}/simulations/alignments/
 OUTPATH=${TOPPATH}/fitted_trees_simulation/
 NAME=$1
 cd $TOPPATH

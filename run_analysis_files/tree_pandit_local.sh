@@ -1,7 +1,6 @@
-LINE=${SLURM_ARRAY_TASK_ID}
 
 
-for LINE in {2..200}; do
+for LINE in {38..200}; do
     echo $LINE
     TOPPATH=/Users/spielman/Projects/dms_modelselection
     ALNPATH=${TOPPATH}/pandit_aa_alignments/
