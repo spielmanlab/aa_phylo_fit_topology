@@ -6,13 +6,13 @@ import re
 
 iqtree_topline = ['Tree', 'logL', 'deltaL', 'bp-RELL', 'p-KH', 'p-SH', 'c-ELW']
 sh_index = iqtree_topline.index("p-SH")
-model_order    = ["m1", "m2", "m3", "m4", "m5", "poisson"]
+model_order    = ["m1", "m2", "m3", "m4", "m5", "poisson", "GTR20"]
 
 type = sys.argv[1]
 replicate = sys.argv[2]
 
 outfile        = "results_sh_" + type + "_" + replicate + ".csv"
-treelist_name  = type + ".trees"
+treelist_name  = type + "-" + replicate + ".trees"
 
 
 if type == "pandit":
@@ -28,7 +28,6 @@ elif type == "simulation":
     dms_list       = ["Gal4", "LAC", "NP", "HA", "HIV"]
     treenames      = ["andersen", "dosreis", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]        
     reps           = 20
-    replicate      = int(replicate)
 
 
 
@@ -89,27 +88,27 @@ def run_tests(alnfile, model, name, outstring):
 
 
 
-def loop_over_tests(type):
+def loop_over_tests(type, replicate):
 
     if type == "pandit":
         #outstring = "name,m1,m2,m3,m4,m5,poisson\n"
-        for name in list(fitmodels.keys()):
-            print(name)
-            inferred_trees_raw = [x for x in os.listdir(inferencepath) if x.startswith(name) and x.endswith("inferredtree.treefile")]
-            inferred_trees_ordered = [] 
-            for model in model_order:
-                for inftree in inferred_trees_raw:
-                    if model in inftree:
-                        with open(inferencepath + inftree, "r") as f:
-                            ts = f.read().strip()
-                        inferred_trees_ordered.append(ts)
-                with open(treelist_name, "w") as f:
-                    for ts in inferred_trees_ordered:
-                        f.write(ts +"\n")
-            outstring += run_tests(alignmentpath + name + ".fasta", fitmodels[name], name, outstring)
+        name = str(replicate)
+        inferred_trees_raw = [x for x in os.listdir(inferencepath) if x.startswith(name) and x.endswith("inferredtree.treefile")]
+        inferred_trees_ordered = [] 
+        for model in model_order:
+            for inftree in inferred_trees_raw:
+                if model in inftree:
+                    with open(inferencepath + inftree, "r") as f:
+                        ts = f.read().strip()
+                    inferred_trees_ordered.append(ts)
+            with open(treelist_name, "w") as f:
+                for ts in inferred_trees_ordered:
+                    f.write(ts +"\n")
+        outstring += run_tests(alignmentpath + name + ".fasta", fitmodels[name], name, outstring)
 
 
     if type == "simulation":
+        replicate = int(replicate)
         #outstring  = "name,tree,repl,m1,m2,m3,m4,m5,poisson,true\n"
         for name in dms_list:
             print(name)
@@ -146,7 +145,7 @@ print("Determing all best-fitting models")
 fitmodels = determine_best_models(type, quantilefile)
     
 print("Run the tests")  
-outstring = loop_over_tests(type)
+outstring = loop_over_tests(type, replicate)
 with open(outfile, "w") as f:
     f.write(outstring)    
 os.system("rm " + treelist_name)
