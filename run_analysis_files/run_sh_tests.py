@@ -40,8 +40,8 @@ def determine_best_models(type, quantilefile):
     if type == "pandit":
         for qline in qlines:
             name = qline.split(",")[0]
-            model = qline.split(",")[4]
-            quant = qline.split(",")[5].strip()
+            model = qline.split(",")[2]
+            quant = qline.split(",")[3].strip()
             if quant == "1":
                 fitmodels[name] = model
     if type == "simulation":
@@ -57,10 +57,10 @@ def determine_best_models(type, quantilefile):
     return(fitmodels)
 
 
-def run_tests(alnfile, model, name, outstring):
+def run_tests(alnfile, m1treefile, model, name, outstring):
 
     ## Call the SH test
-    os.system("iqtree -quiet -nt 6 -s " + alnfile + " -m " + model + " -z " + treelist_name + " -zb 1000 -redo")
+    os.system("iqtree -nt 6 -s " + alnfile + " -m " + model + " -z " + treelist_name + " -zb 10000 -redo -te " + m1treefile)
 
     ## Parse out p-values
     with open(alnfile + ".iqtree", "r") as f:
@@ -77,6 +77,7 @@ def run_tests(alnfile, model, name, outstring):
         stop = x + len(model_order) + 2
     p_sh = []
     for i in range(start, stop):
+        print(i, output[i])
         clean = re.split("\s+", output[i].replace("-","").replace("+","").strip())
         p_sh.append( clean[sh_index] )
     p_sh_string = ",".join(p_sh)
@@ -89,7 +90,7 @@ def run_tests(alnfile, model, name, outstring):
 
 
 def loop_over_tests(type, replicate):
-
+    outstring = ""
     if type == "pandit":
         #outstring = "name,m1,m2,m3,m4,m5,poisson\n"
         name = str(replicate)
@@ -104,7 +105,8 @@ def loop_over_tests(type, replicate):
             with open(treelist_name, "w") as f:
                 for ts in inferred_trees_ordered:
                     f.write(ts +"\n")
-        outstring += run_tests(alignmentpath + name + ".fasta", fitmodels[name], name, outstring)
+        m1treefile = inferencepath + name + "_m1_inferredtree.treefile"
+        outstring += run_tests(alignmentpath + name + ".fasta", m1treefile, fitmodels[name], name, outstring)
 
 
     if type == "simulation":
@@ -133,9 +135,10 @@ def loop_over_tests(type, replicate):
                     with open(treelist_name, "w") as f:
                         for ts in inferred_trees_ordered:
                             f.write(ts +"\n")
-                            
-                    outstring += run_tests(alignmentpath + rawname + ".fasta", fitmodels[rawname], ",".join([name, tree, str(rep)]), outstring)
+                    m1treefile = inferencepath + rawname + "_m1_inferredtree.treefile"
+                    outstring += run_tests(alignmentpath + rawname + ".fasta", m1treefile, fitmodels[rawname], ",".join([name, tree, str(rep)]), outstring)
                     #print(outstring)
+    assert 1==4
     return(outstring)
 
             
