@@ -1,14 +1,14 @@
-IQ-TREE multicore version 1.6.7 for Mac OS X 64-bit built Aug 23 2018
+IQ-TREE multicore version 1.6.9 for Linux 64-bit built Dec 20 2018
 Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor,
 Heiko Schmidt, Dominik Schrempf, Michael Woodhams.
 
-Host:    sciespie2019 (AVX2, FMA3, 32 GB RAM)
-Command: iqtree -nt 4 -m GTR20 -s /Users/spielman/Projects/dms_modelselection/pandit_aa_alignments/PF00622.fasta -st AA
-Seed:    875685 (Using SPRNG - Scalable Parallel Random Number Generator)
-Time:    Thu Jun  6 18:22:00 2019
-Kernel:  AVX+FMA - 4 threads (4 CPU cores detected)
+Host:    spielmanlab (AVX512, FMA3, 125 GB RAM)
+Command: iqtree -nt 4 -m GTR20 -s /home/spielman/dms_modelselection/pandit_aa_alignments/PF00622.fasta -st AA -quiet
+Seed:    413023 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Fri Jun  7 08:58:14 2019
+Kernel:  AVX+FMA - 4 threads (24 CPU cores detected)
 
-Reading alignment file /Users/spielman/Projects/dms_modelselection/pandit_aa_alignments/PF00622.fasta ... Fasta format detected
+Reading alignment file /home/spielman/dms_modelselection/pandit_aa_alignments/PF00622.fasta ... Fasta format detected
 Alignment most likely contains protein sequences
 WARNING: 6 sites contain only gaps or ambiguous characters.
 Alignment has 73 sequences with 240 columns, 235 distinct patterns
@@ -90,10 +90,129 @@ Alignment has 73 sequences with 240 columns, 235 distinct patterns
 WARNING: 13 sequences contain more than 50% gaps/ambiguity
 ****  TOTAL                 46.07%  8 sequences failed composition chi2 test (p-value<5%; df=19)
 
-Create initial parsimony tree by phylogenetic likelihood library (PLL)... 0.011 seconds
+Create initial parsimony tree by phylogenetic likelihood library (PLL)... 0.022 seconds
 WARNING: GTR20 model will estimate 189 substitution rates that might be overfitting!
 WARNING: Please only use GTR20 with very large data and always test for model fit!
 
 NOTE: 2 MB RAM (0 GB) is required!
 Estimate model parameters (epsilon = 0.100)
-1. Initial log-likelihood: -19829.759
+1. Initial log-likelihood: -19846.941
+2. Current log-likelihood: -18957.257
+3. Current log-likelihood: -18800.458
+4. Current log-likelihood: -18775.627
+5. Current log-likelihood: -18766.622
+6. Current log-likelihood: -18763.208
+7. Current log-likelihood: -18762.243
+8. Current log-likelihood: -18761.995
+9. Current log-likelihood: -18761.510
+10. Current log-likelihood: -18760.991
+11. Current log-likelihood: -18758.210
+12. Current log-likelihood: -18756.186
+13. Current log-likelihood: -18755.932
+14. Current log-likelihood: -18755.807
+15. Current log-likelihood: -18755.703
+Optimal log-likelihood: -18755.620
+Parameters optimization took 15 rounds (17.728 sec)
+Computing ML distances based on estimated model parameters... 0.702 sec
+Computing BIONJ tree...
+0.004 seconds
+Log-likelihood of BIONJ tree: -18740.821
+--------------------------------------------------------------------
+|             INITIALIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Generating 98 parsimony trees... 1.870 second
+Computing log-likelihood of 98 initial trees ... 1.806 seconds
+Current best score: -18721.152
+
+Do NNI search on 20 best initial trees
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 1: -18680.485
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 2: -18670.852
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 4: -18661.583
+Iteration 10 / LogL: -18683.723 / Time: 0h:0m:41s
+Iteration 20 / LogL: -18669.022 / Time: 0h:0m:43s
+Finish initializing candidate tree set (20)
+Current best tree score: -18661.583 / CPU time: 25.126
+Number of iterations: 20
+--------------------------------------------------------------------
+|               OPTIMIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Iteration 30 / LogL: -18664.619 / Time: 0h:0m:44s (0h:1m:54s left)
+Iteration 40 / LogL: -18661.651 / Time: 0h:0m:46s (0h:1m:16s left)
+Iteration 50 / LogL: -18662.039 / Time: 0h:0m:48s (0h:0m:53s left)
+Iteration 60 / LogL: -18661.687 / Time: 0h:0m:50s (0h:0m:37s left)
+Iteration 70 / LogL: -18675.266 / Time: 0h:0m:51s (0h:0m:25s left)
+Iteration 80 / LogL: -18661.729 / Time: 0h:0m:53s (0h:0m:16s left)
+Iteration 90 / LogL: -18661.920 / Time: 0h:0m:54s (0h:0m:8s left)
+Iteration 100 / LogL: -18663.943 / Time: 0h:0m:56s (0h:0m:2s left)
+TREE SEARCH COMPLETED AFTER 105 ITERATIONS / Time: 0h:0m:57s
+
+--------------------------------------------------------------------
+|                    FINALIZING TREE SEARCH                        |
+--------------------------------------------------------------------
+Performs final model parameters optimization
+Estimate model parameters (epsilon = 0.010)
+1. Initial log-likelihood: -18661.583
+2. Current log-likelihood: -18661.285
+3. Current log-likelihood: -18661.226
+4. Current log-likelihood: -18661.165
+5. Current log-likelihood: -18661.136
+6. Current log-likelihood: -18661.061
+7. Current log-likelihood: -18661.036
+8. Current log-likelihood: -18660.965
+9. Current log-likelihood: -18660.947
+10. Current log-likelihood: -18660.876
+11. Current log-likelihood: -18660.838
+12. Current log-likelihood: -18660.749
+13. Current log-likelihood: -18660.699
+14. Current log-likelihood: -18660.658
+15. Current log-likelihood: -18660.611
+16. Current log-likelihood: -18660.571
+17. Current log-likelihood: -18660.524
+18. Current log-likelihood: -18660.484
+19. Current log-likelihood: -18660.370
+20. Current log-likelihood: -18660.318
+21. Current log-likelihood: -18660.288
+22. Current log-likelihood: -18660.267
+23. Current log-likelihood: -18660.178
+24. Current log-likelihood: -18660.094
+25. Current log-likelihood: -18660.063
+26. Current log-likelihood: -18660.046
+27. Current log-likelihood: -18659.909
+28. Current log-likelihood: -18659.838
+29. Current log-likelihood: -18659.819
+30. Current log-likelihood: -18659.758
+31. Current log-likelihood: -18659.725
+32. Current log-likelihood: -18659.662
+33. Current log-likelihood: -18659.632
+34. Current log-likelihood: -18659.578
+35. Current log-likelihood: -18659.530
+36. Current log-likelihood: -18659.517
+37. Current log-likelihood: -18659.505
+38. Current log-likelihood: -18659.483
+39. Current log-likelihood: -18659.396
+40. Current log-likelihood: -18659.356
+41. Current log-likelihood: -18659.343
+42. Current log-likelihood: -18658.746
+43. Current log-likelihood: -18658.418
+44. Current log-likelihood: -18658.398
+Optimal log-likelihood: -18658.390
+Parameters optimization took 44 rounds (25.856 sec)
+BEST SCORE FOUND : -18658.390
+Total tree length: 50.951
+
+Total number of iterations: 105
+CPU time used for tree search: 151.282 sec (0h:2m:31s)
+Wall-clock time used for tree search: 39.155 sec (0h:0m:39s)
+Total CPU time used: 325.908 sec (0h:5m:25s)
+Total wall-clock time used: 83.008 sec (0h:1m:23s)
+
+Analysis results written to: 
+  IQ-TREE report:                /home/spielman/dms_modelselection/pandit_aa_alignments/PF00622.fasta.iqtree
+  Maximum-likelihood tree:       /home/spielman/dms_modelselection/pandit_aa_alignments/PF00622.fasta.treefile
+  Likelihood distances:          /home/spielman/dms_modelselection/pandit_aa_alignments/PF00622.fasta.mldist
+  Screen log file:               /home/spielman/dms_modelselection/pandit_aa_alignments/PF00622.fasta.log
+
+Date and Time: Fri Jun  7 08:59:37 2019
