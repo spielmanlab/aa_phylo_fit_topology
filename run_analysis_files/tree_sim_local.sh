@@ -1,6 +1,8 @@
 #!/bin/bash
+source ~/.bash_profile
 
-TOPPATH=/Users/spielman/Projects/dms_modelselection/
+
+TOPPATH=/home/spielman/dms_modelselection/
 ALNPATH=${TOPPATH}/simulations/alignments/
 OUTPATH=${TOPPATH}/fitted_trees_simulation/
 NAME=$1

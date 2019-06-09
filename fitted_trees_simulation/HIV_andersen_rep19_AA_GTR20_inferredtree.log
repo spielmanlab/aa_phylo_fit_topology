@@ -3,10 +3,10 @@ Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor,
 Heiko Schmidt, Dominik Schrempf, Michael Woodhams.
 
 Host:    spielmanlab (AVX512, FMA3, 125 GB RAM)
-Command: iqtree -nt 4 -m GTR20 -s /home/spielman/dms_modelselection//simulations/alignments/HIV_andersen_rep19_AA.fasta -st AA -quiet
-Seed:    982843 (Using SPRNG - Scalable Parallel Random Number Generator)
-Time:    Thu Jun  6 15:17:18 2019
-Kernel:  AVX+FMA - 4 threads (24 CPU cores detected)
+Command: iqtree -nt AUTO -ntmax 8 -m GTR20 -s /home/spielman/dms_modelselection//simulations/alignments/HIV_andersen_rep19_AA.fasta -st AA
+Seed:    546477 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Sat Jun  8 14:30:37 2019
+Kernel:  AVX+FMA - auto-detect threads (24 CPU cores detected)
 
 Reading alignment file /home/spielman/dms_modelselection//simulations/alignments/HIV_andersen_rep19_AA.fasta ... Fasta format detected
 Alignment most likely contains protein sequences
@@ -203,10 +203,101 @@ NOTE: G3170-S-SLE-2013 (identical to G3151-S-SLE-2013) is ignored but added at t
 
 For your convenience alignment with unique sequences printed to /home/spielman/dms_modelselection//simulations/alignments/HIV_andersen_rep19_AA.fasta.uniqueseq.phy
 
-Create initial parsimony tree by phylogenetic likelihood library (PLL)... 6.504 seconds
+Create initial parsimony tree by phylogenetic likelihood library (PLL)... 0.076 seconds
 WARNING: GTR20 model will estimate 189 substitution rates that might be overfitting!
 WARNING: Please only use GTR20 with very large data and always test for model fit!
 
 NOTE: 18 MB RAM (0 GB) is required!
+Measuring multi-threading efficiency up to 8 CPU cores
+Increase to 10 rounds for branch lengths
+14 trees examined
+Threads: 1 / Time: 8.189 sec / Speedup: 1.000 / Efficiency: 100% / LogL: -152096
+Threads: 2 / Time: 4.611 sec / Speedup: 1.776 / Efficiency: 89% / LogL: -152096
+Threads: 3 / Time: 5.160 sec / Speedup: 1.587 / Efficiency: 53% / LogL: -152096
+BEST NUMBER OF THREADS: 2
+
 Estimate model parameters (epsilon = 0.100)
-1. Initial log-likelihood: -43721.876
+1. Initial log-likelihood: -43729.368
+2. Current log-likelihood: -39799.378
+3. Current log-likelihood: -39486.416
+4. Current log-likelihood: -39465.296
+5. Current log-likelihood: -39463.865
+6. Current log-likelihood: -39462.831
+Optimal log-likelihood: -39462.777
+Parameters optimization took 6 rounds (123.027 sec)
+Computing ML distances based on estimated model parameters... 2.073 sec
+Computing BIONJ tree...
+0.018 seconds
+Log-likelihood of BIONJ tree: -39644.426
+--------------------------------------------------------------------
+|             INITIALIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Generating 98 parsimony trees... 6.753 second
+Computing log-likelihood of 98 initial trees ... 7.199 seconds
+Current best score: -39458.744
+
+Do NNI search on 20 best initial trees
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 1: -39454.737
+UPDATE BEST LOG-LIKELIHOOD: -39454.737
+Iteration 10 / LogL: -39454.737 / Time: 0h:3m:1s
+UPDATE BEST LOG-LIKELIHOOD: -39454.737
+Iteration 20 / LogL: -39454.737 / Time: 0h:3m:4s
+Finish initializing candidate tree set (4)
+Current best tree score: -39454.737 / CPU time: 41.400
+Number of iterations: 20
+--------------------------------------------------------------------
+|               OPTIMIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+UPDATE BEST LOG-LIKELIHOOD: -39454.736
+UPDATE BEST LOG-LIKELIHOOD: -39454.736
+UPDATE BEST LOG-LIKELIHOOD: -39454.736
+Iteration 30 / LogL: -39454.737 / Time: 0h:3m:12s (0h:7m:50s left)
+UPDATE BEST LOG-LIKELIHOOD: -39454.736
+UPDATE BEST LOG-LIKELIHOOD: -39454.736
+Iteration 40 / LogL: -39455.535 / Time: 0h:3m:20s (0h:5m:12s left)
+Iteration 50 / LogL: -39455.536 / Time: 0h:3m:28s (0h:3m:36s left)
+Iteration 60 / LogL: -39454.736 / Time: 0h:3m:36s (0h:2m:30s left)
+UPDATE BEST LOG-LIKELIHOOD: -39454.735
+Iteration 70 / LogL: -39455.534 / Time: 0h:3m:44s (0h:1m:40s left)
+UPDATE BEST LOG-LIKELIHOOD: -39454.734
+Iteration 80 / LogL: -39454.734 / Time: 0h:3m:52s (0h:1m:1s left)
+Iteration 90 / LogL: -39455.535 / Time: 0h:3m:59s (0h:0m:29s left)
+Iteration 100 / LogL: -39455.541 / Time: 0h:4m:7s (0h:0m:2s left)
+TREE SEARCH COMPLETED AFTER 102 ITERATIONS / Time: 0h:4m:9s
+
+--------------------------------------------------------------------
+|                    FINALIZING TREE SEARCH                        |
+--------------------------------------------------------------------
+Performs final model parameters optimization
+Estimate model parameters (epsilon = 0.010)
+1. Initial log-likelihood: -39454.734
+2. Current log-likelihood: -39454.675
+3. Current log-likelihood: -39454.574
+4. Current log-likelihood: -39454.560
+5. Current log-likelihood: -39454.460
+6. Current log-likelihood: -39454.360
+7. Current log-likelihood: -39454.266
+8. Current log-likelihood: -39454.242
+9. Current log-likelihood: -39454.042
+10. Current log-likelihood: -39454.002
+11. Current log-likelihood: -39453.942
+12. Current log-likelihood: -39453.928
+Optimal log-likelihood: -39453.919
+Parameters optimization took 12 rounds (68.885 sec)
+BEST SCORE FOUND : -39453.919
+Total tree length: 11.691
+
+Total number of iterations: 102
+CPU time used for tree search: 206.117 sec (0h:3m:26s)
+Wall-clock time used for tree search: 106.365 sec (0h:1m:46s)
+Total CPU time used: 637.093 sec (0h:10m:37s)
+Total wall-clock time used: 318.170 sec (0h:5m:18s)
+
+Analysis results written to: 
+  IQ-TREE report:                /home/spielman/dms_modelselection//simulations/alignments/HIV_andersen_rep19_AA.fasta.iqtree
+  Maximum-likelihood tree:       /home/spielman/dms_modelselection//simulations/alignments/HIV_andersen_rep19_AA.fasta.treefile
+  Likelihood distances:          /home/spielman/dms_modelselection//simulations/alignments/HIV_andersen_rep19_AA.fasta.mldist
+  Screen log file:               /home/spielman/dms_modelselection//simulations/alignments/HIV_andersen_rep19_AA.fasta.log
+
+Date and Time: Sat Jun  8 14:35:55 2019

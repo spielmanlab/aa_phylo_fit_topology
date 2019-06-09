@@ -1,10 +1,11 @@
+#!/bin/bash
 
+TOPPATH=/home/spielman/dms_modelselection
+ALNPATH=${TOPPATH}/pandit_aa_alignments/
+OUTPATH=${TOPPATH}/fitted_trees_pandit/
 
-for LINE in {38..200}; do
+for LINE in {42..200}; do
     echo $LINE
-    TOPPATH=/Users/spielman/Projects/dms_modelselection
-    ALNPATH=${TOPPATH}/pandit_aa_alignments/
-    OUTPATH=${TOPPATH}/fitted_trees_pandit/
 
 
     FILE=${ALNPATH}/names.txt

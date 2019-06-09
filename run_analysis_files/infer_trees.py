@@ -4,7 +4,7 @@ import sys
 from copy import deepcopy
 
 def run_save_iqtree(alignment_file, data_type, model, outname, true_tree, threads):
-    
+    threads="AUTO -ntmax 8"
     ### Optimize tree under model ###
     if not os.path.exists(outname + "_inferredtree.iqtree"):
         print("Inferring tree", model)
@@ -52,13 +52,13 @@ def main():
     else: ## simulation
         rawname        = name + "_" + tree + "_rep" + repl + "_AA"
         true_tree_file =  "simulations/true_trees/" + tree + ".tree"
-        #for line in all_models:
-        #    if line.startswith(name + "," + tree + "," + repl):
-        #        line2 = line.split(",")
-        #        model = line2[4].strip()
-        #        q = line2[5].strip()
-        #        use_models[q] = model
-        #
+        for line in all_models:
+            if line.startswith(name + "," + tree + "," + repl):
+                line2 = line.split(",")
+                model = line2[4].strip()
+                q = line2[5].strip()
+                use_models[q] = model
+        
     alignment_file = alignment_path + rawname + ".fasta"
   
 
@@ -71,14 +71,9 @@ def main():
 #  run_save_iqtree(alignment_file, "AA", "Poisson", outname, true_tree_file, threads)
 
     ## GTR20
-#    outname = fitted_tree_path + rawname + "_GTR20"
-#    run_save_iqtree(alignment_file, "AA", "GTR20", outname, true_tree_file, threads)
+    outname = fitted_tree_path + rawname + "_GTR20"
+    run_save_iqtree(alignment_file, "AA", "GTR20", outname, true_tree_file, threads)
 
-    ## HB style for simulated data only
-    if tree != "NA":
-        outname = fitted_tree_path + rawname + "_HB"
-        model_file = "hb_models/" + name + "_HB.paml" 
-        run_save_iqtree(alignment_file, "AA", model_file + "+F", outname, true_tree_file, threads)
              
 
 main()

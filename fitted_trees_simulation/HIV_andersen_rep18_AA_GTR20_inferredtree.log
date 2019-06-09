@@ -3,10 +3,10 @@ Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor,
 Heiko Schmidt, Dominik Schrempf, Michael Woodhams.
 
 Host:    spielmanlab (AVX512, FMA3, 125 GB RAM)
-Command: iqtree -nt 4 -m GTR20 -s /home/spielman/dms_modelselection//simulations/alignments/HIV_andersen_rep18_AA.fasta -st AA -quiet
-Seed:    9249 (Using SPRNG - Scalable Parallel Random Number Generator)
-Time:    Thu Jun  6 15:17:18 2019
-Kernel:  AVX+FMA - 4 threads (24 CPU cores detected)
+Command: iqtree -nt AUTO -ntmax 8 -m GTR20 -s /home/spielman/dms_modelselection//simulations/alignments/HIV_andersen_rep18_AA.fasta -st AA
+Seed:    614961 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Sat Jun  8 14:23:11 2019
+Kernel:  AVX+FMA - auto-detect threads (24 CPU cores detected)
 
 Reading alignment file /home/spielman/dms_modelselection//simulations/alignments/HIV_andersen_rep18_AA.fasta ... Fasta format detected
 Alignment most likely contains protein sequences
@@ -203,10 +203,128 @@ NOTE: G3170-S-SLE-2013 (identical to G3151-S-SLE-2013) is ignored but added at t
 
 For your convenience alignment with unique sequences printed to /home/spielman/dms_modelselection//simulations/alignments/HIV_andersen_rep18_AA.fasta.uniqueseq.phy
 
-Create initial parsimony tree by phylogenetic likelihood library (PLL)... 7.663 seconds
+Create initial parsimony tree by phylogenetic likelihood library (PLL)... 0.062 seconds
 WARNING: GTR20 model will estimate 189 substitution rates that might be overfitting!
 WARNING: Please only use GTR20 with very large data and always test for model fit!
 
 NOTE: 18 MB RAM (0 GB) is required!
+Measuring multi-threading efficiency up to 8 CPU cores
+Increase to 10 rounds for branch lengths
+12 trees examined
+Threads: 1 / Time: 8.106 sec / Speedup: 1.000 / Efficiency: 100% / LogL: -156721
+Threads: 2 / Time: 3.764 sec / Speedup: 2.154 / Efficiency: 108% / LogL: -156721
+Threads: 3 / Time: 3.248 sec / Speedup: 2.496 / Efficiency: 83% / LogL: -156721
+Threads: 4 / Time: 3.467 sec / Speedup: 2.338 / Efficiency: 58% / LogL: -156721
+Threads: 5 / Time: 3.186 sec / Speedup: 2.544 / Efficiency: 51% / LogL: -156721
+Threads: 6 / Time: 2.921 sec / Speedup: 2.774 / Efficiency: 46% / LogL: -156721
+BEST NUMBER OF THREADS: 3
+
 Estimate model parameters (epsilon = 0.100)
-1. Initial log-likelihood: -44419.662
+1. Initial log-likelihood: -44420.309
+2. Current log-likelihood: -40321.029
+3. Current log-likelihood: -40037.842
+4. Current log-likelihood: -40034.419
+5. Current log-likelihood: -40034.206
+6. Current log-likelihood: -40034.071
+Optimal log-likelihood: -40034.046
+Parameters optimization took 6 rounds (119.325 sec)
+Computing ML distances based on estimated model parameters... 2.462 sec
+Computing BIONJ tree...
+0.018 seconds
+Log-likelihood of BIONJ tree: -40252.476
+--------------------------------------------------------------------
+|             INITIALIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Generating 98 parsimony trees... 6.579 second
+Computing log-likelihood of 98 initial trees ... 9.148 seconds
+Current best score: -40024.909
+
+Do NNI search on 20 best initial trees
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 1: -40019.289
+Iteration 10 / LogL: -40019.764 / Time: 0h:3m:18s
+Iteration 20 / LogL: -40021.593 / Time: 0h:3m:20s
+Finish initializing candidate tree set (20)
+Current best tree score: -40019.289 / CPU time: 55.299
+Number of iterations: 20
+--------------------------------------------------------------------
+|               OPTIMIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+BETTER TREE FOUND at iteration 24: -40019.289
+BETTER TREE FOUND at iteration 25: -40019.289
+BETTER TREE FOUND at iteration 27: -40019.289
+BETTER TREE FOUND at iteration 29: -40019.289
+Iteration 30 / LogL: -40080.757 / Time: 0h:3m:27s (0h:11m:45s left)
+BETTER TREE FOUND at iteration 32: -40019.288
+BETTER TREE FOUND at iteration 37: -40019.288
+Iteration 40 / LogL: -40111.947 / Time: 0h:3m:34s (0h:8m:50s left)
+Iteration 50 / LogL: -40019.289 / Time: 0h:3m:40s (0h:6m:30s left)
+UPDATE BEST LOG-LIKELIHOOD: -40019.288
+Iteration 60 / LogL: -40023.618 / Time: 0h:3m:47s (0h:4m:55s left)
+Iteration 70 / LogL: -40019.290 / Time: 0h:3m:53s (0h:3m:46s left)
+Iteration 80 / LogL: -40019.289 / Time: 0h:4m:0s (0h:2m:53s left)
+Iteration 90 / LogL: -40019.289 / Time: 0h:4m:7s (0h:2m:10s left)
+Iteration 100 / LogL: -40023.622 / Time: 0h:4m:13s (0h:1m:34s left)
+Iteration 110 / LogL: -40020.184 / Time: 0h:4m:20s (0h:1m:4s left)
+BETTER TREE FOUND at iteration 119: -40019.287
+Iteration 120 / LogL: -40021.112 / Time: 0h:4m:26s (0h:3m:41s left)
+Iteration 130 / LogL: -40019.289 / Time: 0h:4m:33s (0h:3m:8s left)
+Iteration 140 / LogL: -40020.243 / Time: 0h:4m:40s (0h:2m:38s left)
+Iteration 150 / LogL: -40019.288 / Time: 0h:4m:46s (0h:2m:12s left)
+Iteration 160 / LogL: -40019.289 / Time: 0h:4m:53s (0h:1m:48s left)
+BETTER TREE FOUND at iteration 167: -40019.287
+Iteration 170 / LogL: -40025.892 / Time: 0h:4m:59s (0h:2m:51s left)
+Iteration 180 / LogL: -40019.289 / Time: 0h:5m:6s (0h:2m:28s left)
+Iteration 190 / LogL: -40047.406 / Time: 0h:5m:13s (0h:2m:7s left)
+Iteration 200 / LogL: -40046.818 / Time: 0h:5m:19s (0h:1m:47s left)
+Iteration 210 / LogL: -40036.364 / Time: 0h:5m:26s (0h:1m:28s left)
+Iteration 220 / LogL: -40032.463 / Time: 0h:5m:32s (0h:1m:11s left)
+Iteration 230 / LogL: -40023.618 / Time: 0h:5m:38s (0h:0m:54s left)
+BETTER TREE FOUND at iteration 231: -40019.287
+Iteration 240 / LogL: -40020.177 / Time: 0h:5m:45s (0h:2m:11s left)
+BETTER TREE FOUND at iteration 247: -40019.287
+BETTER TREE FOUND at iteration 248: -40019.286
+Iteration 250 / LogL: -40020.186 / Time: 0h:5m:51s (0h:2m:18s left)
+BETTER TREE FOUND at iteration 252: -40019.286
+BETTER TREE FOUND at iteration 259: -40019.286
+Iteration 260 / LogL: -40020.228 / Time: 0h:5m:58s (0h:2m:16s left)
+Iteration 270 / LogL: -40046.557 / Time: 0h:6m:4s (0h:2m:0s left)
+Iteration 280 / LogL: -40020.772 / Time: 0h:6m:11s (0h:1m:44s left)
+Iteration 290 / LogL: -40019.288 / Time: 0h:6m:17s (0h:1m:30s left)
+Iteration 300 / LogL: -40019.287 / Time: 0h:6m:24s (0h:1m:15s left)
+Iteration 310 / LogL: -40019.287 / Time: 0h:6m:31s (0h:1m:1s left)
+Iteration 320 / LogL: -40019.287 / Time: 0h:6m:37s (0h:0m:48s left)
+Iteration 330 / LogL: -40019.286 / Time: 0h:6m:44s (0h:0m:35s left)
+Iteration 340 / LogL: -40019.287 / Time: 0h:6m:50s (0h:0m:22s left)
+Iteration 350 / LogL: -40019.287 / Time: 0h:6m:56s (0h:0m:10s left)
+Iteration 360 / LogL: -40019.287 / Time: 0h:7m:3s (0h:0m:-2s left)
+TREE SEARCH COMPLETED AFTER 360 ITERATIONS / Time: 0h:7m:3s
+
+--------------------------------------------------------------------
+|                    FINALIZING TREE SEARCH                        |
+--------------------------------------------------------------------
+Performs final model parameters optimization
+Estimate model parameters (epsilon = 0.010)
+1. Initial log-likelihood: -40019.286
+2. Current log-likelihood: -40018.964
+3. Current log-likelihood: -40018.909
+4. Current log-likelihood: -40018.883
+5. Current log-likelihood: -40018.863
+Optimal log-likelihood: -40018.853
+Parameters optimization took 5 rounds (22.427 sec)
+BEST SCORE FOUND : -40018.853
+Total tree length: 12.025
+
+Total number of iterations: 360
+CPU time used for tree search: 819.247 sec (0h:13m:39s)
+Wall-clock time used for tree search: 277.666 sec (0h:4m:37s)
+Total CPU time used: 1329.276 sec (0h:22m:9s)
+Total wall-clock time used: 445.817 sec (0h:7m:25s)
+
+Analysis results written to: 
+  IQ-TREE report:                /home/spielman/dms_modelselection//simulations/alignments/HIV_andersen_rep18_AA.fasta.iqtree
+  Maximum-likelihood tree:       /home/spielman/dms_modelselection//simulations/alignments/HIV_andersen_rep18_AA.fasta.treefile
+  Likelihood distances:          /home/spielman/dms_modelselection//simulations/alignments/HIV_andersen_rep18_AA.fasta.mldist
+  Screen log file:               /home/spielman/dms_modelselection//simulations/alignments/HIV_andersen_rep18_AA.fasta.log
+
+Date and Time: Sat Jun  8 14:30:37 2019

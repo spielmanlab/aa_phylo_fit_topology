@@ -3,10 +3,10 @@ Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor,
 Heiko Schmidt, Dominik Schrempf, Michael Woodhams.
 
 Host:    spielmanlab (AVX512, FMA3, 125 GB RAM)
-Command: iqtree -nt 4 -m GTR20 -s /home/spielman/dms_modelselection//simulations/alignments/HA_spiralia_rep7_AA.fasta -st AA -quiet
-Seed:    930553 (Using SPRNG - Scalable Parallel Random Number Generator)
-Time:    Thu Jun  6 15:17:17 2019
-Kernel:  AVX+FMA - 4 threads (24 CPU cores detected)
+Command: iqtree -nt AUTO -ntmax 8 -m GTR20 -s /home/spielman/dms_modelselection//simulations/alignments/HA_spiralia_rep7_AA.fasta -st AA
+Seed:    906697 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Sat Jun  8 16:30:15 2019
+Kernel:  AVX+FMA - auto-detect threads (24 CPU cores detected)
 
 Reading alignment file /home/spielman/dms_modelselection//simulations/alignments/HA_spiralia_rep7_AA.fasta ... Fasta format detected
 Alignment most likely contains protein sequences
@@ -118,10 +118,97 @@ Alignment has 103 sequences with 564 columns, 561 distinct patterns
  103  Limnognathia_maerski              0.00%    passed     98.11%
 ****  TOTAL                             0.00%  0 sequences failed composition chi2 test (p-value<5%; df=19)
 
-Create initial parsimony tree by phylogenetic likelihood library (PLL)... 4.815 seconds
+Create initial parsimony tree by phylogenetic likelihood library (PLL)... 0.037 seconds
 WARNING: GTR20 model will estimate 189 substitution rates that might be overfitting!
 WARNING: Please only use GTR20 with very large data and always test for model fit!
 
 NOTE: 9 MB RAM (0 GB) is required!
+Measuring multi-threading efficiency up to 8 CPU cores
+Increase to 10 rounds for branch lengths
+49 trees examined
+Threads: 1 / Time: 8.018 sec / Speedup: 1.000 / Efficiency: 100% / LogL: -51463
+Threads: 2 / Time: 5.023 sec / Speedup: 1.596 / Efficiency: 80% / LogL: -51463
+Threads: 3 / Time: 3.870 sec / Speedup: 2.072 / Efficiency: 69% / LogL: -51463
+Threads: 4 / Time: 3.168 sec / Speedup: 2.531 / Efficiency: 63% / LogL: -51463
+Threads: 5 / Time: 2.910 sec / Speedup: 2.756 / Efficiency: 55% / LogL: -51463
+Threads: 6 / Time: 3.550 sec / Speedup: 2.258 / Efficiency: 38% / LogL: -51463
+BEST NUMBER OF THREADS: 5
+
 Estimate model parameters (epsilon = 0.100)
-1. Initial log-likelihood: -36799.119
+1. Initial log-likelihood: -36799.799
+2. Current log-likelihood: -33522.986
+3. Current log-likelihood: -33298.567
+4. Current log-likelihood: -33293.634
+5. Current log-likelihood: -33292.378
+6. Current log-likelihood: -33291.718
+7. Current log-likelihood: -33291.567
+8. Current log-likelihood: -33291.218
+9. Current log-likelihood: -33290.975
+10. Current log-likelihood: -33290.619
+11. Current log-likelihood: -33290.499
+12. Current log-likelihood: -33290.397
+Optimal log-likelihood: -33290.361
+Parameters optimization took 12 rounds (44.063 sec)
+Computing ML distances based on estimated model parameters... 0.573 sec
+Computing BIONJ tree...
+0.005 seconds
+Log-likelihood of BIONJ tree: -33296.620
+--------------------------------------------------------------------
+|             INITIALIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Generating 98 parsimony trees... 4.070 second
+Computing log-likelihood of 98 initial trees ... 2.418 seconds
+Current best score: -33288.980
+
+Do NNI search on 20 best initial trees
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 1: -33288.446
+Iteration 10 / LogL: -33332.750 / Time: 0h:1m:20s
+Iteration 20 / LogL: -33288.447 / Time: 0h:1m:21s
+Finish initializing candidate tree set (4)
+Current best tree score: -33288.446 / CPU time: 10.815
+Number of iterations: 20
+--------------------------------------------------------------------
+|               OPTIMIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Iteration 30 / LogL: -33330.022 / Time: 0h:1m:23s (0h:3m:24s left)
+Iteration 40 / LogL: -33330.030 / Time: 0h:1m:26s (0h:2m:14s left)
+Iteration 50 / LogL: -33288.516 / Time: 0h:1m:28s (0h:1m:32s left)
+Iteration 60 / LogL: -33288.459 / Time: 0h:1m:30s (0h:1m:3s left)
+Iteration 70 / LogL: -33291.183 / Time: 0h:1m:33s (0h:0m:41s left)
+Iteration 80 / LogL: -33330.022 / Time: 0h:1m:35s (0h:0m:25s left)
+Iteration 90 / LogL: -33332.749 / Time: 0h:1m:37s (0h:0m:12s left)
+Iteration 100 / LogL: -33291.177 / Time: 0h:1m:40s (0h:0m:1s left)
+TREE SEARCH COMPLETED AFTER 102 ITERATIONS / Time: 0h:1m:40s
+
+--------------------------------------------------------------------
+|                    FINALIZING TREE SEARCH                        |
+--------------------------------------------------------------------
+Performs final model parameters optimization
+Estimate model parameters (epsilon = 0.010)
+1. Initial log-likelihood: -33288.446
+2. Current log-likelihood: -33288.430
+3. Current log-likelihood: -33288.413
+4. Current log-likelihood: -33288.370
+5. Current log-likelihood: -33288.227
+6. Current log-likelihood: -33288.159
+7. Current log-likelihood: -33288.140
+8. Current log-likelihood: -33288.126
+Optimal log-likelihood: -33288.117
+Parameters optimization took 8 rounds (13.817 sec)
+BEST SCORE FOUND : -33288.117
+Total tree length: 10.870
+
+Total number of iterations: 102
+CPU time used for tree search: 132.830 sec (0h:2m:12s)
+Wall-clock time used for tree search: 29.684 sec (0h:0m:29s)
+Total CPU time used: 506.749 sec (0h:8m:26s)
+Total wall-clock time used: 114.486 sec (0h:1m:54s)
+
+Analysis results written to: 
+  IQ-TREE report:                /home/spielman/dms_modelselection//simulations/alignments/HA_spiralia_rep7_AA.fasta.iqtree
+  Maximum-likelihood tree:       /home/spielman/dms_modelselection//simulations/alignments/HA_spiralia_rep7_AA.fasta.treefile
+  Likelihood distances:          /home/spielman/dms_modelselection//simulations/alignments/HA_spiralia_rep7_AA.fasta.mldist
+  Screen log file:               /home/spielman/dms_modelselection//simulations/alignments/HA_spiralia_rep7_AA.fasta.log
+
+Date and Time: Sat Jun  8 16:32:10 2019
