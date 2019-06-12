@@ -3,9 +3,9 @@ Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor,
 Heiko Schmidt, Dominik Schrempf, Michael Woodhams.
 
 Host:    spielmanlab (AVX512, FMA3, 125 GB RAM)
-Command: iqtree -quiet -nt AUTO -ntmax 6 -m mtVer+G4 -s /home/spielman/dms_modelselection//simulations/alignments/NP_ruhfel_rep13_AA.fasta -st AA -redo -bb 1000
-Seed:    741668 (Using SPRNG - Scalable Parallel Random Number Generator)
-Time:    Mon Jun 10 16:38:40 2019
+Command: iqtree -quiet -nt AUTO -ntmax 7 -m mtVer+G4 -s /home/spielman/dms_modelselection//simulations/alignments/NP_ruhfel_rep13_AA.fasta -st AA -redo -bb 1000
+Seed:    827132 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Tue Jun 11 19:21:57 2019
 Kernel:  AVX+FMA - auto-detect threads (24 CPU cores detected)
 
 Reading alignment file /home/spielman/dms_modelselection//simulations/alignments/NP_ruhfel_rep13_AA.fasta ... Fasta format detected
@@ -404,9 +404,153 @@ NOTE: Pinus_strobus (identical to Pinus_albicaulis) is ignored but added at the 
 
 For your convenience alignment with unique sequences printed to /home/spielman/dms_modelselection//simulations/alignments/NP_ruhfel_rep13_AA.fasta.uniqueseq.phy
 
-Create initial parsimony tree by phylogenetic likelihood library (PLL)... 0.150 seconds
-Generating 1000 samples for ultrafast bootstrap (seed: 741668)...
+Create initial parsimony tree by phylogenetic likelihood library (PLL)... 0.164 seconds
+Generating 1000 samples for ultrafast bootstrap (seed: 827132)...
 
 NOTE: 112 MB RAM (0 GB) is required!
-Measuring multi-threading efficiency up to 6 CPU cores
+Measuring multi-threading efficiency up to 7 CPU cores
 Increase to 10 rounds for branch lengths
+3 trees examined
+Threads: 1 / Time: 10.277 sec / Speedup: 1.000 / Efficiency: 100% / LogL: -188367
+Threads: 2 / Time: 5.815 sec / Speedup: 1.767 / Efficiency: 88% / LogL: -188367
+Threads: 3 / Time: 4.343 sec / Speedup: 2.366 / Efficiency: 79% / LogL: -188367
+Threads: 4 / Time: 3.677 sec / Speedup: 2.795 / Efficiency: 70% / LogL: -188367
+Threads: 5 / Time: 3.134 sec / Speedup: 3.279 / Efficiency: 66% / LogL: -188367
+Threads: 6 / Time: 3.822 sec / Speedup: 2.689 / Efficiency: 45% / LogL: -188367
+BEST NUMBER OF THREADS: 5
+
+Estimate model parameters (epsilon = 0.100)
+1. Initial log-likelihood: -88569.952
+2. Current log-likelihood: -87952.745
+3. Current log-likelihood: -87918.362
+4. Current log-likelihood: -87914.545
+5. Current log-likelihood: -87914.398
+Optimal log-likelihood: -87914.380
+Gamma shape alpha: 1.691
+Parameters optimization took 5 rounds (2.277 sec)
+Computing ML distances based on estimated model parameters... 35.739 sec
+Computing BIONJ tree...
+0.094 seconds
+Log-likelihood of BIONJ tree: -88180.419
+--------------------------------------------------------------------
+|             INITIALIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Generating 98 parsimony trees... 15.512 second
+Computing log-likelihood of 98 initial trees ... 22.441 seconds
+Current best score: -87880.333
+
+Do NNI search on 20 best initial trees
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 1: -87827.581
+Iteration 10 / LogL: -87844.008 / Time: 0h:2m:18s
+Iteration 20 / LogL: -87844.172 / Time: 0h:3m:13s
+Finish initializing candidate tree set (20)
+Current best tree score: -87827.581 / CPU time: 151.388
+Number of iterations: 20
+--------------------------------------------------------------------
+|               OPTIMIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+BETTER TREE FOUND at iteration 28: -87827.576
+Iteration 30 / LogL: -87830.715 / Time: 0h:4m:2s (0h:13m:37s left)
+Iteration 40 / LogL: -87927.114 / Time: 0h:4m:49s (0h:10m:51s left)
+BETTER TREE FOUND at iteration 42: -87827.576
+BETTER TREE FOUND at iteration 48: -87827.573
+Iteration 50 / LogL: -87827.696 / Time: 0h:5m:36s (0h:11m:10s left)
+Log-likelihood cutoff on original alignment: -87903.202
+Iteration 60 / LogL: -87827.574 / Time: 0h:6m:28s (0h:9m:38s left)
+BETTER TREE FOUND at iteration 65: -87827.572
+Iteration 70 / LogL: -87855.322 / Time: 0h:7m:16s (0h:10m:0s left)
+BETTER TREE FOUND at iteration 71: -87827.571
+Iteration 80 / LogL: -87827.696 / Time: 0h:8m:6s (0h:9m:19s left)
+BETTER TREE FOUND at iteration 82: -87827.571
+BETTER TREE FOUND at iteration 87: -87827.570
+Iteration 90 / LogL: -87828.847 / Time: 0h:8m:58s (0h:9m:46s left)
+BETTER TREE FOUND at iteration 91: -87827.570
+BETTER TREE FOUND at iteration 92: -87827.569
+BETTER TREE FOUND at iteration 99: -87827.569
+Iteration 100 / LogL: -87849.761 / Time: 0h:9m:46s (0h:9m:46s left)
+Log-likelihood cutoff on original alignment: -87903.202
+NOTE: Bootstrap correlation coefficient of split occurrence frequencies: 0.997
+Iteration 110 / LogL: -87827.693 / Time: 0h:10m:38s (0h:8m:46s left)
+Iteration 120 / LogL: -87833.125 / Time: 0h:11m:28s (0h:7m:42s left)
+BETTER TREE FOUND at iteration 125: -87827.569
+BETTER TREE FOUND at iteration 126: -87827.568
+Iteration 130 / LogL: -87827.966 / Time: 0h:12m:13s (0h:9m:5s left)
+Iteration 140 / LogL: -87830.053 / Time: 0h:12m:59s (0h:8m:1s left)
+Iteration 150 / LogL: -87827.568 / Time: 0h:13m:50s (0h:7m:3s left)
+Log-likelihood cutoff on original alignment: -87903.202
+BETTER TREE FOUND at iteration 153: -87827.568
+Iteration 160 / LogL: -87827.693 / Time: 0h:14m:36s (0h:8m:32s left)
+BETTER TREE FOUND at iteration 165: -87827.568
+Iteration 170 / LogL: -87828.972 / Time: 0h:15m:27s (0h:8m:41s left)
+BETTER TREE FOUND at iteration 176: -87827.567
+Iteration 180 / LogL: -87829.976 / Time: 0h:16m:14s (0h:8m:42s left)
+BETTER TREE FOUND at iteration 181: -87827.567
+Iteration 190 / LogL: -87827.692 / Time: 0h:17m:4s (0h:8m:13s left)
+Iteration 200 / LogL: -87827.567 / Time: 0h:17m:48s (0h:7m:14s left)
+Log-likelihood cutoff on original alignment: -87903.202
+NOTE: Bootstrap correlation coefficient of split occurrence frequencies: 0.999
+BETTER TREE FOUND at iteration 205: -87827.567
+Iteration 210 / LogL: -87852.875 / Time: 0h:18m:38s (0h:8m:28s left)
+Iteration 220 / LogL: -87827.567 / Time: 0h:19m:27s (0h:7m:32s left)
+BETTER TREE FOUND at iteration 228: -87827.566
+Iteration 230 / LogL: -87936.938 / Time: 0h:20m:15s (0h:8m:40s left)
+BETTER TREE FOUND at iteration 238: -87827.566
+Iteration 240 / LogL: -87827.566 / Time: 0h:21m:1s (0h:8m:36s left)
+Iteration 250 / LogL: -87828.297 / Time: 0h:21m:48s (0h:7m:42s left)
+Log-likelihood cutoff on original alignment: -87903.202
+Iteration 260 / LogL: -87827.690 / Time: 0h:22m:37s (0h:6m:48s left)
+BETTER TREE FOUND at iteration 267: -87827.566
+Iteration 270 / LogL: -87828.665 / Time: 0h:23m:27s (0h:8m:27s left)
+Iteration 280 / LogL: -87829.989 / Time: 0h:24m:20s (0h:7m:35s left)
+Iteration 290 / LogL: -87828.843 / Time: 0h:25m:7s (0h:6m:41s left)
+Iteration 300 / LogL: -87827.566 / Time: 0h:25m:55s (0h:5m:48s left)
+Log-likelihood cutoff on original alignment: -87903.202
+NOTE: Bootstrap correlation coefficient of split occurrence frequencies: 0.999
+Iteration 310 / LogL: -87827.567 / Time: 0h:26m:43s (0h:7m:46s left)
+Iteration 320 / LogL: -87829.445 / Time: 0h:27m:31s (0h:6m:54s left)
+Iteration 330 / LogL: -87853.350 / Time: 0h:28m:19s (0h:6m:1s left)
+Iteration 340 / LogL: -87827.928 / Time: 0h:29m:12s (0h:5m:10s left)
+Iteration 350 / LogL: -87830.051 / Time: 0h:30m:0s (0h:4m:17s left)
+Log-likelihood cutoff on original alignment: -87903.202
+Iteration 360 / LogL: -87831.729 / Time: 0h:30m:51s (0h:3m:26s left)
+TREE SEARCH COMPLETED AFTER 368 ITERATIONS / Time: 0h:31m:29s
+
+--------------------------------------------------------------------
+|                    FINALIZING TREE SEARCH                        |
+--------------------------------------------------------------------
+Performs final model parameters optimization
+Estimate model parameters (epsilon = 0.010)
+1. Initial log-likelihood: -87827.566
+Optimal log-likelihood: -87827.565
+Gamma shape alpha: 1.702
+Parameters optimization took 1 rounds (0.304 sec)
+BEST SCORE FOUND : -87827.565
+Creating bootstrap support values...
+Split supports printed to NEXUS file /home/spielman/dms_modelselection//simulations/alignments/NP_ruhfel_rep13_AA.fasta.splits.nex
+Total tree length: 51.040
+
+Total number of iterations: 368
+CPU time used for tree search: 9124.412 sec (2h:32m:4s)
+Wall-clock time used for tree search: 1846.982 sec (0h:30m:46s)
+Total CPU time used: 9277.908 sec (2h:34m:37s)
+Total wall-clock time used: 1890.803 sec (0h:31m:30s)
+
+Computing bootstrap consensus tree...
+Reading input file /home/spielman/dms_modelselection//simulations/alignments/NP_ruhfel_rep13_AA.fasta.splits.nex...
+344 taxa and 1282 splits.
+Consensus tree written to /home/spielman/dms_modelselection//simulations/alignments/NP_ruhfel_rep13_AA.fasta.contree
+Reading input trees file /home/spielman/dms_modelselection//simulations/alignments/NP_ruhfel_rep13_AA.fasta.contree
+Log-likelihood of consensus tree: -87827.581
+
+Analysis results written to: 
+  IQ-TREE report:                /home/spielman/dms_modelselection//simulations/alignments/NP_ruhfel_rep13_AA.fasta.iqtree
+  Maximum-likelihood tree:       /home/spielman/dms_modelselection//simulations/alignments/NP_ruhfel_rep13_AA.fasta.treefile
+  Likelihood distances:          /home/spielman/dms_modelselection//simulations/alignments/NP_ruhfel_rep13_AA.fasta.mldist
+
+Ultrafast bootstrap approximation results written to:
+  Split support values:          /home/spielman/dms_modelselection//simulations/alignments/NP_ruhfel_rep13_AA.fasta.splits.nex
+  Consensus tree:                /home/spielman/dms_modelselection//simulations/alignments/NP_ruhfel_rep13_AA.fasta.contree
+  Screen log file:               /home/spielman/dms_modelselection//simulations/alignments/NP_ruhfel_rep13_AA.fasta.log
+
+Date and Time: Tue Jun 11 19:53:30 2019
