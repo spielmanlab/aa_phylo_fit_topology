@@ -50,8 +50,7 @@ msel_pandit <- read_csv("../processed_model_selection/quantile_model_selection_p
 ######### Normalize RF values #########
 simulation_rf_fit %>% 
     left_join(sim_info) %>%
-    filter(tree != "greenalga") %>%
-    mutate(max_rf = 2*ntaxa - 6) %>%
+    mutate(max_rf = 2*ntaxa - 6) %>%  ### twice the number of internal edges
     mutate(rf_true_norm = rf_true/max_rf) -> simulation_rf_fit
 
 pandit_rf_fit %>% 
