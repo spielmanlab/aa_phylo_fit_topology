@@ -3,21 +3,21 @@ import re
 import sys
 from copy import deepcopy
 
-def run_save_iqtree(alignment_file, data_type, model, outname, true_tree, threads):
-    threads="AUTO -ntmax 8"
+def run_save_iqtree(alignment_file, data_type, model, outname, true_tree, threadmax):
     ### Optimize tree under model ###
     if not os.path.exists(outname + "_inferredtree.iqtree"):
-        print("Inferring tree", model)
-        os.system("iqtree -nt " + str(threads) + " -m " + model + " -s " + alignment_file + " -st " + data_type)
+        #print("Inferring tree", model)
+        os.system("iqtree -quiet -nt AUTO -ntmax " + str(threadmax) + " -m " + model + " -s " + alignment_file + " -st " + data_type  + " -redo -bb 1000")
         os.system("mv " + alignment_file + ".log " + outname + "_inferredtree.log")
         os.system("mv " + alignment_file + ".treefile " + outname + "_inferredtree.treefile")
         os.system("mv " + alignment_file + ".iqtree " + outname + "_inferredtree.iqtree")
+        os.system("mv " + alignment_file + ".contree " + outname + "_inferredtree.contree")
         os.system("rm " + alignment_file + ".*")    
     
     ### Optimize parameters on true tree ###
 #     if not os.path.exists(outname + "_optimizedtruetree.iqtree"):
 #         print("Optimzing true tree", model)
-#         os.system("iqtree -nt " + str(threads) + " -m " + model + " -s " + alignment_file + " -st " + data_type + " -te " + true_tree)
+#         os.system("iqtree -nt " + str(threadmax) + " -m " + model + " -s " + alignment_file + " -st " + data_type + " -te " + true_tree)
 #         os.system("mv " + alignment_file + ".log " + outname + "_optimizedtruetree.log")
 #         os.system("mv " + alignment_file + ".treefile " + outname + "_optimizedtruetree.treefile")
 #         os.system("mv " + alignment_file + ".iqtree " + outname + "_optimizedtruetree.iqtree")
@@ -32,7 +32,7 @@ def main():
     fitted_tree_path    = sys.argv[4]
     alignment_path      = sys.argv[5]
     model_file          = sys.argv[6]
-    threads             = sys.argv[7]
+    threadmax           = sys.argv[7]
    
     with open(model_file, "r") as f: 
         all_models = f.readlines()
@@ -63,16 +63,17 @@ def main():
   
 
     # quartile models    
-#    for modelquant in range(1,6): 
-#        outname = fitted_tree_path + rawname + "_m" + str(modelquant)
-#        run_save_iqtree(alignment_file, "AA", use_models[str(modelquant)], outname, true_tree_file, threads)
+    for modelquant in range(1,6): 
+        outname = fitted_tree_path + rawname + "_m" + str(modelquant)
+        run_save_iqtree(alignment_file, "AA", use_models[str(modelquant)], outname, true_tree_file, threadmax)
+    
     ## poisson
-#    outname = fitted_tree_path + rawname + "_poisson"
-#  run_save_iqtree(alignment_file, "AA", "Poisson", outname, true_tree_file, threads)
+    outname = fitted_tree_path + rawname + "_poisson"
+    run_save_iqtree(alignment_file, "AA", "Poisson", outname, true_tree_file, threadmax)
 
     ## GTR20
     outname = fitted_tree_path + rawname + "_GTR20"
-    run_save_iqtree(alignment_file, "AA", "GTR20", outname, true_tree_file, threads)
+    run_save_iqtree(alignment_file, "AA", "GTR20", outname, true_tree_file, threadmax)
 
              
 

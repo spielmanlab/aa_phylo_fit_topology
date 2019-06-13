@@ -41,7 +41,7 @@ assert(len(sys.argv)==2),"\n specify `simulation`, `pandit`"
 reps  = list(range(1,21))
 if type == "simulation":
     alignment_path = "simulations/simulation_alignments/"
-    names = ["HA", "NP", "HIV", "LAC", "Gal4"]
+    names = ["HA", "NP", "HIV"] #, "LAC", "Gal4"]
     trees = ["greenalga", "opisthokonta", "prum", "ruhfel", "salichos", "dosreis", "andersen", "spiralia", "rayfinned"]
 
 if type == "pandit":
