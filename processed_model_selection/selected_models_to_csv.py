@@ -42,7 +42,7 @@ reps  = list(range(1,21))
 if type == "simulation":
     alignment_path = "simulations/simulation_alignments/"
     names = ["HA", "NP", "HIV"] #, "LAC", "Gal4"]
-    trees = ["greenalga", "opisthokonta", "prum", "ruhfel", "salichos", "dosreis", "andersen", "spiralia", "rayfinned"]
+    trees = ["opisthokonta", "prum", "ruhfel", "salichos", "dosreis", "andersen", "spiralia", "rayfinned"]
 
 if type == "pandit":
     alignment_path = "pandit_aa_alignments/"
