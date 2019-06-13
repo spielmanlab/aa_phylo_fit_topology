@@ -5,15 +5,20 @@ from copy import deepcopy
 
 def run_save_iqtree(alignment_file, data_type, model, outname, true_tree, threadmax):
     ### Optimize tree under model ###
-    if not os.path.exists(outname + "_inferredtree.iqtree"):
-        #print("Inferring tree", model)
+    if not os.path.exists(outname + "_inferredtree.contree"):
+        print("Inferring",alignment_file, model)
+#    else:
+#        print("OK", alignment_file, model)
+
         os.system("iqtree -quiet -nt AUTO -ntmax " + str(threadmax) + " -m " + model + " -s " + alignment_file + " -st " + data_type  + " -redo -bb 1000")
         os.system("mv " + alignment_file + ".log " + outname + "_inferredtree.log")
         os.system("mv " + alignment_file + ".treefile " + outname + "_inferredtree.treefile")
         os.system("mv " + alignment_file + ".iqtree " + outname + "_inferredtree.iqtree")
         os.system("mv " + alignment_file + ".contree " + outname + "_inferredtree.contree")
         os.system("rm " + alignment_file + ".*")    
-    
+    else:
+        print("ALREADY PRESENT", alignment_file, model) 
+   
     ### Optimize parameters on true tree ###
 #     if not os.path.exists(outname + "_optimizedtruetree.iqtree"):
 #         print("Optimzing true tree", model)
