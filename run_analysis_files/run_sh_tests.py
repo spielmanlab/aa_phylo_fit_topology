@@ -21,7 +21,7 @@ if type == "pandit":
     treelist_name  = type + ".trees"
 elif type == "simulation":
     alignmentpath  = "../simulations/alignments/"
-    inferencepath  = "../fitted_trees_simulation/"
+    inferencepath  = "../fitted_with_ufb/" #"../fitted_trees_simulation/"
     shpath        = "../sh_tests_simulation/"
     true_tree_path = "../simulations/true_trees/"
     quantilefile   = "../processed_model_selection/quantile_model_selection_simulation.csv"
@@ -109,7 +109,7 @@ def loop_over_tests(type):
             ## Call the SH test
             sh_outfile = shpath + name + ".topology_tests"
             if not os.path.exists(sh_outfile):
-                os.system("iqtree -quiet -nt 4 -s " + alnfile + " -m " + fitmodels[name] + " -z " + treelist_name + " -zb 10000 -te " + m1tree + " -redo")
+                os.system("iqtree -quiet -nt 4 -s " + alnfile + " -m " + fitmodels[name] + " -z " + treelist_name + " -zb 10000 -au -te " + m1tree + " -redo")
                 os.system("mv " + alnfile + ".iqtree " + sh_outfile)
                 os.system("rm " + alnfile + ".*")
             with open(sh_outfile, "r") as f:
@@ -157,7 +157,7 @@ def loop_over_tests(type):
                         os.system("rm " + alnfile + ".*")
                     with open(sh_outfile, "r") as f:
                         lines = f.readlines()
-                    this_out = parse_tests(lines, name + "," + tree + "," str(rep))
+                    this_out = parse_tests(lines, name + "," + tree + "," + str(rep))
                     outstring += this_out
                     with open(rawname + ".shtest", "w") as f:
                         f.write(this_out)
