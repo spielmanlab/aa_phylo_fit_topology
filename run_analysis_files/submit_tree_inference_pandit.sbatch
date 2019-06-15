@@ -11,7 +11,7 @@ LINE=${SLURM_ARRAY_TASK_ID}
 REP=${SLURM_ARRAY_TASK_ID}
 TOPPATH=/csm_data/spielman_lab/dms_modelselection
 ALNPATH=${TOPPATH}/pandit_aa_alignments/
-OUTPATH=${TOPPATH}/fitted_trees_pandit/
+OUTPATH=${TOPPATH}/fitted_with_ufb_pandit/
 mkdir -p $OUTPATH
 
 FILE=${ALNPATH}/names.txt
