@@ -1,0 +1,145 @@
+IQ-TREE multicore version 1.6.7 for Linux 64-bit built Aug 23 2018
+Developed by Bui Quang Minh, Nguyen Lam Tung, Olga Chernomor,
+Heiko Schmidt, Dominik Schrempf, Michael Woodhams.
+
+Host:    csm-com-001 (AVX2, FMA3, 62 GB RAM)
+Command: iqtree -quiet -nt AUTO -ntmax 8 -m GTR20 -s /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF04776.fasta -st AA -redo -bb 1000
+Seed:    547148 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Fri Jun 14 20:23:50 2019
+Kernel:  AVX+FMA - auto-detect threads (48 CPU cores detected)
+
+Reading alignment file /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF04776.fasta ... Fasta format detected
+Alignment most likely contains protein sequences
+Alignment has 21 sequences with 154 columns, 151 distinct patterns
+112 parsimony-informative, 22 singleton sites, 19 constant sites
+                   Gap/Ambiguity  Composition  p-value
+   1  Q9T0D7ARATH47162    24.68%    passed     99.97%
+   2  O64484ARATH82171    41.56%    passed     61.50%
+   3  Q9M2M6ARATH3109     30.52%    passed     90.34%
+   4  Q9LSG8ARATH122231   28.57%    passed     43.36%
+   5  Q9FYM5ARATH333447   25.32%    passed     89.41%
+   6  Q9SRX1ARATH160276   24.03%    passed     97.84%
+   7  Q9LMC2ARATH117235   22.73%    passed     99.25%
+   8  Q9LH42ARATH165285   21.43%    passed     97.67%
+   9  Q9LM50ARATH127227   34.42%    passed     93.12%
+  10  Q9LR96ARATH623745   20.13%    passed     99.49%
+  11  Q9LR96ARATH218345   16.88%    passed     93.99%
+  12  Q9C6N2ARATH134255   20.78%    passed     94.05%
+  13  O23610ARATH141265   18.83%    passed     80.15%
+  14  O49698ARATH158254   37.01%    passed     18.64%
+  15  Q9SV54ARATH170273   32.47%    passed     18.60%
+  16  Q9FN07ARATH151219   55.19%    passed     15.15%
+  17  Q9SIU9ARATH167277   27.92%    passed     78.78%
+  18  Q9SU90ARATH244361   23.38%    passed     97.37%
+  19  O22236ARATH281377   37.01%    passed     80.59%
+  20  Q9LN37ARATH338431   38.96%    passed     63.31%
+  21  Q9FFR6ARATH57155    35.71%    passed     22.20%
+WARNING: 1 sequences contain more than 50% gaps/ambiguity
+****  TOTAL               29.41%  0 sequences failed composition chi2 test (p-value<5%; df=19)
+
+Create initial parsimony tree by phylogenetic likelihood library (PLL)... 0.001 seconds
+Generating 1000 samples for ultrafast bootstrap (seed: 547148)...
+WARNING: GTR20 model will estimate 189 substitution rates that might be overfitting!
+WARNING: Please only use GTR20 with very large data and always test for model fit!
+
+NOTE: 1 MB RAM (0 GB) is required!
+Measuring multi-threading efficiency up to 8 CPU cores
+Increase to 10 rounds for branch lengths
+603 trees examined
+Threads: 1 / Time: 8.008 sec / Speedup: 1.000 / Efficiency: 100% / LogL: -4843
+Threads: 2 / Time: 5.403 sec / Speedup: 1.482 / Efficiency: 74% / LogL: -4843
+Threads: 3 / Time: 4.542 sec / Speedup: 1.763 / Efficiency: 59% / LogL: -4843
+Threads: 4 / Time: 4.201 sec / Speedup: 1.906 / Efficiency: 48% / LogL: -4843
+BEST NUMBER OF THREADS: 3
+
+Estimate model parameters (epsilon = 0.100)
+1. Initial log-likelihood: -4592.403
+2. Current log-likelihood: -4340.866
+3. Current log-likelihood: -4300.027
+4. Current log-likelihood: -4295.162
+5. Current log-likelihood: -4293.655
+6. Current log-likelihood: -4293.516
+7. Current log-likelihood: -4293.392
+8. Current log-likelihood: -4293.235
+Optimal log-likelihood: -4293.165
+Parameters optimization took 8 rounds (2.431 sec)
+Computing ML distances based on estimated model parameters... 0.039 sec
+Computing BIONJ tree...
+0.005 seconds
+Log-likelihood of BIONJ tree: -4292.742
+--------------------------------------------------------------------
+|             INITIALIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+Generating 98 parsimony trees... 0.174 second
+Computing log-likelihood of 98 initial trees ... 0.403 seconds
+Current best score: -4291.201
+
+Do NNI search on 20 best initial trees
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 1: -4284.398
+Estimate model parameters (epsilon = 0.100)
+BETTER TREE FOUND at iteration 2: -4278.892
+Iteration 10 / LogL: -4279.081 / Time: 0h:0m:28s
+Iteration 20 / LogL: -4278.900 / Time: 0h:0m:28s
+Finish initializing candidate tree set (4)
+Current best tree score: -4278.892 / CPU time: 4.174
+Number of iterations: 20
+--------------------------------------------------------------------
+|               OPTIMIZING CANDIDATE TREE SET                      |
+--------------------------------------------------------------------
+UPDATE BEST LOG-LIKELIHOOD: -4278.892
+Iteration 30 / LogL: -4279.351 / Time: 0h:0m:29s (0h:1m:12s left)
+Iteration 40 / LogL: -4286.675 / Time: 0h:0m:29s (0h:0m:47s left)
+Iteration 50 / LogL: -4279.347 / Time: 0h:0m:30s (0h:0m:31s left)
+Log-likelihood cutoff on original alignment: -4302.589
+Iteration 60 / LogL: -4279.376 / Time: 0h:0m:30s (0h:0m:21s left)
+Iteration 70 / LogL: -4280.991 / Time: 0h:0m:31s (0h:0m:14s left)
+Iteration 80 / LogL: -4282.323 / Time: 0h:0m:31s (0h:0m:8s left)
+Iteration 90 / LogL: -4282.319 / Time: 0h:0m:31s (0h:0m:4s left)
+Iteration 100 / LogL: -4283.896 / Time: 0h:0m:32s (0h:0m:0s left)
+Log-likelihood cutoff on original alignment: -4302.585
+NOTE: Bootstrap correlation coefficient of split occurrence frequencies: 0.995
+TREE SEARCH COMPLETED AFTER 103 ITERATIONS / Time: 0h:0m:32s
+
+--------------------------------------------------------------------
+|                    FINALIZING TREE SEARCH                        |
+--------------------------------------------------------------------
+Performs final model parameters optimization
+Estimate model parameters (epsilon = 0.010)
+1. Initial log-likelihood: -4278.892
+2. Current log-likelihood: -4278.777
+3. Current log-likelihood: -4278.688
+4. Current log-likelihood: -4278.612
+5. Current log-likelihood: -4278.550
+6. Current log-likelihood: -4278.525
+Optimal log-likelihood: -4278.519
+Parameters optimization took 6 rounds (1.232 sec)
+BEST SCORE FOUND : -4278.519
+Creating bootstrap support values...
+Split supports printed to NEXUS file /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF04776.fasta.splits.nex
+Total tree length: 11.626
+
+Total number of iterations: 103
+CPU time used for tree search: 23.608 sec (0h:0m:23s)
+Wall-clock time used for tree search: 7.916 sec (0h:0m:7s)
+Total CPU time used: 92.653 sec (0h:1m:32s)
+Total wall-clock time used: 33.861 sec (0h:0m:33s)
+
+Computing bootstrap consensus tree...
+Reading input file /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF04776.fasta.splits.nex...
+21 taxa and 174 splits.
+Consensus tree written to /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF04776.fasta.contree
+Reading input trees file /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF04776.fasta.contree
+Log-likelihood of consensus tree: -4278.519
+
+Analysis results written to: 
+  IQ-TREE report:                /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF04776.fasta.iqtree
+  Maximum-likelihood tree:       /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF04776.fasta.treefile
+  Likelihood distances:          /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF04776.fasta.mldist
+
+Ultrafast bootstrap approximation results written to:
+  Split support values:          /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF04776.fasta.splits.nex
+  Consensus tree:                /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF04776.fasta.contree
+  Screen log file:               /csm_data/spielman_lab/dms_modelselection/pandit_aa_alignments/PF04776.fasta.log
+
+Date and Time: Fri Jun 14 20:24:24 2019

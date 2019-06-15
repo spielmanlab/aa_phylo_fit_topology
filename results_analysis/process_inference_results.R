@@ -6,18 +6,27 @@ library(multcomp)
 library(broom)
 library(ggforce)
 library(xtable)
+library(colorspace)
+library(ggridges)
 
-theme_set(theme_bw())
-figure_directory <- "figures/"
+theme_set(theme_classic() + theme(axis.line = element_line(colour = "grey10"),
+                                  strip.background = element_rect(size=0.5)))
+figure_directory <- "figures_new/"
 
 ########################## Factor levels and labeling ################################ 
-name_levels <- c("Gal4", "LAC", "NP", "HA", "HIV")
-name_labels_nsites <- c("Gal4 (63)", "LAC (262)", "NP (497)", "HA (564)", "HIV (661)")
+name_levels <- c("NP", "HA", "HIV")
+name_labels_nsites <- c("NP (497)", "HA (564)", "HIV (661)")
 
-model_levels <- c("m1", "m2", "m3", "m4", "poisson", "m5")
-model_labels <- c("M1", "M2", "M3", "M4", "Poisson", "M5")
-model_levels_nom1 <- c("m2", "m3", "m4", "poisson", "m5")
-model_labels_nom1 <- c("M2", "M3", "M4", "Poisson", "M5")
+model_levels <- c("m1", "m2", "m3", "m4", "m5", "poisson", "GTR20")
+model_labels <- c("M1", "M2", "M3", "M4", "M5", "JC", "GTR20")
+m1to5_cols <- sequential_hcl(5, palette = "ylorrd")
+poisson_col <- "grey40"
+gtr20_col   <- "grey80" 
+model_colors <- c(m1to5_cols, poisson_col, gtr20_col)
+model_colors_nom1 <- c(m1to5_cols[2:5], poisson_col, gtr20_col)
+
+model_levels_nom1 <- c("m2", "m3", "m4", "m5", "poisson", "GTR20")
+model_labels_nom1 <- c("M2", "M3", "M4",  "M5", "JC", "GTR20")
 
 tree_levels <- c("ruhfel", "rayfinned", "dosreis", "prum", "andersen", "spiralia", "opisthokonta", "salichos")
 tree_labels <- c("Green Plant", "Ray-finned fish", "Mammals", "Aves", "Lassa Virus", "Spiralia", "Opisthokonta", "Yeast")
@@ -27,36 +36,38 @@ tree_labels_ntaxa <- c("Green Plant (360)", "Ray-finned fish (305)", "Mammals (2
 
 ################################### Read in all data ##################################
 
-### RF and xIC results
-simulation_rf_fit  <- read_csv("inference_results_simulation.csv",guess_max = 10000)
-pandit_rf_fit     <- read_csv("inference_results_pandit.csv",guess_max = 10000) 
+### RF and BIC results
+simulation_rf_fit  <- read_csv("rf_fit_simulation.csv",guess_max = 10000)
+pandit_rf_fit      <- read_csv("rf_fit_pandit.csv",guess_max = 10000) 
 
 ### basic information about datasets
-sim_info <- read_csv("../simulations/simulation_trees_ntaxa.csv") 
-pandit_info <- read_csv("../pandit_aa_alignments/info.csv")
+sim_info    <- read_csv("../simulations/simulation_trees_ntaxa.csv") 
+pandit_info <- read_csv("../pandit_aa_alignments/pandit_info.csv")
 
-### SH test results
-simulation_sh <- read_csv("results_sh_simulation.csv")
-pandit_sh <- read_csv("results_sh_pandit.csv")
+### Topology test results
+simulation_topology <- read_csv("topology_tests_simulation.csv")
+pandit_topology     <- read_csv("topology_tests_pandit.csv")
 
 ## actual selected models
 msel_simulation <- read_csv("../processed_model_selection/quantile_model_selection_simulation.csv")
-all_sel <- read_csv("../processed_model_selection/all_model_selection_simulation.csv")
-msel_pandit <- read_csv("../processed_model_selection/quantile_model_selection_pandit.csv")
+all_sel         <- read_csv("../processed_model_selection/all_model_selection_simulation.csv")
+msel_pandit     <- read_csv("../processed_model_selection/quantile_model_selection_pandit.csv")
 
 
+## Bootstrap analysis
+sim_ufb <- read_csv("ufb_splits_simulation.csv")
 
 
 ######### Normalize RF values #########
 simulation_rf_fit %>% 
     left_join(sim_info) %>%
     mutate(max_rf = 2*ntaxa - 6) %>%  ### twice the number of internal edges
-    mutate(rf_true_norm = rf_true/max_rf) -> simulation_rf_fit
+    mutate(rf_true_norm = rf/max_rf) -> simulation_rf_fit
 
 pandit_rf_fit %>% 
     left_join(pandit_info) %>%
     mutate(max_rf = 2*ntaxa - 6) %>%
-    mutate(rf_m1_norm     = rf_m1/max_rf) -> pandit_rf_fit
+    mutate(rf_m1_norm     = rf/max_rf) -> pandit_rf_fit
 
 
 
@@ -64,8 +75,7 @@ pandit_rf_fit %>%
 
 #### simulation fit results
 simulation_rf_fit %>%
-  filter(optim == "inferredtree") %>% 
-  dplyr::select(-AIC, -AICc, -k,-logl, -rf_true, -rf_true_norm, -treelength) %>%
+  dplyr::select(-AIC, -AICc, -k,-logl, -rf, -rf_true_norm, -treelength) %>%
   group_by(name, tree, rep) %>%
   mutate(ic.rank = as.integer(rank(BIC))) %>%
     mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
@@ -75,45 +85,50 @@ simulation_rf_fit %>%
     geom_bar(color="black", size=.2) + 
     facet_grid(name_levels~tree_levels) +
     panel_border() + 
-    scale_fill_brewer(palette = "RdYlBu", name = "Protein Model") +
+    #scale_fill_brewer(palette = "RdYlBu", name = "Protein Model") +
+    scale_fill_manual(values=model_colors, name = "Protein Model") +
     xlab("Model rank by BIC") + ylab("Count") + 
     theme(strip.text = element_text(size=8), 
           legend.position = "bottom", 
-          legend.key.size = unit(4, "pt"), 
-          legend.text = element_text(size=6), 
+          legend.key.size = unit(6, "pt"), 
+          legend.text = element_text(size=7), 
           legend.title = element_text(size=7), 
           axis.text = element_text(size=7), 
           axis.title = element_text(size=8)) +
     guides(fill = guide_legend(nrow=1)) -> model_fit_simulation_bars
 l <- get_legend(model_fit_simulation_bars)
+
 both <- plot_grid(model_fit_simulation_bars + theme(legend.position = "none"), l, nrow=2, rel_heights=c(1,0.05))
-save_plot(paste0(figure_directory,"model_fit_simulation_bars.pdf"), both, base_width=7)
+save_plot(paste0(figure_directory,"model_fit_simulation_bars.pdf"), both, base_width=10)
   
   
 
 
-######## simulation RF *violins*
+######## simulation RF boxplots
 simulation_rf_fit %>%
-  filter(optim == "inferredtree") %>%
   mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
          tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels_ntaxa),
          name_levels  = factor(name, levels=name_levels, labels = name_labels_nsites)) %>%
         ggplot(aes(x = model_levels, y = rf_true_norm)) + 
-            #geom_boxplot(outlier.shape = "", size=0.15,  aes(fill = name_levels), width=1) + 
-            geom_violin(size=0.15,  aes(fill = name_levels), scale = "width") + 
-            #geom_jitter(position=position_jitterdodge(dodge.width = 0.3), shape = 21, alpha=0.7, color = "grey40", aes(fill = name_levels))  +       
+            #geom_sina(aes(color = name_levels), position = position_dodge(width=0.5)) + 
+            geom_boxplot(aes(fill = name_levels), outlier.size = 0.3, size=0.25,  width=0.9) + 
+            #geom_violin(size=0.15,  aes(fill = name_levels), scale = "width") + 
+            #geom_point(position=position_jitterdodge(jitter.width = 0.2), size=0.75, alpha=0.7, aes(color = name_levels))  +       
+            facet_wrap(~tree_levels, scales = "free_y", nrow=2) +
             #scale_color_brewer(palette = "RdYlBu", name = "Protein Model", labels = model_labels) +
             #scale_fill_brewer(palette = "Set1", name = "DMS Simulations", labels = name_labels_nsites) +
-            scale_fill_discrete(name = "DMS Parameterization", labels = name_labels_nsites) +
-            background_grid() +
+            scale_fill_hue(l=50, name = "DMS Parameterization", labels = name_labels_nsites) +
+            panel_border() +
+            background_grid() + 
             #scale_y_continuous(limits = y_limits) + 
-            facet_wrap(~tree_levels, scales = "free_y", nrow=2) +
             xlab("Protein model") + ylab("Normalized Robinson-Foulds Distance") + 
-            theme(legend.position = "bottom") -> simulation_rf_violin  
-save_plot(paste0(figure_directory,"simulation_rf_violin.pdf"), simulation_rf_violin, base_width=11, base_height=5)
+            #geom_point(data = sim_rf_plotdata_mean, aes(x = model_levels, y = meanrf)) + 
+            #geom_line(data = sim_rf_plotdata_mean, aes(x = model_levels, y = meanrf, group = name_levels)) + 
+            theme(legend.position = "bottom") -> simulation_rf_boxplot  
+save_plot(paste0(figure_directory,"simulation_rf_boxplot.pdf"), simulation_rf_boxplot, base_width=12, base_height=5)
 
 
-# simulation_rf_fit %>% filter(optim == "inferredtree") %>% group_by(name, tree, model) %>% tally(rf_true ==0) %>% filter(n>1) %>% xtable()
+# simulation_rf_fit %>% group_by(name, tree, model) %>% tally(rf ==0) %>% filter(n>1) %>% xtable()
 # % latex table generated in R 3.5.1 by xtable 1.8-4 package
 # % Thu Jun  6 12:09:44 2019
 # \begin{table}[ht]
@@ -122,26 +137,165 @@ save_plot(paste0(figure_directory,"simulation_rf_violin.pdf"), simulation_rf_vio
 #   \hline
 #  & name & tree & model & n \\ 
 #   \hline
-# 1 & HA & salichos & m1 &   2 \\ 
-#   2 & HA & salichos & m2 &   2 \\ 
-#   3 & HIV & opisthokonta & m1 &   8 \\ 
-#   4 & HIV & opisthokonta & m2 &   9 \\ 
-#   5 & HIV & opisthokonta & m3 &   4 \\ 
-#   6 & HIV & opisthokonta & m4 &   4 \\ 
-#   7 & HIV & opisthokonta & poisson &   6 \\ 
-#   8 & HIV & salichos & m1 &   2 \\ 
-#   9 & HIV & salichos & m2 &   3 \\ 
-#   10 & HIV & salichos & poisson &   3 \\ 
-#   11 & HIV & spiralia & m1 &   3 \\ 
-#   12 & HIV & spiralia & m3 &   3 \\ 
-#   13 & HIV & spiralia & m4 &   4 \\ 
-#   14 & HIV & spiralia & poisson &   4 \\ 
-#   15 & NP & salichos & m1 &   4 \\ 
-#   16 & NP & salichos & m2 &   3 \\ 
-#   17 & NP & salichos & m4 &   2 \\ 
-#    \hline
+# 1 & HA & opisthokonta & GTR20 &   4 \\ 
+#   2 & HA & salichos & GTR20 &   4 \\ 
+#   3 & HA & salichos & m1 &   2 \\ 
+#   4 & HA & salichos & m2 &   2 \\ 
+#   5 & HIV & opisthokonta & GTR20 &  16 \\ 
+#   6 & HIV & opisthokonta & m1 &   9 \\ 
+#   7 & HIV & opisthokonta & m2 &   9 \\ 
+#   8 & HIV & opisthokonta & m3 &   4 \\ 
+#   9 & HIV & opisthokonta & m4 &   4 \\ 
+#   10 & HIV & opisthokonta & poisson &   6 \\ 
+#   11 & HIV & salichos & GTR20 &   6 \\ 
+#   12 & HIV & salichos & m1 &   2 \\ 
+#   13 & HIV & salichos & m2 &   2 \\ 
+#   14 & HIV & salichos & m3 &   2 \\ 
+#   15 & HIV & salichos & m4 &   2 \\ 
+#   16 & HIV & salichos & poisson &   3 \\ 
+#   17 & HIV & spiralia & GTR20 &   5 \\ 
+#   18 & HIV & spiralia & m1 &   3 \\ 
+#   19 & HIV & spiralia & m2 &   2 \\ 
+#   20 & HIV & spiralia & m3 &   3 \\ 
+#   21 & HIV & spiralia & m4 &   4 \\ 
+#   22 & HIV & spiralia & poisson &   4 \\ 
+#   23 & NP & opisthokonta & GTR20 &   3 \\ 
+#   24 & NP & salichos & GTR20 &   4 \\ 
+#   25 & NP & salichos & m1 &   4 \\ 
+#   26 & NP & salichos & m2 &   3 \\ 
+#   27 & NP & salichos & m4 &   3 \\     
+# \hline
 # \end{tabular}
 # \end{table}
+
+
+
+
+
+sim_ufb %>% 
+    mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
+        tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels_ntaxa),
+        name_levels  = factor(name, levels=name_levels), 
+        rep = factor(rep)) -> ufb_fact
+ufb_fact %>%
+    group_by(model_levels, tree_levels, name_levels, rep) %>%
+    tally() %>%
+    rename(total_considered = n) -> ufb_total_nodes
+     
+############## False positive nodes ##############
+ufb_fact %>% 
+    mutate(supported = boot >= 95) %>% 
+    filter(in_true == FALSE, supported == TRUE) %>% 
+    group_by(model_levels, tree_levels, name_levels, rep) %>%
+    tally() %>% 
+    complete(model_levels, tree_levels, name_levels, rep, fill = list(n = 0)) %>%
+    left_join(ufb_total_nodes) %>%
+    mutate(percent = n / total_considered) %>%
+    distinct() -> ufb_fp
+
+
+ufb_fp %>%
+    filter(name_levels == "HA") %>%
+    ggplot(aes(x = model_levels, y = percent, fill = model_levels)) + 
+        geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5,  size=2, color="grey10")  +     
+        scale_fill_manual(values=model_colors, name = "Protein Model") +         
+        facet_wrap(~tree_levels, nrow=2) +
+        scale_y_continuous(breaks=c(0, 0.02, 0.04, 0.06)) + 
+        background_grid() + 
+        panel_border() +
+        theme(legend.position = "none",
+              strip.text = element_text(size=8), 
+              axis.text.x = element_text(size=8)) +
+        xlab("Protein Models") + ylab("Percent false positive nodes") +
+        geom_hline(yintercept = 0.05, color = "dodgerblue3")  -> sim_ufb_fp
+save_plot(paste0(figure_directory,"ufb_simulation_fp_HA.pdf"), sim_ufb_fp, base_width = 10, base_height=4)
+
+
+ufb_fp %>%
+    filter(name_levels %in% c("HIV", "NP")) %>%
+    ggplot(aes(x = model_levels, y = percent, fill = model_levels)) + 
+        geom_jitter(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5,  size=1.75, color="grey10")  +     
+        scale_fill_manual(values=model_colors, name = "Protein Model") +         
+        facet_grid(name_levels~tree_levels) +
+        background_grid() + 
+        panel_border() +
+        theme(legend.position = "none",
+              strip.text = element_text(size=8), 
+              axis.text.x = element_text(size=6, angle=30)) +
+        xlab("Protein Models") + ylab("Percent false positive nodes") +
+        geom_hline(yintercept = 0.05, color = "dodgerblue3")  -> sim_ufb_fp
+save_plot(paste0(figure_directory,"ufb_simulation_fp_HIV-NP.pdf"), sim_ufb_fp, base_width = 10, base_height=3)
+
+
+
+############ False negative nodes ##############
+# ufb_fact %>% 
+#     mutate(supported = boot >= 95) %>% 
+#     filter(in_true == TRUE, supported == FALSE) %>% 
+#     group_by(model_levels, tree_levels, name_levels, rep) %>%
+#     tally() %>% 
+#     complete(model_levels, tree_levels, name_levels, rep, fill = list(n = 0)) %>%
+#     left_join(ufb_total_nodes) %>%
+#     mutate(percent = n / total_considered) %>%
+#     distinct() %>%
+#     ggplot(aes(x = model_levels, y = percent, fill = model_levels)) + 
+#         geom_jitter(position=position_jitterdodge(), alpha=0.7, shape = 21, size=1.25, color="grey10")  +     
+#         scale_fill_manual(values=model_colors, name = "Protein Model") +         
+#         facet_grid(name_levels~tree_levels) +
+#         scale_y_continuous(breaks=seq(0, 0.5, 0.1)) + 
+#         background_grid() + 
+#         panel_border() +
+#         theme(legend.position = "none",
+#               strip.text = element_text(size=8), 
+#               axis.text = element_text(size=7), 
+#               axis.text.x = element_text(size=6, angle=30), 
+#               axis.title = element_text(size=8)) +
+#         xlab("Protein Models") + ylab("Percent false negative nodes") -> sim_ufb_fn
+# save_plot(paste0(figure_directory,"ufb_simulation_fnnodes.pdf"), sim_ufb_fn, base_width=10.5)
+
+
+############ Node accuracy ##############
+ufb_fact %>% 
+    mutate(supported = boot >= 95) %>% 
+    filter(in_true == supported) %>% 
+    group_by(model_levels, tree_levels, name_levels, rep) %>%
+    tally() %>% 
+    complete(model_levels, tree_levels, name_levels, rep, fill = list(n = 0)) %>%
+    left_join(ufb_total_nodes) %>%
+    mutate(percent = n / total_considered) %>%
+    distinct() -> ufb_accuracy
+
+ufb_accuracy %>%
+    filter(name_levels == "HA") %>%
+    ggplot(aes(x = model_levels, y = percent, fill = model_levels)) + 
+        geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5,  size=2, color="grey10")  +     
+        scale_fill_manual(values=model_colors, name = "Protein Model") +         
+        facet_wrap(~tree_levels, nrow=2, scales="free_y") +
+        #scale_y_continuous(breaks=seq(0.5, 1.0, 0.1)) + 
+        background_grid() + 
+        panel_border() +
+        theme(legend.position = "none",
+              strip.text = element_text(size=8), 
+              axis.text.x = element_text(size=8)) +
+        xlab("Protein Models") + ylab("Percent accurate nodes") -> sim_ufb_acc
+save_plot(paste0(figure_directory,"ufb_simulation_accuracy_HA.pdf"), sim_ufb_acc, base_width = 10, base_height=4)
+
+
+ufb_accuracy %>%
+    filter(name_levels %in% c("HIV", "NP")) %>%
+    ggplot(aes(x = model_levels, y = percent, fill = model_levels)) + 
+        geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5,  size=1.75, color="grey10")  +     
+        scale_fill_manual(values=model_colors, name = "Protein Model") +         
+        facet_grid(name_levels~tree_levels) +
+        scale_y_continuous(breaks=seq(0.5, 1.0, 0.1)) + 
+        background_grid() + 
+        panel_border() +
+        theme(legend.position = "none",
+              strip.text = element_text(size=8), 
+              axis.text.x = element_text(size=6, angle=30)) +
+        xlab("Protein Models") + ylab("Percent accurate nodes") -> sim_ufb_acc
+save_plot(paste0(figure_directory,"ufb_simulation_accuracy_HIV-NP.pdf"), sim_ufb_acc, base_width = 10, base_height=3)
+
 
 
 
@@ -158,108 +312,122 @@ msel_pandit %>%
   mutate(model_matrix_levels = fct_reorder(model_matrix, n)) %>%
   ggplot(aes(x = model_matrix_levels, y = n), fill = "grey60") + 
   geom_col() +
-  geom_text(aes(x = model_matrix_levels, y = n+2, label = n), size=3)+
+  geom_text(aes(x = model_matrix_levels, y = n+4, label = n), size=3)+
   xlab("M1 Model Matrix") + 
   ylab("Count") +
-  theme(axis.text.x = element_text(size=8))-> m1_pandit_model_plot
+  theme(axis.text.x = element_text(size=7))-> m1_pandit_model_plot
 
   #### PANDIT fit results
-  pandit_rf_fit %>%
-    filter(optim == "inferredtree") %>%
+pandit_rf_fit %>%
     group_by(name) %>%
-    mutate(ic.rank = as.integer(rank(BIC))) %>%
+    mutate(ic.rank = as.integer(rank(BIC))) -> pandit_ranks
+    
+pandit_ranks %>%    
     mutate(model_levels = factor(model, levels=model_levels, labels = model_labels)) %>%
     ggplot(aes(x = factor(ic.rank), fill = model_levels)) + 
     geom_bar(color="black", size=.2) + 
     panel_border() + 
-    scale_fill_brewer(palette = "RdYlBu", name = "") +
-    xlab("Model rank by BIC") + ylab("Count") + 
-    theme(legend.position = "bottom") +
-    guides( fill = guide_legend(nrow=1)) -> model_fit_pandit_bars
+    scale_fill_manual(values=model_colors, name = "") +
+    xlab("Model rank by BIC") + ylab("Count")-> model_fit_pandit_bars
+    #theme(legend.key.size = unit(6, "pt"), 
+    #      legend.text = element_text(size=7), 
+    #      legend.title = element_text(size=7))
+    #guides( fill = guide_legend(nrow=1))
+     
   
-plot_grid(m1_pandit_model_plot, model_fit_pandit_bars, scale=0.93, nrow=1, labels="auto") -> pandit_model_grid
+pandit_ranks %>% 
+    filter(model == "GTR20") %>% 
+    ggplot(aes(x = ic.rank, y = ntaxa, color = treelength)) + 
+        geom_point(alpha=0.7, size=2) + geom_smooth(method = "lm", color= "grey20") + 
+        scale_x_continuous(breaks=1:6) + 
+        scale_color_continuous(name = "Treelength") + 
+        xlab("GTR20 model rank") + ylab("Number of taxa") + 
+        annotate("text", x = 5, y=325, label = "R^2 == 0.61", parse=TRUE) -> gtr20_rank_plot
+        
+        
+        
+plot_grid(m1_pandit_model_plot, model_fit_pandit_bars, gtr20_rank_plot, scale=0.93, nrow=1, labels="auto") -> pandit_model_grid
 
-save_plot(paste0(figure_directory, "pandit_model_bars.pdf"), pandit_model_grid, base_width=10)
+save_plot(paste0(figure_directory, "pandit_model_bars.pdf"), pandit_model_grid, base_width=12, base_height=2.5)
   
 
 
-    
+
+
+
+
+
 pandit_rf_fit %>%
-  filter(model != "m1", optim == "inferredtree") %>%
-  mutate(model_levels = factor(model, levels=model_levels_nom1, labels = model_labels_nom1)) -> pandit_rf_fit_plotme
-pandit_rf_fit_plotme %>%
-    group_by(model_levels) %>%
-    summarize(meanrf = mean(rf_m1_norm)) -> pandit_rf_fit_plotme_mean
-
-pandit_rf_fit_plotme %>%
-  ggplot(aes(x = model_levels, y = rf_m1_norm, fill = model_levels)) + 
-  geom_violin()+
-  panel_border() + 
-  scale_fill_manual(values = c("#FC8D59", "#FEE090", "#E0F3F8" ,"#91BFDB", "#4575B4"), name = "Protein Model", labels = model_labels_nom1) +
-  geom_point(data = pandit_rf_fit_plotme_mean, aes(x = model_levels, y = meanrf), size=2.5, color = "grey20") + 
-  geom_path(data = pandit_rf_fit_plotme_mean, aes(x = model_levels, y = meanrf), color = "grey20", group = "") + 
-  #scale_fill_brewer(palette = "RdYlBu", name = "Protein Model", labels = model_labels_nom1) +
-  xlab("Protein Models") + ylab("Normalized RF distance from M1 tree") +
-  theme(legend.position = "none") -> rf_m1_pandit_plot     
+  filter(model != "m1") %>%
+  mutate(model_levels = factor(model, levels=model_levels_nom1, labels = model_labels_nom1)) %>%
+  ggplot(aes(y = model_levels, fill = model_levels, x = rf_m1_norm)) + 
+    geom_density_ridges(scale=1.5, quantile_lines=TRUE, quantiles=2)+
+      scale_fill_manual(values = model_colors_nom1, name = "Protein Model", labels = model_labels_nom1) +
+      ylab("Protein Models") + xlab("Normalized RF distance from M1 tree") +
+      scale_x_continuous(expand = c(0.01, 0)) +
+      scale_y_discrete(expand = c(0.05, 0)) +
+      background_grid(colour.major = "grey70") +
+      theme(legend.position = "none") -> rf_m1_pandit_plot     
 
 
   
 #### PANDIT results
-pandit_sh %>%
-    gather(model, pvalue, m1:poisson) %>% 
+pandit_topology %>%
+    filter(whichtest == "au") %>%
+    gather(model, pvalue, m1:GTR20) %>% 
     mutate(notsig = pvalue >= 0.01) %>%
     group_by(model, notsig) %>%
     tally() %>%
     mutate(perc_in_conf=n/200) %>%
-    mutate(model_levels = factor(model, levels=model_levels, labels = model_labels)) -> pandit_sh_summary
+    mutate(model_levels = factor(model, levels=model_levels, labels = model_labels)) -> pandit_au_summary
 
-pandit_sh_summary  %>% filter(notsig == FALSE) %>% mutate(label = paste0(100*(perc_in_conf), "%")) -> pandit_sh_summary_false
-pandit_sh_summary %>%
+pandit_au_summary  %>% filter(notsig == TRUE) %>% mutate(label = paste0(100*(perc_in_conf), "%")) -> pandit_au_summary_false
+pandit_au_summary %>%
   mutate(notsig = factor(notsig, levels=c("TRUE", "FALSE"))) %>%
     ggplot(aes(x = model_levels, y = perc_in_conf, fill = notsig)) + 
         geom_col() +
-        geom_text(data = pandit_sh_summary_false, aes(x = model_levels, y = perc_in_conf -.015, label = label), size=3) + 
-        scale_fill_hue(l=60, name = "In M1 confidence set") +
+        geom_text(data = pandit_au_summary_false, aes(x = model_levels, y = 1.02, label = label), size=3) + 
+        scale_fill_manual(values=c("palegreen3", "dodgerblue3"), name = "In M1 confidence set") +
         xlab("Models") + ylab("Percent of alignments") +
         theme(legend.position = "bottom") + 
-        guides(fill = guide_legend(nrow=1, title.position = "left", hjust = 0.8))-> pandit_sh_barplot
+          guides(fill = guide_legend(nrow=1, title.position = "left")) -> pandit_au_barplot
         
 
-pandit_sh %>% filter(m4 >=0.01, m5>=0.01, poisson <0.01) %>% nrow()  -> poisson_only   
-pandit_sh %>% filter(m4 >=0.01, m5<0.01, poisson >=0.01) %>% nrow()  -> m5_only
-pandit_sh %>% filter(m4 <0.01,  m5>=0.01, poisson >=0.01) %>% nrow() -> m4_only
-pandit_sh %>% filter(m4 >=0.01, m5<0.01, poisson <0.01) %>% nrow()   -> m5_poisson       
-pandit_sh %>% filter(m4 <0.01,  m5<0.01, poisson >=0.01) %>% nrow()  -> m4_m5
-pandit_sh %>% filter(m4 <0.01,  m5>=0.01, poisson <0.01) %>% nrow()  -> m4_poisson
-pandit_sh %>% filter(m4 <0.01,  m5<0.01, poisson <0.01) %>% nrow()   -> all_three        
+pandit_topology %>% filter(whichtest == "au", m4 >=0.01, m5>=0.01, poisson <0.01) %>% nrow()  -> poisson_only   
+pandit_topology %>% filter(whichtest == "au", m4 >=0.01, m5<0.01, poisson >=0.01) %>% nrow()  -> m5_only
+pandit_topology %>% filter(whichtest == "au", m4 <0.01,  m5>=0.01, poisson >=0.01) %>% nrow() -> m4_only
+pandit_topology %>% filter(whichtest == "au", m4 >=0.01, m5<0.01, poisson <0.01) %>% nrow()   -> m5_poisson       
+pandit_topology %>% filter(whichtest == "au", m4 <0.01,  m5<0.01, poisson >=0.01) %>% nrow()  -> m4_m5
+pandit_topology %>% filter(whichtest == "au", m4 <0.01,  m5>=0.01, poisson <0.01) %>% nrow()  -> m4_poisson
+pandit_topology %>% filter(whichtest == "au", m4 <0.01,  m5<0.01, poisson <0.01) %>% nrow()   -> all_three        
 venn_numbers <- tibble(type = c("m4_only", "m5_only", "poisson_only", "m4_m5", "m4_poisson", "m5_poisson", "all"), 
                       labels = c(m4_only, m5_only, poisson_only, m4_m5, m4_poisson, m5_poisson, all_three),                       x = c(0,     1.4,  -1.4,    0.75,   -0.75,   0,   0),   
                       y = c(1.5,  -0.7,   -0.7,    0.5,    0.5,    -1,   0))                                
 df.venn <- data.frame(x = c(0, 0.866, -0.866),
                       y = c(1, -0.5, -0.5),
-                      labels = c('M4', 'M5', 'Poisson'))
+                      labels = c('M4', 'M5', 'JC'))
 ggplot(df.venn, aes(x0 = x, y0 = y, r = 1.5, fill = labels)) +
-  geom_circle(alpha = .4, size = 1, colour = 'grey60') +
+  geom_circle(alpha = 0.5, size = 1, colour = 'grey50') +
   theme_void() + 
   coord_fixed(clip = "off") + 
 theme(legend.position = 'none') +
-  #scale_fill_manual(values = c('cornflowerblue', 'firebrick',  'gold')) +
+  scale_fill_manual(values = c(poisson_col, m1to5_cols[4], m1to5_cols[5])) +
   #scale_colour_manual(values = c('cornflowerblue', 'firebrick', 'gold'), guide = FALSE) +
   labs(fill = NULL) +
   annotate("text", x = venn_numbers$x, y = venn_numbers$y, label = venn_numbers$labels, size = 5) +
   annotate("text", x = 0, y = 2.65, label = "M4",fontface = "bold", size=4) +
-  annotate("text", x = -2.6, y = -1.5,  label = "Poisson",fontface = "bold", size=4) +
-  annotate("text", x = 2.45, y = -1.5, label = "M5",fontface = "bold", size=4) -> disagree_m1_venn
+  annotate("text", x = -2.3, y = -1.5,  label = "JC",fontface = "bold", size=4) +
+  annotate("text", x = 2.3, y = -1.5, label = "M5",fontface = "bold", size=4) -> disagree_m1_venn
 
 
 
 
-pandit_sh_barplot_nolegend <- pandit_sh_barplot + theme(legend.position = "none")
-pandit_sh_barplot_legend<- get_legend(pandit_sh_barplot)
-pandit_rf_sh_plot <- plot_grid(rf_m1_pandit_plot, pandit_sh_barplot_nolegend, disagree_m1_venn, scale=c(0.92, 0.92, 0.88), nrow=1, labels="auto")
-pandit_rf_sh_plot_full <- plot_grid(pandit_rf_sh_plot, pandit_sh_barplot_legend, nrow=2, rel_widths=c(1, 0.2), rel_heights=c(1, 0.1))
+pandit_au_barplot_nolegend <- pandit_au_barplot + theme(legend.position = "none")
+pandit_au_barplot_legend<- get_legend(pandit_au_barplot)
+pandit_rf_au_plot <- plot_grid(rf_m1_pandit_plot, pandit_au_barplot_nolegend, disagree_m1_venn, scale=c(0.92, 0.92, 0.87), nrow=1, labels="auto")
+pandit_rf_au_plot_full <- plot_grid(pandit_rf_au_plot, pandit_au_barplot_legend, nrow=2, rel_widths=c(1, 0.2), rel_heights=c(1, 0.08))
 
-save_plot(paste0(figure_directory,"pandit_rf_m1set.pdf"), pandit_rf_sh_plot_full, base_width=12)
+save_plot(paste0(figure_directory,"pandit_rf_m1set.pdf"), pandit_rf_au_plot_full, base_width=12)
 
 
 
@@ -267,16 +435,20 @@ save_plot(paste0(figure_directory,"pandit_rf_m1set.pdf"), pandit_rf_sh_plot_full
 ######################### Model matrices and schematic ############################
 
 #### Plot schematic for m1-m5
-scheme_name <- "NP"
-scheme_tree <- "opisthokonta"
+scheme_name <- "HA"
+scheme_tree <- "ruhfel"
 scheme_rep <- 1
 all_sel %>% 
   dplyr::select(name, tree, model, bic, repl) %>%
   filter(name == scheme_name, tree == scheme_tree, repl == scheme_rep) -> scheme_data
 
 simulation_rf_fit %>% 
-  filter(name == "NP", optim == "inferredtree", model == "poisson", rep == 1, tree == "opisthokonta") %>% 
+  filter(name == scheme_name, model == "poisson", rep == scheme_rep, tree == scheme_tree) %>% 
   pull(BIC) -> poisson_bic
+
+simulation_rf_fit %>% 
+  filter(name == scheme_name, model == "GTR20", rep == scheme_rep, tree == scheme_tree) %>% 
+  pull(BIC) -> gtr20_bic
 
 
 msel_simulation %>%
@@ -285,21 +457,24 @@ msel_simulation %>%
   mutate(modelm2 = paste0("M", modelm),
     model_levels_matrix = paste0(modelm2, " (", model_name, ")")) %>%
   bind_rows(
-      tibble(name = scheme_name, tree = scheme_tree, repl = scheme_rep, modelm = 4.5, modelm2 = "Poisson", model_name = "Poisson", model_levels_matrix = "Poisson", bic = poisson_bic)) %>%
-  mutate(model_levels= factor(modelm2, levels=c("M1", "M2", "M3", "M4", "Poisson", "M5")))   -> chunks
+          tibble(name = scheme_name, tree = scheme_tree, repl = scheme_rep, modelm = 4.3, modelm2 = "JC", model_name = "JC", model_levels_matrix = "JC", bic = poisson_bic),
+          tibble(name = scheme_name, tree = scheme_tree, repl = scheme_rep, modelm = 4.6, modelm2 = "GTR20", model_name = "GTR20", model_levels_matrix = "GTR20", bic = gtr20_bic)
+      ) %>%
+  mutate(model_levels= factor(modelm2, levels=c("M1", "M2", "M3", "M4", "M5", "JC", "GTR20")))   -> chunks
 
 
 ggplot(scheme_data, aes(x = "", y = bic)) + 
-    geom_violin(scale="width", fill="grey80", color = "grey70", alpha=0.6) + 
+    geom_violin(fill="dodgerblue3", color = "dodgerblue4", alpha=0.3) + 
   geom_point(alpha = 0.3, size=2.5) +
   geom_point(data = chunks, shape=21, aes(x = 1, y = bic, fill = model_levels), size=2.5) + 
-    geom_label(data = chunks, x = 1.02, hjust="outward", color = "black", aes(y = bic+250, fill = model_levels, label = model_levels_matrix), size=3, fontface = "bold", alpha=0.8) + 
- # scale_color_brewer(palette = "RdYlBu") +
-  scale_fill_brewer(palette = "RdYlBu") +
+    geom_label(data = chunks,  x = 1.02, hjust="outward", color = "black", aes(y = bic+300, fill = model_levels, label = model_levels_matrix), size=3, fontface = "bold", alpha=0.8) + 
+    #geom_label(data = subset(chunks, model_levels != "M1"),  x = 1.02, hjust="outward", color = "black", aes(y = bic+300, fill = model_levels, label = model_levels_matrix), size=3, fontface = "bold", alpha=0.75) + 
+    #geom_label(data = subset(chunks, model_levels == "M1"), x = 1.02, hjust="outward", color = "white", aes(y = bic+300, fill = model_levels, label = model_levels_matrix), size=3, fontface = "bold", alpha=0.75) + 
+  scale_fill_manual(values = c(  lighten(lighten(model_colors[1])), model_colors[2:7])) +
   theme(legend.position = "none", axis.ticks.x = element_blank()) +
-    xlab("") + ylab("BIC values across all tested models")  -> range_scheme_plot
+    xlab("") + ylab("BIC values across all tested models")  -> quant_scheme_plot
 
-ggsave(paste0(figure_directory, "bic_dist_scheme_qviolin.pdf"), range_scheme_plot, width = 6, height=5)
+ggsave(paste0(figure_directory, "bic_dist_scheme_qviolin.pdf"), quant_scheme_plot, width = 6, height=5)
     
 
 for (m in 1:5) {
@@ -315,12 +490,18 @@ for (m in 1:5) {
                model_matrix_levels = fct_reorder(model_matrix, n)) %>%
         ggplot(aes(x = tree_levels, y = n, fill = model_matrix_levels)) + 
         geom_bar(stat="identity") +
-        facet_wrap(~name_levels, nrow=2) + 
+        facet_wrap(~name_levels, nrow=1) + 
         xlab("Simulation tree") + 
         ylab("Count") + 
-        labs(fill = paste(mname, "Model Matrix")) + 
-        theme(axis.text.x = element_text(size=8)) -> selected_m_plot
-    save_plot(paste0(figure_directory, "selected_", mname, "_simulation_barplot.pdf"), selected_m_plot, base_width=16, base_height = 6) 
+        theme(axis.text.x = element_text(size=6.5), legend.position = "bottom")-> selected_m_plot        
+        if (m == 1)
+        {
+            selected_m_plot <- selected_m_plot + scale_fill_manual(values=c("palegreen3", "dodgerblue3"), name = paste(mname, "Model Matrix")) 
+        }   else{
+            selected_m_plot <- selected_m_plot + guides(fill = guide_legend(nrow=2, title = paste(mname, "Model Matrix")))
+        }
+            
+    save_plot(paste0(figure_directory, "selected_", mname, "_simulation_barplot.pdf"), selected_m_plot, base_width=12, base_height = 3) 
 }
 
       
@@ -358,302 +539,213 @@ save_plot(paste0(figure_directory, "selected_models_m2-5_pandit.pdf"), selected_
 
 
 
-
-
-  
-  
-
-
-################################## SH tests ################################
-
-#### simulation results
-simulation_sh %>%
-    gather(model, pvalue, m1:true) %>% 
-    filter(pvalue < 0.01) %>%
-    group_by(name, tree, model) %>%
-    tally() %>% 
-    arrange(model, name) %>%
-    xtable()
-# 1    NP opisthokonta   14    m5  0.009
-# 2   HIV opisthokonta    4    m5  0.005
-# 3   HIV opisthokonta   13    m5  0.006
-# 4   HIV opisthokonta   15    m5  0.002
-# 5   HIV       ruhfel   19    m5  0.001
-# 6   LAC     andersen    3  true  0.003
-# 7  Gal4     andersen   17  true  0.010
-# 8  Gal4      dosreis    6  true  0.010
-# 9  Gal4      dosreis    7  true  0.005
-# 10 Gal4      dosreis   13  true  0.009
-# 11 Gal4      dosreis   16  true  0.005
-# 12 Gal4         prum    2  true  0.005
-# 13 Gal4         prum    3  true  0.002
-# 14 Gal4         prum    5  true  0.005
-# 15 Gal4         prum    8  true  0.006
-# 16 Gal4         prum    9  true  0.010
-# 17 Gal4         prum   13  true  0.005
-# 18 Gal4         prum   15  true  0.009
-# 19 Gal4         prum   17  true  0.008
-# 20 Gal4         prum   20  true  0.009
-# 21 Gal4       ruhfel    2  true  0.009
-# 22 Gal4       ruhfel    3  true  0.000
-# 23 Gal4       ruhfel    4  true  0.010
-# 24 Gal4       ruhfel    5  true  0.004
-# 25 Gal4       ruhfel    6  true  0.006
-# 26 Gal4       ruhfel    9  true  0.004
-# 27 Gal4       ruhfel   10  true  0.005
-# 28 Gal4       ruhfel   11  true  0.010
-# 29 Gal4       ruhfel   15  true  0.008
-# 30 Gal4       ruhfel   18  true  0.003
-# 31 Gal4       ruhfel   19  true  0.002
-# 32 Gal4       ruhfel   20  true  0.000
-# 33 Gal4    rayfinned    3  true  0.001
-# 34 Gal4    rayfinned    4  true  0.004
-# 35 Gal4    rayfinned    6  true  0.005
-# 36 Gal4    rayfinned    8  true  0.002
-# 37 Gal4    rayfinned    9  true  0.006
-# 38 Gal4    rayfinned   14  true  0.003
-# 39 Gal4    rayfinned   17  true  0.001
-# 40 Gal4    rayfinned   19  true  0.003
-# 41 Gal4     spiralia    9  true  0.008
-
-
-# \begin{table}[ht]
-# \centering
-# \begin{tabular}{rlllr}
-#   \hline
-#  & name & tree & model & n \\ 
-#   \hline
-# 1 & HIV & opisthokonta & m5 &   3 \\ 
-#   2 & HIV & ruhfel & m5 &   1 \\ 
-#   3 & NP & opisthokonta & m5 &   1 \\ 
-#   4 & Gal4 & andersen & true &   1 \\ 
-#   5 & Gal4 & dosreis & true &   4 \\ 
-#   6 & Gal4 & prum & true &   9 \\ 
-#   7 & Gal4 & rayfinned & true &   8 \\ 
-#   8 & Gal4 & ruhfel & true &  12 \\ 
-#   9 & Gal4 & spiralia & true &   1 \\ 
-#   10 & LAC & andersen & true &   1 \\ 
-#    \hline
-# \end{tabular}
-# \end{table}
-
-
-    
-  
-
-
-
 ############################### Linear models ################################
 
 ######## RF for simulations
-simulation_rf_fit %>% filter(optim == "inferredtree") -> simulation_rf_fit2
-simulation_rf_fit2$model <- factor(simulation_rf_fit2$model, levels=c("m1", "m2", "m3", "m4", "m5", "poisson"))
-lmer(rf_true_norm ~ model + (1|name) + (1|tree), data = simulation_rf_fit2) -> fit
+simulation_rf_fit$model <- factor(simulation_rf_fit$model, levels=c("m1", "m2", "m3", "m4", "m5", "poisson", "GTR20"))
+lmer(rf_true_norm ~ model + (1|name) + (1|tree), data = simulation_rf_fit) -> fit
 glht(fit, linfct=mcp(model='Tukey')) %>% summary()
 # Linear Hypotheses:
-# m2 - m1 == 0       0.0045753  0.0025070   1.825   0.4495    
-# m3 - m1 == 0       0.0071323  0.0025070   2.845   0.0506 .  
-# m4 - m1 == 0       0.0084163  0.0025070   3.357   0.0103 *  
-# m5 - m1 == 0       0.0267098  0.0025070  10.654   <0.001 ***
-# poisson - m1 == 0  0.0050639  0.0025070   2.020   0.3308    
-# m3 - m2 == 0       0.0025570  0.0025070   1.020   0.9115    
-# m4 - m2 == 0       0.0038410  0.0025070   1.532   0.6434    
-# m5 - m2 == 0       0.0221345  0.0025070   8.829   <0.001 ***
-# poisson - m2 == 0  0.0004886  0.0025070   0.195   1.0000    
-# m4 - m3 == 0       0.0012840  0.0025070   0.512   0.9957    
-# m5 - m3 == 0       0.0195775  0.0025070   7.809   <0.001 ***
-# poisson - m3 == 0 -0.0020684  0.0025070  -0.825   0.9630    
-# m5 - m4 == 0       0.0182934  0.0025070   7.297   <0.001 ***
-# poisson - m4 == 0 -0.0033525  0.0025070  -1.337   0.7642    
-# poisson - m5 == 0 -0.0216459  0.0025070  -8.634   <0.001 ***
+# m2 - m1 == 0          0.0024572  0.0020367   1.206  0.89194    
+# m3 - m1 == 0          0.0044539  0.0020367   2.187  0.30229    
+# m4 - m1 == 0          0.0064229  0.0020367   3.154  0.02686 *  
+# m5 - m1 == 0          0.0226019  0.0020367  11.097  < 0.001 ***
+# poisson - m1 == 0     0.0034234  0.0020367   1.681  0.62890    
+# GTR20 - m1 == 0      -0.0072462  0.0020367  -3.558  0.00693 ** 
+# m3 - m2 == 0          0.0019968  0.0020367   0.980  0.95833    
+# m4 - m2 == 0          0.0039657  0.0020367   1.947  0.44881    
+# m5 - m2 == 0          0.0201447  0.0020367   9.891  < 0.001 ***
+# poisson - m2 == 0     0.0009663  0.0020367   0.474  0.99916    
+# GTR20 - m2 == 0      -0.0097033  0.0020367  -4.764  < 0.001 ***
+# m4 - m3 == 0          0.0019690  0.0020367   0.967  0.96108    
+# m5 - m3 == 0          0.0181480  0.0020367   8.910  < 0.001 ***
+# poisson - m3 == 0    -0.0010305  0.0020367  -0.506  0.99878    
+# GTR20 - m3 == 0      -0.0117001  0.0020367  -5.745  < 0.001 ***
+# m5 - m4 == 0          0.0161790  0.0020367   7.944  < 0.001 ***
+# poisson - m4 == 0    -0.0029994  0.0020367  -1.473  0.76118    
+# GTR20 - m4 == 0      -0.0136690  0.0020367  -6.711  < 0.001 ***
+# poisson - m5 == 0    -0.0191785  0.0020367  -9.416  < 0.001 ***
+# GTR20 - m5 == 0      -0.0298481  0.0020367 -14.655  < 0.001 ***
+# GTR20 - poisson == 0 -0.0106696  0.0020367  -5.239  < 0.001 ***
 
 ## SIG LINES:
-# m5 - m1 == 0       0.0267098  0.0025070  10.654   <0.001 ***
-# m5 - m2 == 0       0.0221345  0.0025070   8.829   <0.001 ***
-# m5 - m4 == 0       0.0182934  0.0025070   7.297   <0.001 ***
-# poisson - m5 == 0 -0.0216459  0.0025070  -8.634   <0.001 ***
-# m5 - m3 == 0       0.0195775  0.0025070   7.809   <0.001 ***
+# GTR20 - m1 == 0      -0.0072462  0.0020367  -3.558  0.00693 ** 
+# GTR20 - m2 == 0      -0.0097033  0.0020367  -4.764  < 0.001 ***
+# GTR20 - m3 == 0      -0.0117001  0.0020367  -5.745  < 0.001 ***
+# GTR20 - m5 == 0      -0.0298481  0.0020367 -14.655  < 0.001 ***
+# GTR20 - m4 == 0      -0.0136690  0.0020367  -6.711  < 0.001 ***
+# GTR20 - poisson == 0 -0.0106696  0.0020367  -5.239  < 0.001 ***
+
+# m5 - m4 == 0          0.0161790  0.0020367   7.944  < 0.001 ***
+# m5 - m1 == 0          0.0226019  0.0020367  11.097  < 0.001 ***
+# m5 - m2 == 0          0.0201447  0.0020367   9.891  < 0.001 ***
+# poisson - m5 == 0    -0.0191785  0.0020367  -9.416  < 0.001 ***
+# m5 - m3 == 0          0.0181480  0.0020367   8.910  < 0.001 ***
 
 
 
 ######## RF against m1 tree for pandit
-pandit_rf_fit %>% filter(optim == "inferredtree") -> pandit_rf_fit2
-pandit_rf_fit2$model <- factor(pandit_rf_fit2$model, levels=c("m1", "m2", "m3", "m4", "m5", "poisson"))
-lmer(rf_m1_norm ~ model + (1|name), data = pandit_rf_fit2) -> fit
+pandit_rf_fit$model <- factor(pandit_rf_fit$model, levels=c("m1", "m2", "m3", "m4", "m5", "poisson", "GTR20"))
+lmer(rf_m1_norm ~ model + (1|name), data = pandit_rf_fit) -> fit
 glht(fit, linfct=mcp(model='Tukey')) %>% summary()
 # Linear Hypotheses:
-# m2 - m1 == 0       0.304420   0.008274  36.790  < 1e-04 ***
-# m3 - m1 == 0       0.334983   0.008274  40.484  < 1e-04 ***
-# m4 - m1 == 0       0.370579   0.008274  44.786  < 1e-04 ***
-# m5 - m1 == 0       0.451461   0.008274  54.561  < 1e-04 ***
-# poisson - m1 == 0  0.439134   0.008274  53.071  < 1e-04 ***
-# m3 - m2 == 0       0.030563   0.008274   3.694 0.002962 ** 
-# m4 - m2 == 0       0.066159   0.008274   7.996  < 1e-04 ***
-# m5 - m2 == 0       0.147041   0.008274  17.771  < 1e-04 ***
-# poisson - m2 == 0  0.134714   0.008274  16.281  < 1e-04 ***
-# m4 - m3 == 0       0.035596   0.008274   4.302 0.000253 ***
-# m5 - m3 == 0       0.116478   0.008274  14.077  < 1e-04 ***
-# poisson - m3 == 0  0.104152   0.008274  12.587  < 1e-04 ***
-# m5 - m4 == 0       0.080882   0.008274   9.775  < 1e-04 ***
-# poisson - m4 == 0  0.068555   0.008274   8.285  < 1e-04 ***
-# poisson - m5 == 0 -0.012327   0.008274  -1.490 0.670916    
+ #                     Estimate Std. Error z value Pr(>|z|)    
+# m2 - m1 == 0          0.285180   0.007569  37.677   <0.001 ***
+# m3 - m1 == 0          0.318060   0.007569  42.020   <0.001 ***
+# m4 - m1 == 0          0.357157   0.007569  47.186   <0.001 ***
+# m5 - m1 == 0          0.437822   0.007569  57.843   <0.001 ***
+# poisson - m1 == 0     0.421142   0.007569  55.639   <0.001 ***
+# GTR20 - m1 == 0       0.324905   0.007569  42.925   <0.001 ***
+# m3 - m2 == 0          0.032880   0.007569   4.344   <0.001 ***
+# m4 - m2 == 0          0.071977   0.007569   9.509   <0.001 ***
+# m5 - m2 == 0          0.152642   0.007569  20.166   <0.001 ***
+# poisson - m2 == 0     0.135962   0.007569  17.963   <0.001 ***
+# GTR20 - m2 == 0       0.039725   0.007569   5.248   <0.001 ***
+# m4 - m3 == 0          0.039097   0.007569   5.165   <0.001 ***
+# m5 - m3 == 0          0.119762   0.007569  15.822   <0.001 ***
+# poisson - m3 == 0     0.103082   0.007569  13.619   <0.001 ***
+# GTR20 - m3 == 0       0.006845   0.007569   0.904    0.972                ns
+# m5 - m4 == 0          0.080665   0.007569  10.657   <0.001 ***
+# poisson - m4 == 0     0.063985   0.007569   8.453   <0.001 ***
+# GTR20 - m4 == 0      -0.032253   0.007569  -4.261   <0.001 ***
+# poisson - m5 == 0    -0.016680   0.007569  -2.204    0.293               ns
+# GTR20 - m5 == 0      -0.112917   0.007569 -14.918   <0.001 ***
+# GTR20 - poisson == 0 -0.096237   0.007569 -12.714   <0.001 ***
+# ---
 
-    
 
 
 
 
-######################### TREELENGTH FIGURES #################################
 
-######## simulation treelength Boxplots
-# simulation_rf_fit %>%
-#   filter(optim == "inferredtree") %>%
-#   mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
-#          tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels_twolines),
-#          name_levels  = factor(name, levels=name_levels, labels = name_labels_nsites)) %>%
-#   ggplot(aes(x = model_levels, y = treelength, fill = model_levels)) + 
-#   geom_boxplot(outlier.size = 0.2, size=0.1) + 
-#   scale_fill_brewer(palette = "RdYlBu", name = "Protein Model", labels = model_labels) +
-#   facet_grid(tree_levels~name_levels, scales="free_y") +
-#   panel_border() +
-#   background_grid() +
-#   theme(axis.text.x = element_blank(),
-#         strip.text.y = element_text(size=8), 
-#         axis.ticks.x = element_blank(), 
-#         legend.position = "bottom") +
-#   guides(fill = guide_legend(nrow = 1)) +
-#   xlab("Protein Models") + ylab("Inferred treelength") -> simulation_tl_boxplot
-# save_plot(paste0(figure_directory,"simulation_tl_boxplot_all.pdf"), simulation_tl_boxplot, base_height=8)
+
+
+
+
+
 # 
+# #### PANDIT results
+# simulation_topology %>%
+#     filter(whichtest == "au") %>%
+#     gather(model, pvalue, m1:GTR20) %>% 
+#     mutate(sig = pvalue < 0.01) %>%
+#     filter(sig == TRUE)
 # 
-# ######## simulation treelength Boxplots, NP only
-# simulation_rf_fit %>%
-#   filter(optim == "inferredtree") %>%
-#   mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
-#          tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels)) %>%
-#   filter(name == "NP") %>%
-#   ggplot(aes(x = model_levels, y = treelength, fill = model_levels)) + 
-#   geom_boxplot(outlier.size = 0.3, size=0.1) + 
-#   scale_fill_brewer(palette = "RdYlBu", name = "", labels = model_labels) +
-#   facet_wrap(~tree_levels, scales="free_y", nrow = 2) +
-#   panel_border() +
-#   background_grid() +
-#   theme(axis.text.x = element_blank(),
-#         axis.text.y = element_text(size=7), 
-#         axis.ticks.x = element_blank(), legend.position = "bottom") + 
-#   guides(fill = guide_legend(nrow=1)) +
-#   xlab("Protein Models") + ylab("Inferred treelength") -> simulation_tl_boxplot_np
-# 
-# 
-# msel_simulation %>% 
-#   filter(name == "NP", tree == "opisthokonta") %>% 
-#   rowwise() %>% 
-#   mutate(model_matrix = str_split(model, "\\+")[[1]][1],
-#          model = paste0("r", modelr)) %>%
-#   dplyr::select(-modelr) %>% 
-#   rename(rep = repl) -> np_models
-# 
-# simulation_rf_fit %>% 
-#   filter(name == "NP", optim == "inferredtree", tree == "opisthokonta") %>%
-#   dplyr::select(name, tree, rep, treelength, model, BIC) %>%
-#   left_join(np_models) %>%
-#   mutate(model_matrix = ifelse(is.na(model_matrix), "Poisson", model_matrix)) %>%
-#   mutate(model_levels = factor(model, levels = model_levels, labels = model_labels)) %>%
-#   ggplot(aes(x = model_levels, y = treelength, group = rep)) + 
-#   geom_point(aes(color = model_matrix), alpha = 0.9)  + geom_line(alpha=0.5, color="grey70") +
-#   xlab("Protein Model") + ylab("Inferred treelength") + 
-#   theme(legend.position = "bottom", legend.spacing.x = unit(0.01, 'cm'), legend.key.size = unit(0.45, 'cm'), legend.key = element_rect(size=0.5), legend.text = element_text(size=6), legend.title= element_text(size=8) ) + 
-#   panel_border() + 
-#   guides(color = guide_legend(nrow=2)) + labs(color = "Model matrix") +
-#   ggtitle("NP simulation replicates along the Opisthokonta tree") -> np_opis_tl_lineplot
-# 
-# bl_plots <- plot_grid(simulation_tl_boxplot_np, np_opis_tl_lineplot, nrow=1, labels="auto", scale=0.95)
-# 
-# save_plot(paste0(figure_directory,"simulation_tl_np_panels.pdf"), bl_plots, base_width = 12)
+#     group_by(model, name, tree, notsig) %>%
+#     tally() %>%
+#     mutate(perc_in_conf=n/200) %>%
+#     mutate(model_levels = factor(model, levels=model_levels, labels = model_labels)) -> pandit_au_summary
 # 
 # 
 # 
-# ############################### TL vs TL #################################
-# 
-# simulation_rf_fit %>% 
-#   dplyr::select(name, tree, rep, model, optim, treelength) %>% 
-#   spread(optim, treelength) %>% 
-#   mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
-#          tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
-#          name_levels  = factor(name, levels=name_levels)) %>%
-#   ggplot(aes(x = optimizedtruetree, y = inferredtree)) + 
-#   geom_point(aes(color = tree_levels), alpha=0.8) + 
-#   facet_grid(name_levels~model_levels) + 
-#   geom_abline(color="red", alpha=0.7) +
-#   coord_equal() + 
-#   xlab("Treelength along optimized true tree") + 
-#   ylab("Treelength along inferred model tree") +
-#   labs(color = "Simulation tree") +
-#   theme(axis.text = element_text(size=8))-> simulation_tl_inf_vs_optim
-# ggsave(paste0(figure_directory, "simulation_tl_inf_vs_optim.pdf"), simulation_tl_inf_vs_optim, height = 5, width=7)
-# 
-# pandit_rf_fit %>% 
-#   dplyr::select(name, model, optim, treelength) %>% 
-#   spread(optim, treelength) %>% 
-#   mutate(model_levels = factor(model, levels=model_levels, labels = model_labels)) %>%
-#   ggplot(aes(x = optimizedtruetree, y = inferredtree)) + 
-#   geom_point() + 
-#   geom_abline(color="red") + 
-#   coord_equal() + 
-#   facet_wrap(~model_levels) + 
-#   xlab("Treelength along optimized M1 tree") + 
-#   ylab("Treelength along inferred model tree")  -> pandit_tl_inf_vs_optim
-# ggsave(paste0(figure_directory, "pandit_tl_inf_vs_optim.pdf"), pandit_tl_inf_vs_optim,  height = 5, width=5)
+
+
+
+
+
+
+
 # 
 # 
-# 
-# 
-# 
-# #   
-# #### PANDIT normalized treelength boxes
-# pandit_rf_fit %>% 
-#     filter(model == "m1", optim == "inferredtree") %>% 
-#     dplyr::select(name, treelength) %>% 
-#     rename(m1_treelength = treelength)  -> m1_tl
-# pandit_rf_fit %>% 
-#     filter(optim == "inferredtree") %>% 
-#     dplyr::select(name, model, treelength) %>% 
-#     left_join(m1_tl) %>% 
+# pandit_ufb %>% 
 #     filter(model != "m1") %>%
-#     mutate(tl_norm = treelength / m1_treelength,
-#            model_levels = factor(model, levels=model_levels_nom1, labels = model_labels_nom1)) %>%
-#     ggplot(aes(x = model_levels, y = tl_norm, fill = model_levels)) + 
-#     geom_boxplot() + #color = "grey30", alpha=1, outlier.shape = " ") + 
-#     panel_border() + 
-#     #geom_jitter(alpha = 0.8, size=1) + 
-#     geom_hline(yintercept=1, color = "#D73027", size=0.8) + 
-#     scale_fill_manual(values = c("#FC8D59", "#FEE090", "#E0F3F8" ,"#91BFDB", "#4575B4"), name = "Protein Model", labels = model_labels_nom1) +
-#     xlab("Protein Models") + ylab("Normalized treelength") +
-#     theme(legend.position = "none") -> pandit_tl_norm
+#     mutate(model_levels = factor(model, levels=model_levels_nom1, labels = model_labels_nom1),
+#         name_levels  = factor(name)) -> ufb_fact
+# ufb_fact %>%
+#     group_by(model_levels, name_levels) %>%
+#     tally() %>%
+#     rename(total_considered = n) -> ufb_total_nodes
+#      
+# ############## False positive nodes ##############
+# ufb_fact %>% 
+#     mutate(supported = boot >= 95) %>% 
+#     filter(supported == TRUE, in_true == FALSE) %>% 
+#     group_by(model_levels, name_levels) %>%
+#     tally() %>% 
+#     complete(model_levels, name_levels, fill = list(n = 0)) %>%
+#     left_join(ufb_total_nodes) %>%
+#     mutate(percent = n / total_considered) %>%
+#     distinct() -> ufb_fp
+# 
+# ufb_fp %>%
+#     ungroup() %>%
+#     mutate(controlled = percent <= 0.05) %>%
+#     group_by(model_levels) %>%
+#     summarize(percent_controlled = 100 * sum(controlled) / 200) -> ufb_fp_controlled
+# 
+#     
+# ufb_fp %>%
+#     ggplot(aes(x = model_levels, y = percent, fill = model_levels)) +
+#         geom_sina(shape=21, color="grey30", maxwidth=0.75) +
+#         #geom_jitter(position=position_jitterdodge(), shape = 21, alpha=0.5,  size=2, color="grey10")  +     
+#         scale_fill_manual(values=model_colors_nom1) +         
+#         background_grid() + 
+#         panel_border() +
+#         theme(legend.position = "none",
+#               strip.text = element_text(size=8), 
+#               axis.text.x = element_text(size=8)) +
+#         xlab("Protein Models") + ylab("Percent false positive nodes\nrelative to M1") +
+#         geom_hline(yintercept = 0.05, color = "dodgerblue3")  +
+#         geom_text(data = ufb_fp_controlled, aes(x = model_levels, y = 0.043, label = paste0(percent_controlled, "%")), fontface="bold", size=3, nudge_x = -0.36) -> pandit_ufb_fp  
+# 
+# save_plot(paste0(figure_directory,"ufb_pandit_fp.pdf"), pandit_ufb_fp, base_width = 10, base_height=3)
+# 
+# 
+# 
+# 
+# ##################### Node accuracy #####################################
+# give.n <- function(x){
+#   return(c(y = median(x) + 0.1, label = length(x)))
+# }
+# ufb_fact %>% 
+#     mutate(supported = boot >= 95) %>% 
+#     filter(supported == in_true) %>% 
+#     group_by(model_levels, name_levels) %>%
+#     tally() %>% 
+#     complete(model_levels, name_levels, fill = list(n = 0)) %>%
+#     left_join(ufb_total_nodes) %>%
+#     mutate(percent = n / total_considered) %>% ## fuck you yy hack
+#     distinct() -> ufb_fact_acc
+# 
+# ufb_fact_acc %>%
+#     group_by(model_levels) %>%
+#     summarize(meanpercent= 100* round(mean(percent), 3)) -> ufb_fact_acc_means
+#  
+# ufb_fact_acc %>%   
+#     ggplot(aes(x = model_levels, y = percent, fill = model_levels)) +
+#         geom_sina(shape=21, color="grey30", maxwidth=0.75) +
+#         #geom_jitter(position=position_jitterdodge(), shape = 21, alpha=0.5,  size=2, color="grey10")  +     
+#         scale_fill_manual(values=model_colors_nom1) +         
+#         background_grid() + 
+#         panel_border() +
+#         theme(legend.position = "none",
+#               strip.text = element_text(size=8), 
+#               axis.text.x = element_text(size=8)) +
+#         scale_y_continuous(limits=c(0,1), breaks=c(0, 0.2, 0.4, 0.6, 0.8, 1)) + 
+#         geom_text(data = ufb_fact_acc_means, y=0.9, aes(x = model_levels, label = paste0(meanpercent, "%")), nudge_x = -0.35)+
+#         #stat_summary(fun.y = "mean", geom = "text", aes(x = model_levels, label = round(..y.., 2)), position = position_nudge(x = -0.4)) +
+#         xlab("Protein Models") + ylab("Percent accurate nodes\nrelative to M1")  -> pandit_ufb_acc 
+# 
+# save_plot(paste0(figure_directory,"ufb_pandit_accuracy.pdf"), pandit_ufb_acc, base_width = 10, base_height=3)
+# 
+# 
+# ufb_fp %>%
+#     filter(name_levels %in% c("HIV", "NP")) %>%
+#     ggplot(aes(x = model_levels, y = percent, fill = model_levels)) + 
+#         geom_jitter(position=position_jitterdodge(), shape = 21, alpha=0.5,  size=2, color="grey10")  +     
+#         scale_fill_manual(values=model_colors, name = "Protein Model") +         
+#         facet_grid(name_levels~tree_levels) +
+#         background_grid() + 
+#         panel_border() +
+#         theme(legend.position = "none",
+#               strip.text = element_text(size=8), 
+#               axis.text.x = element_text(size=6, angle=30)) +
+#         xlab("Protein Models") + ylab("Percent false positive nodes") +
+#         geom_hline(yintercept = 0.05, color = "dodgerblue3")  -> sim_ufb_fp
+# save_plot(paste0(figure_directory,"ufb_simulation_fp_HIV-NP.pdf"), sim_ufb_fp, base_width = 10, base_height=4)
+# 
+# 
+# 
+# 
+# 
 
-
-
-
-
-#### Box plot version  
-# quant <- quantile(scheme_data$bic)
-# scheme_data %>%
-#   ggplot(aes(x = "", y = bic)) + 
-#     geom_boxplot(fill = "firebrick3") +
-#     xlab("") + ylab("BIC values across all tested models") +
-#     theme(axis.ticks.x = element_blank(),
-#           panel.border = element_blank(),
-#           axis.line = element_line(color = 'black'), 
-#           plot.margin = margin(0.5, 1, 0, 0.5, "cm")) +
-#     geom_segment(x = 1.5, y = quant[[1]], xend = 1.02, yend = quant[[1]], color = "grey40", arrow = arrow(length = unit(0.03, "npc"), type = "closed")) +
-#     annotate(geom = "text", x = 1.55, y = min(scheme_data$bic), label = "M1") +
-#     geom_segment(x = 1.5, y = quant[[2]], xend = 1.4, yend = quant[[2]], color = "grey40", arrow = arrow(length = unit(0.03, "npc"), type = "closed")) +
-#     annotate(geom = "text", x = 1.55, y = quant[[2]], label = "M2") +
-#     geom_segment(x = 1.5, y = quant[[3]], xend = 1.4, yend = quant[[3]], color = "grey40", arrow = arrow(length = unit(0.03, "npc"), type = "closed")) +
-#     annotate(geom = "text", x = 1.55, y = quant[[3]], label = "M3") +
-#     geom_segment(x = 1.5, y = quant[[4]], xend = 1.4, yend = quant[[4]], color = "grey40", arrow = arrow(length = unit(0.03, "npc"), type = "closed")) +
-#     annotate(geom = "text", x = 1.55, y = quant[[4]], label = "M4") +
-#     geom_segment(x = 1.5, y = quant[[5]], xend = 1.02, yend = quant[[5]], color = "grey40", arrow = arrow(length = unit(0.03, "npc"), type = "closed")) +
-#     annotate(geom = "text", x = 1.55, y = quant[[5]], label = "M5")  -> scheme_plot
-#    
-# save_plot(paste0(figure_directory,"bic_dist_scheme.pdf"), scheme_plot) 
