@@ -38,7 +38,8 @@ tree_labels_ntaxa <- c("Green Plant (360)", "Ray-finned fish (305)", "Mammals (2
 
 ### RF and BIC results
 simulation_rf_fit  <- read_csv("rf_fit_simulation.csv",guess_max = 10000)
-pandit_rf_fit      <- read_csv("rf_fit_pandit.csv",guess_max = 10000) 
+pandit_rf  <- read_csv("rf_pandit.csv",guess_max = 10000) 
+pandit_fit <- read_csv("fit_pandit.csv",guess_max = 10000) 
 
 ### basic information about datasets
 sim_info    <- read_csv("../simulations/simulation_trees_ntaxa.csv") 
@@ -64,10 +65,11 @@ simulation_rf_fit %>%
     mutate(max_rf = 2*ntaxa - 6) %>%  ### twice the number of internal edges
     mutate(rf_true_norm = rf/max_rf) -> simulation_rf_fit
 
-pandit_rf_fit %>% 
+pandit_rf %>% 
     left_join(pandit_info) %>%
     mutate(max_rf = 2*ntaxa - 6) %>%
-    mutate(rf_m1_norm     = rf/max_rf) -> pandit_rf_fit
+    mutate(rf     = rf/max_rf) -> pandit_rf
+
 
 
 
@@ -318,7 +320,7 @@ msel_pandit %>%
   theme(axis.text.x = element_text(size=7))-> m1_pandit_model_plot
 
   #### PANDIT fit results
-pandit_rf_fit %>%
+pandit_rf %>%
     group_by(name) %>%
     mutate(ic.rank = as.integer(rank(BIC))) -> pandit_ranks
     
@@ -355,23 +357,45 @@ save_plot(paste0(figure_directory, "pandit_model_bars.pdf"), pandit_model_grid, 
 
 
 
+pandit_rf %>%
+    group_by(model1, model2) %>% 
+    summarize(medianrf = median(rf)) %>% ## 0.294is min
+    left_join(pandit_rf) %>%
+    ungroup() %>%
+    mutate(model1 = factor(model1, levels=model_levels, labels = model_labels), 
+            model2 = factor(model2, levels=model_levels, labels = model_labels)) %>%
+    mutate(hasm1 = (model1 == "M1" | model2 == "M1")) %>%
+    unite(model_pair, model1, model2, sep = " - ") %>%
+    mutate(model_pair_fct = fct_reorder(model_pair, rf, .desc=TRUE)) -> pandit_rf_ridgedata
+
+pandit_rf_ridgedata %>% 
+    dplyr::select(model_pair_fct, hasm1) %>% 
+    distinct() %>% 
+    arrange(model_pair_fct) %>% 
+    mutate(face = ifelse(hasm1, "bold", "plain")) %>% 
+    pull(face) -> font_face
+pandit_rf_ridgedata %>% 
+    ggplot(aes(x = rf, y = fct_reorder(model_pair, rf, .desc=TRUE), fill = medianrf)) + 
+        geom_density_ridges(scale=1.4, quantile_lines=TRUE, quantiles=2, rel_min_height = 0.01) +
+        ylab("") + xlab("Normalized RF Distance") + 
+        scale_x_continuous(expand = c(0.01, 0)) +
+        scale_y_discrete(expand = c(0.01, 0), position="right") +
+        scale_fill_gradient(low = "#FFF68F", high = "dodgerblue3", name = "Median nRF")+
+        #geom_vline(xintercept = 0.294, color = "black") +
+        theme(axis.line.y = element_blank(), 
+              axis.ticks.y = element_blank(),
+              legend.position = "bottom",  
+              legend.key.height=unit(.7,"line"),
+              legend.title = element_text(size=10), 
+              legend.text = element_text(size=9), 
+              axis.text = element_text(size=11),
+              axis.title = element_text(size=12),
+              axis.text.y = element_text(face = font_face) ) +
+        background_grid(colour.major = "grey70")-> rf_pandit_plot
+
+                                     
 
 
-pandit_rf_fit %>%
-  filter(model != "m1") %>%
-  mutate(model_levels = factor(model, levels=model_levels_nom1, labels = model_labels_nom1)) %>%
-  ggplot(aes(y = model_levels, fill = model_levels, x = rf_m1_norm)) + 
-    geom_density_ridges(scale=1.5, quantile_lines=TRUE, quantiles=2)+
-      scale_fill_manual(values = model_colors_nom1, name = "Protein Model", labels = model_labels_nom1) +
-      ylab("Protein Models") + xlab("Normalized RF distance from M1 tree") +
-      scale_x_continuous(expand = c(0.01, 0)) +
-      scale_y_discrete(expand = c(0.05, 0)) +
-      background_grid(colour.major = "grey70") +
-      theme(legend.position = "none") -> rf_m1_pandit_plot     
-
-
-  
-#### PANDIT results
 pandit_topology %>%
     filter(whichtest == "au") %>%
     gather(model, pvalue, m1:GTR20) %>% 
@@ -387,7 +411,7 @@ pandit_au_summary %>%
     ggplot(aes(x = model_levels, y = perc_in_conf, fill = notsig)) + 
         geom_col() +
         geom_text(data = pandit_au_summary_false, aes(x = model_levels, y = 1.02, label = label), size=3) + 
-        scale_fill_manual(values=c("palegreen3", "dodgerblue3"), name = "In M1 confidence set") +
+        scale_fill_manual(values=c("palegreen4", "orange3"), name = "In M1 confidence set") +
         xlab("Models") + ylab("Percent of alignments") +
         theme(legend.position = "bottom") + 
           guides(fill = guide_legend(nrow=1, title.position = "left")) -> pandit_au_barplot
@@ -424,10 +448,17 @@ theme(legend.position = 'none') +
 
 pandit_au_barplot_nolegend <- pandit_au_barplot + theme(legend.position = "none")
 pandit_au_barplot_legend<- get_legend(pandit_au_barplot)
-pandit_rf_au_plot <- plot_grid(rf_m1_pandit_plot, pandit_au_barplot_nolegend, disagree_m1_venn, scale=c(0.92, 0.92, 0.87), nrow=1, labels="auto")
-pandit_rf_au_plot_full <- plot_grid(pandit_rf_au_plot, pandit_au_barplot_legend, nrow=2, rel_widths=c(1, 0.2), rel_heights=c(1, 0.08))
+pandit_rf_nolegend <- rf_pandit_plot + theme(legend.position = "none")
+pandit_rf_legend<- get_legend(rf_pandit_plot)
 
-save_plot(paste0(figure_directory,"pandit_rf_m1set.pdf"), pandit_rf_au_plot_full, base_width=12)
+#pandit_rf_au_plot <- plot_grid(pandit_rf_nolegend, pandit_au_barplot_nolegend, disagree_m1_venn, scale=c(1, 0.92, 0.7), nrow=1, labels="auto")
+
+part1 <- plot_grid(pandit_rf_nolegend, pandit_au_barplot_nolegend, nrow=1, labels=c("a", "b"))
+part2 <- plot_grid(pandit_rf_legend, pandit_au_barplot_legend, nrow=1)
+part12 <- plot_grid(part1, part2, nrow=2, rel_heights=c(1,0.1))
+pandit_rf_au_plot_full <- plot_grid(part12, disagree_m1_venn, nrow=1, labels=c("","c"), scale=c(0.95, 0.95, 0.7), rel_widths=c(0.7, 0.3))
+
+save_plot(paste0(figure_directory,"rf_pandit_plot.pdf"), pandit_rf_au_plot_full, base_width=14, base_height=5)
 
 
 
