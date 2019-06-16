@@ -63,7 +63,7 @@ if type ==  "pandit":
     fileinfo_order = ["name", "model"]
     outfile_rf  = outpath + "rf_" + type + ".csv"
     outfile_fit = outpath + "fit_" + type + ".csv"
-    outstring_fit = "name,model," + ",".join(fitinfo_order) + "\n"
+    outstring_fit = "name,model," + ",".join(fitinfo_order) + ",tl\n"
     outstring_rf = "name,model1,model2,rf\n"
     model_order = ["m1", "m2", "m3", "m4", "m5", "poisson", "GTR20"]
 
@@ -92,7 +92,9 @@ if type ==  "pandit":
                 outstring_rf += pandit + "," + this_model + "," + model_order[j] + "," + rf + "\n"
         
             iqfile = inferencepath + pandit + "_" + this_model + "_inferredtree.iqtree"
-            outstring_fit += pandit + "," + this_model + "," + obtain_fit_info(iqfile,fitinfo_order) + "\n"
+            tl = str(trees[i].length())
+            outstring_fit += pandit + "," + this_model + "," + obtain_fit_info(iqfile,fitinfo_order) + "," + tl + "\n"
+
 
     with open(outfile_fit, "w") as f:
         f.write(outstring_fit.strip())

@@ -11,7 +11,7 @@ library(ggridges)
 
 theme_set(theme_classic() + theme(axis.line = element_line(colour = "grey10"),
                                   strip.background = element_rect(size=0.5)))
-figure_directory <- "figures_new/"
+figure_directory <- "figures/"
 
 ########################## Factor levels and labeling ################################ 
 name_levels <- c("NP", "HA", "HIV")
@@ -69,6 +69,7 @@ pandit_rf %>%
     left_join(pandit_info) %>%
     mutate(max_rf = 2*ntaxa - 6) %>%
     mutate(rf     = rf/max_rf) -> pandit_rf
+pandit_fit %>% left_join(pandit_info) -> pandit_fit
 
 
 
@@ -319,10 +320,11 @@ msel_pandit %>%
   ylab("Count") +
   theme(axis.text.x = element_text(size=7))-> m1_pandit_model_plot
 
-  #### PANDIT fit results
-pandit_rf %>%
+ #### PANDIT fit results
+pandit_fit %>%
     group_by(name) %>%
-    mutate(ic.rank = as.integer(rank(BIC))) -> pandit_ranks
+    mutate(ic.rank = as.integer(rank(BIC))) %>%
+    left_join(pandit_info) -> pandit_ranks
     
 pandit_ranks %>%    
     mutate(model_levels = factor(model, levels=model_levels, labels = model_labels)) %>%
@@ -339,7 +341,7 @@ pandit_ranks %>%
   
 pandit_ranks %>% 
     filter(model == "GTR20") %>% 
-    ggplot(aes(x = ic.rank, y = ntaxa, color = treelength)) + 
+    ggplot(aes(x = ic.rank, y = ntaxa, color = tl)) + 
         geom_point(alpha=0.7, size=2) + geom_smooth(method = "lm", color= "grey20") + 
         scale_x_continuous(breaks=1:6) + 
         scale_color_continuous(name = "Treelength") + 
@@ -380,18 +382,38 @@ pandit_rf_ridgedata %>%
         ylab("") + xlab("Normalized RF Distance") + 
         scale_x_continuous(expand = c(0.01, 0)) +
         scale_y_discrete(expand = c(0.01, 0), position="right") +
-        scale_fill_gradient(low = "#FFF68F", high = "dodgerblue3", name = "Median nRF")+
-        #geom_vline(xintercept = 0.294, color = "black") +
-        theme(axis.line.y = element_blank(), 
-              axis.ticks.y = element_blank(),
-              legend.position = "bottom",  
-              legend.key.height=unit(.7,"line"),
-              legend.title = element_text(size=10), 
-              legend.text = element_text(size=9), 
-              axis.text = element_text(size=11),
-              axis.title = element_text(size=12),
-              axis.text.y = element_text(face = font_face) ) +
-        background_grid(colour.major = "grey70")-> rf_pandit_plot
+        background_grid(colour.major = "grey70")+
+        scale_fill_gradient(low = "#FFF68F", high = "dodgerblue3", name = "Median nRF",
+            guide = guide_colorbar(
+                direction = "horizontal",
+                label.position = "bottom",
+                title.position = "left",
+                barwidth = grid::unit(1.5, "in"),
+                barheight = grid::unit(0.2, "in")
+            )
+        ) +
+        theme(
+            axis.line.y = element_blank(), 
+            axis.ticks.y = element_blank(),
+            legend.position = "bottom",
+            legend.title = element_text(size=10), 
+            legend.text = element_text(size=9),
+            axis.text.y = element_text(face = font_face)
+        )  -> rf_pandit_plot
+ 
+        
+        
+    
+    
+    # theme(axis.line.y = element_blank(), 
+    #           axis.ticks.y = element_blank(),
+    #           legend.position = c(0.5, 0.01),  
+    #           legend.key.height=unit(.7,"line"),
+    #           legend.title = element_text(size=10), 
+    #           legend.text = element_text(size=9), 
+    #           axis.text = element_text(size=11),
+    #           axis.title = element_text(size=12),
+    #           axis.text.y = element_text(face = font_face) ) +
 
                                      
 
@@ -411,7 +433,8 @@ pandit_au_summary %>%
     ggplot(aes(x = model_levels, y = perc_in_conf, fill = notsig)) + 
         geom_col() +
         geom_text(data = pandit_au_summary_false, aes(x = model_levels, y = 1.02, label = label), size=3) + 
-        scale_fill_manual(values=c("palegreen4", "orange3"), name = "In M1 confidence set") +
+        #scale_fill_manual(values=c("seagreen3", "coral2"), name = "In M1 confidence set") +
+        scale_fill_hue(l=50, name = "In M1 Confidence Set") +
         xlab("Models") + ylab("Percent of alignments") +
         theme(legend.position = "bottom") + 
           guides(fill = guide_legend(nrow=1, title.position = "left")) -> pandit_au_barplot
@@ -435,9 +458,9 @@ ggplot(df.venn, aes(x0 = x, y0 = y, r = 1.5, fill = labels)) +
   theme_void() + 
   coord_fixed(clip = "off") + 
 theme(legend.position = 'none') +
-  scale_fill_manual(values = c(poisson_col, m1to5_cols[4], m1to5_cols[5])) +
+  #scale_fill_manual(values = c(poisson_col, m1to5_cols[4], m1to5_cols[5])) +
   #scale_colour_manual(values = c('cornflowerblue', 'firebrick', 'gold'), guide = FALSE) +
-  labs(fill = NULL) +
+  scale_fill_hue(l=50) + labs(fill = NULL) +
   annotate("text", x = venn_numbers$x, y = venn_numbers$y, label = venn_numbers$labels, size = 5) +
   annotate("text", x = 0, y = 2.65, label = "M4",fontface = "bold", size=4) +
   annotate("text", x = -2.3, y = -1.5,  label = "JC",fontface = "bold", size=4) +
@@ -456,7 +479,7 @@ pandit_rf_legend<- get_legend(rf_pandit_plot)
 part1 <- plot_grid(pandit_rf_nolegend, pandit_au_barplot_nolegend, nrow=1, labels=c("a", "b"))
 part2 <- plot_grid(pandit_rf_legend, pandit_au_barplot_legend, nrow=1)
 part12 <- plot_grid(part1, part2, nrow=2, rel_heights=c(1,0.1))
-pandit_rf_au_plot_full <- plot_grid(part12, disagree_m1_venn, nrow=1, labels=c("","c"), scale=c(0.95, 0.95, 0.7), rel_widths=c(0.7, 0.3))
+pandit_rf_au_plot_full <- plot_grid(part12, disagree_m1_venn, nrow=1, labels=c("","c"),vjust=2.45, scale=c(0.95, 0.95, 0.5), rel_widths=c(0.7, 0.3))
 
 save_plot(paste0(figure_directory,"rf_pandit_plot.pdf"), pandit_rf_au_plot_full, base_width=14, base_height=5)
 
@@ -654,14 +677,18 @@ glht(fit, linfct=mcp(model='Tukey')) %>% summary()
 
 
 
-# 
-# #### PANDIT results
-# simulation_topology %>%
-#     filter(whichtest == "au") %>%
-#     gather(model, pvalue, m1:GTR20) %>% 
-#     mutate(sig = pvalue < 0.01) %>%
-#     filter(sig == TRUE)
-# 
+
+#### PANDIT results
+simulation_topology %>%
+    filter(whichtest == "au") %>%
+    gather(model, pvalue, m1:true) %>%
+    
+    
+    mutate(sig = pvalue < 0.01) %>%
+    filter(sig == TRUE) %>%
+    group_by(name, tree, model) %>%
+    tally() %>%
+    mutate(n = 100* n/20)
 #     group_by(model, name, tree, notsig) %>%
 #     tally() %>%
 #     mutate(perc_in_conf=n/200) %>%
