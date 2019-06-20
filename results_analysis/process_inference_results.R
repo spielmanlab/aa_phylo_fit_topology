@@ -1,77 +1,5 @@
-library(cowplot)
-library(tidyverse)
-library(lme4)
-library(lmerTest)
-library(multcomp)
-library(broom)
-library(ggforce)
-library(xtable)
-library(colorspace)
-library(ggridges)
-
-theme_set(theme_classic() + theme(axis.line = element_line(colour = "grey10"),
-                                  strip.background = element_rect(size=0.5)))
-figure_directory <- "figures/"
-
-########################## Factor levels and labeling ################################ 
-name_levels <- c("NP", "HA", "HIV")
-name_labels_nsites <- c("NP (497)", "HA (564)", "HIV (661)")
-
-model_levels <- c("m1", "m2", "m3", "m4", "m5", "poisson", "GTR20")
-model_labels <- c("M1", "M2", "M3", "M4", "M5", "JC", "GTR")
-m1to5_cols <- sequential_hcl(5, palette = "ylorrd")
-poisson_col <- "grey40"
-gtr20_col   <- "grey80" 
-model_colors <- c(m1to5_cols, poisson_col, gtr20_col)
-model_colors_nom1 <- c(m1to5_cols[2:5], poisson_col, gtr20_col)
-
-model_levels_nom1 <- c("m2", "m3", "m4", "m5", "poisson", "GTR20")
-model_labels_nom1 <- c("M2", "M3", "M4",  "M5", "JC", "GTR")
-
-tree_levels <- c("ruhfel", "rayfinned", "dosreis", "prum", "andersen", "spiralia", "opisthokonta", "salichos")
-tree_labels <- c("Green Plant", "Ray-finned fish", "Mammals", "Aves", "Lassa Virus", "Spiralia", "Opisthokonta", "Yeast")
-tree_labels_twolines <- c("Green\nPlant", "Ray-finned\nfish", "Mammals", "Aves", "Lassa\nVirus", "Spiralia", "Opisthokonta", "Yeast")
-tree_labels_ntaxa <- c("Green Plant (360)", "Ray-finned fish (305)", "Mammals (274)", "Aves (200)", "Lassa Virus (179)", "Spiralia (103)", "Opisthokonta (70)", "Yeast (23)")
-
-
-################################### Read in all data ##################################
-
-### RF and BIC results
-simulation_rf_fit  <- read_csv("rf_fit_simulation.csv",guess_max = 10000)
-pandit_rf  <- read_csv("rf_pandit.csv",guess_max = 10000) 
-pandit_fit <- read_csv("fit_pandit.csv",guess_max = 10000) 
-
-### basic information about datasets
-sim_info    <- read_csv("../simulations/simulation_trees_ntaxa.csv") 
-pandit_info <- read_csv("../pandit_aa_alignments/pandit_info.csv")
-
-### Topology test results
-simulation_topology <- read_csv("topology_tests_simulation.csv")
-pandit_topology     <- read_csv("topology_tests_pandit.csv")
-
-## actual selected models
-msel_simulation <- read_csv("../processed_model_selection/quantile_model_selection_simulation.csv")
-all_sel         <- read_csv("../processed_model_selection/all_model_selection_simulation.csv")
-msel_pandit     <- read_csv("../processed_model_selection/quantile_model_selection_pandit.csv")
-
-
-## Bootstrap analysis
-sim_ufb <- read_csv("ufb_splits_simulation.csv")
-
-
-######### Normalize RF values #########
-simulation_rf_fit %>% 
-    left_join(sim_info) %>%
-    mutate(max_rf = 2*ntaxa - 6) %>%  ### twice the number of internal edges
-    mutate(rf_true_norm = rf/max_rf) -> simulation_rf_fit
-
-pandit_rf %>% 
-    left_join(pandit_info) %>%
-    mutate(max_rf = 2*ntaxa - 6) %>%
-    mutate(rf     = rf/max_rf) -> pandit_rf
-pandit_fit %>% left_join(pandit_info) -> pandit_fit
-
-
+source("load.R") # ugh i dont want to keep copy/pasting this stuff it lives there now
+#stop()
 
 
 ############################### Simulation figures ################################
@@ -128,7 +56,7 @@ simulation_rf_fit %>%
             #geom_point(data = sim_rf_plotdata_mean, aes(x = model_levels, y = meanrf)) + 
             #geom_line(data = sim_rf_plotdata_mean, aes(x = model_levels, y = meanrf, group = name_levels)) + 
             theme(legend.position = "bottom") -> simulation_rf_boxplot  
-save_plot(paste0(figure_directory,"simulation_rf_boxplot.pdf"), simulation_rf_boxplot, base_width=12, base_height=5)
+save_plot(paste0(figure_directory,"simulation_rf_boxplot.pdf"), simulation_rf_boxplot, base_width=10, base_height=4)
 
 
 # simulation_rf_fit %>% group_by(name, tree, model) %>% tally(rf ==0) %>% filter(n>1) %>% xtable()
@@ -437,7 +365,7 @@ pandit_rf_ridgedata %>%
 pandit_rf_ridgedata %>% 
     ggplot(aes(x = rf, y = fct_reorder(model_pair, rf, .desc=TRUE), fill = medianrf)) + 
         geom_density_ridges(scale=1.4, quantile_lines=TRUE, quantiles=2, rel_min_height = 0.01) +
-        ylab("") + xlab("Normalized RF Distance") + 
+        ylab("") + xlab("Normalized Robinson-Foulds Distance") + 
         scale_x_continuous(expand = c(0.01, 0)) +
         scale_y_discrete(expand = c(0.01, 0), position="right") +
         background_grid(colour.major = "grey70")+
@@ -454,11 +382,11 @@ pandit_rf_ridgedata %>%
             axis.line.y = element_blank(), 
             axis.ticks.y = element_blank(),
             legend.position = "bottom",
-            legend.title = element_text(size=10), 
-            legend.text = element_text(size=9),
-            axis.text.y = element_text(face = font_face)
+            axis.text.y = element_text(size=11, face = font_face),
+            axis.text.x = element_text(size=11)
         )  -> rf_pandit_plot
  
+save_plot(paste0(figure_directory, "pandit_ridgeplot.pdf"), rf_pandit_plot, base_width=5, base_height=7)
         
         
     
@@ -490,10 +418,10 @@ pandit_au_summary %>%
   mutate(notsig = factor(notsig, levels=c("TRUE", "FALSE"))) %>%
     ggplot(aes(x = model_levels, y = perc_in_conf, fill = notsig)) + 
         geom_col() +
-        geom_text(data = pandit_au_summary_false, aes(x = model_levels, y = 1.02, label = label), size=3) + 
+        geom_text(data = pandit_au_summary_false, aes(x = model_levels, y = 1.04, label = label), size=3) + 
         #scale_fill_manual(values=c("seagreen3", "coral2"), name = "In M1 confidence set") +
         scale_fill_hue(l=50, name = "In M1 Confidence Set") +
-        xlab("Models") + ylab("Percent of alignments") +
+        xlab("Protein models") + ylab("Proportion of alignments") +
         theme(legend.position = "bottom") + 
           guides(fill = guide_legend(nrow=1, title.position = "left")) -> pandit_au_barplot
         
@@ -526,20 +454,24 @@ theme(legend.position = 'none') +
 
 
 
+pandit_au_plot <- plot_grid(pandit_au_barplot, disagree_m1_venn, labels="auto", scale=c(0.95, 0.8))
+save_plot(paste0(figure_directory,"pandit_au.pdf"), pandit_au_plot, base_width=8, base_height=3.5)
 
-pandit_au_barplot_nolegend <- pandit_au_barplot + theme(legend.position = "none")
-pandit_au_barplot_legend<- get_legend(pandit_au_barplot)
-pandit_rf_nolegend <- rf_pandit_plot + theme(legend.position = "none")
-pandit_rf_legend<- get_legend(rf_pandit_plot)
+
+#pandit_au_barplot_nolegend <- pandit_au_barplot + theme(legend.position = "none")
+#pandit_au_barplot_legend<- get_legend(pandit_au_barplot)
+
+
+#pandit_rf_nolegend <- rf_pandit_plot + theme(legend.position = "none")
+#pandit_rf_legend<- get_legend(rf_pandit_plot)
 
 #pandit_rf_au_plot <- plot_grid(pandit_rf_nolegend, pandit_au_barplot_nolegend, disagree_m1_venn, scale=c(1, 0.92, 0.7), nrow=1, labels="auto")
 
-part1 <- plot_grid(pandit_rf_nolegend, pandit_au_barplot_nolegend, nrow=1, labels=c("a", "b"))
-part2 <- plot_grid(pandit_rf_legend, pandit_au_barplot_legend, nrow=1)
-part12 <- plot_grid(part1, part2, nrow=2, rel_heights=c(1,0.1))
-pandit_rf_au_plot_full <- plot_grid(part12, disagree_m1_venn, nrow=1, labels=c("","c"),vjust=2.45, scale=c(0.95, 0.95, 0.5), rel_widths=c(0.7, 0.3))
-
-save_plot(paste0(figure_directory,"rf_pandit_plot.pdf"), pandit_rf_au_plot_full, base_width=14, base_height=5)
+#part1 <- plot_grid(pandit_rf_nolegend, pandit_au_barplot_nolegend, nrow=1, labels=c("a", "b"))
+#part2 <- plot_grid(pandit_rf_legend, pandit_au_barplot_legend, nrow=1)
+#part12 <- plot_grid(part1, part2, nrow=2, rel_heights=c(1,0.1))
+#pandit_rf_au_plot_full <- plot_grid(part12, disagree_m1_venn, nrow=1, labels=c("","c"),vjust=2.45, scale=c(0.95, 0.95, 0.5), rel_widths=c(0.7, 0.3))
+#save_plot(paste0(figure_directory,"rf_pandit_plot.pdf"), pandit_rf_au_plot_full, base_width=14, base_height=5)
 
 
 
@@ -597,7 +529,7 @@ for (m in 1:5) {
         mutate(model_matrix = str_split(model_name, "\\+")[[1]][1]) %>%
         group_by(name, tree, model_matrix) %>%
         tally() %>% 
-        mutate(tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels_twolines),
+        mutate(tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels_abbr),
                name_levels  = factor(name, levels=name_levels),
                model_matrix_levels = fct_reorder(model_matrix, n)) %>%
         ggplot(aes(x = tree_levels, y = n, fill = model_matrix_levels)) + 
@@ -605,15 +537,15 @@ for (m in 1:5) {
         facet_wrap(~name_levels, nrow=1) + 
         xlab("Simulation tree") + 
         ylab("Count") + 
-        theme(axis.text.x = element_text(size=6.5), legend.position = "bottom")-> selected_m_plot        
+        theme(axis.text.x = element_text(size=8), legend.position = "bottom")-> selected_m_plot        
         if (m == 1)
         {
-            selected_m_plot <- selected_m_plot + scale_fill_manual(values=c("palegreen3", "dodgerblue3"), name = paste(mname, "Model Matrix")) 
+            selected_m_plot <- selected_m_plot + scale_fill_hue(l=50, name = paste(mname, "Model Matrix")) 
         }   else{
             selected_m_plot <- selected_m_plot + guides(fill = guide_legend(nrow=2, title = paste(mname, "Model Matrix")))
         }
             
-    save_plot(paste0(figure_directory, "selected_", mname, "_simulation_barplot.pdf"), selected_m_plot, base_width=12, base_height = 3) 
+    save_plot(paste0(figure_directory, "selected_", mname, "_simulation_barplot.pdf"), selected_m_plot, base_width=10, base_height = 3) 
 }
 
       
