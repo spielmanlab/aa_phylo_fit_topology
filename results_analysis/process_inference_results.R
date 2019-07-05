@@ -331,7 +331,7 @@ pandit_ranks %>%
         geom_point(alpha=0.7, size=2) + geom_smooth(method = "lm", color= "grey20") + 
         scale_x_continuous(breaks=1:6) + 
         scale_color_continuous(name = "Treelength") + 
-        xlab("GTR20 model rank") + ylab("Number of taxa") + 
+        xlab("GTR model rank") + ylab("Number of taxa") + 
         annotate("text", x = 5, y=325, label = "R^2 == 0.61", parse=TRUE) -> gtr20_rank_plot
         
         
@@ -480,7 +480,7 @@ save_plot(paste0(figure_directory,"pandit_au.pdf"), pandit_au_plot, base_width=8
 
 #### Plot schematic for m1-m5
 scheme_name <- "HA"
-scheme_tree <- "ruhfel"
+scheme_tree <- "dosreis"
 scheme_rep <- 1
 all_sel %>% 
   dplyr::select(name, tree, model, bic, repl) %>%
@@ -502,14 +502,14 @@ msel_simulation %>%
     model_levels_matrix = paste0(modelm2, " (", model_name, ")")) %>%
   bind_rows(
           tibble(name = scheme_name, tree = scheme_tree, repl = scheme_rep, modelm = 4.3, modelm2 = "JC", model_name = "JC", model_levels_matrix = "JC", bic = poisson_bic),
-          tibble(name = scheme_name, tree = scheme_tree, repl = scheme_rep, modelm = 4.6, modelm2 = "GTR20", model_name = "GTR20", model_levels_matrix = "GTR20", bic = gtr20_bic)
+          tibble(name = scheme_name, tree = scheme_tree, repl = scheme_rep, modelm = 4.6, modelm2 = "GTR", model_name = "GTR", model_levels_matrix = "GTR", bic = gtr20_bic)
       ) %>%
-  mutate(model_levels= factor(modelm2, levels=c("M1", "M2", "M3", "M4", "M5", "JC", "GTR20")))   -> chunks
+  mutate(model_levels= factor(modelm2, levels=c("M1", "M2", "M3", "M4", "M5", "JC", "GTR")))   -> chunks
 
 
 ggplot(scheme_data, aes(x = "", y = bic)) + 
     geom_violin(fill="dodgerblue3", color = "dodgerblue4", alpha=0.3) + 
-  geom_point(alpha = 0.3, size=2.5) +
+  geom_point(alpha = 0.2, size=2.5) +
   geom_point(data = chunks, shape=21, aes(x = 1, y = bic, fill = model_levels), size=2.5) + 
     geom_label(data = chunks,  x = 1.02, hjust="outward", color = "black", aes(y = bic+300, fill = model_levels, label = model_levels_matrix), size=3, fontface = "bold", alpha=0.8) + 
     #geom_label(data = subset(chunks, model_levels != "M1"),  x = 1.02, hjust="outward", color = "black", aes(y = bic+300, fill = model_levels, label = model_levels_matrix), size=3, fontface = "bold", alpha=0.75) + 

@@ -38,9 +38,9 @@ def compare_ufb(bp_prefix, inftree, truetree):
             if node.label: ## near-zero branch lengths aren't included
                 ufb = node.label
                 if bp in truetree.bipartition_edge_map:
-                    ufb_string += bp_prefix + "," + str(ufb) + ",TRUE\n"
+                    ufb_string += bp_prefix + "," + str(ufb) + "," + str(node.level()) + ",TRUE\n"
                 else:
-                    ufb_string += bp_prefix + "," + str(ufb) + ",FALSE\n"
+                    ufb_string += bp_prefix + "," + str(ufb) + "," + str(node.level()) + ",FALSE\n"
             else:
                 if node.edge_length is not None:
                     assert(node.edge_length <= 1e-5), "MISSING BOOTSTRAP?!"
@@ -109,13 +109,14 @@ if type == "simulation":
     inferencepath  = "../fitted_trees_ufb_simulation/" 
     true_tree_path = "../simulations/true_trees/"
     dms_list       = ["NP", "HA", "HIV"]
-    treenames      = ["andersen", "dosreis", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]        
+    treenames      = ["dosreis","andersen", "dosreis", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]        
     reps           = 20
     fileinfo_order = ["name", "tree", "rep", "model"]
     outstring_rf_fit = ",".join(fileinfo_order) + "," + ",".join(fitinfo_order) +",rf,treelength\n"
-    outstring_boot   = ",".join(fileinfo_order) + ",boot,in_true\n"
-    outfile_rf_fit  = outpath + "rf_fit_" + type + ".csv"
-    outfile_boot   = outpath + "ufb_splits_" + type + ".csv"
+    outstring_boot   = ",".join(fileinfo_order) + ",boot,level,in_true\n"
+    outfile_rf_fit  = outpath + "rf_fit_" + type + "2.csv"
+    outfile_boot   = outpath + "ufb_splits_" + type + "2.csv"
+
 
     iqfiles_all = [x for x in os.listdir(inferencepath) if x.endswith(".iqtree")]
 
@@ -130,6 +131,7 @@ if type == "simulation":
                 treespaces[treename] = ts
                 this_true = dendropy.Tree.get_from_path(true_tree_path + treename +"_resolved.tree", "newick", taxon_namespace = treespaces[treename], rooting='force-unrooted')
                 this_true.encode_bipartitions()
+                                
                 truetrees[treename] = this_true
             
             for this_treename in treenames:
@@ -155,6 +157,7 @@ if type == "simulation":
                                     taxon_namespace = treespaces[this_treename]
                                    )
                     inftree.encode_bipartitions()
+
                     rf = str( treecompare.symmetric_difference( truetrees[this_treename], inftree) )
                     tl = str(inftree.length())
                 
