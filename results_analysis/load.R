@@ -18,7 +18,7 @@ name_levels <- c("NP", "HA", "HIV")
 name_labels_nsites <- c("NP (497)", "HA (564)", "HIV (661)")
 
 model_levels <- c("m1", "m2", "m3", "m4", "m5", "poisson", "GTR20")
-model_labels <- c("M1", "M2", "M3", "M4", "M5", "JC", "GTR")
+model_labels <- c("m1", "m2", "m3", "m4", "m5", "JC", "GTR")
 m1to5_cols <- sequential_hcl(5, palette = "ylorrd")
 poisson_col <- "grey40"
 gtr20_col   <- "grey80" 
@@ -26,7 +26,7 @@ model_colors <- c(m1to5_cols, poisson_col, gtr20_col)
 model_colors_nom1 <- c(m1to5_cols[2:5], poisson_col, gtr20_col)
 
 model_levels_nom1 <- c("m2", "m3", "m4", "m5", "poisson", "GTR20")
-model_labels_nom1 <- c("M2", "M3", "M4",  "M5", "JC", "GTR")
+model_labels_nom1 <- c("m2", "m3", "m4",  "m5", "JC", "GTR")
 
 tree_levels <- c("ruhfel", "rayfinned", "dosreis", "prum", "andersen", "spiralia", "opisthokonta", "salichos")
 tree_labels <- c("Green Plant", "Ray-finned fish", "Mammals", "Aves", "Lassa Virus", "Spiralia", "Opisthokonta", "Yeast")

@@ -6,7 +6,8 @@ source("load.R") # ugh i dont want to keep copy/pasting this stuff it lives ther
 
 #### simulation fit results
 simulation_rf_fit %>%
-  dplyr::select(-AIC, -AICc, -k,-logl, -rf, -rf_true_norm, -treelength) %>%
+  dplyr::select(-AIC, -AICc, -k,-logl, -rf, -rf_true_norm, -treelength, -max_rf, -ntaxa) %>%
+  distinct() %>%
   group_by(name, tree, rep) %>%
   mutate(ic.rank = as.integer(rank(BIC))) %>%
     mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
@@ -98,6 +99,29 @@ save_plot(paste0(figure_directory,"simulation_rf_boxplot.pdf"), simulation_rf_bo
 # \hline
 # \end{tabular}
 # \end{table}
+
+
+
+simulation_topology %>%
+    filter(whichtest == "au") %>%
+    gather(model, pvalue, m1:true) %>%
+    mutate(sig = pvalue < 0.01) %>%
+    filter(sig == TRUE) %>%
+    group_by(name, tree, model) %>%
+    tally() %>%
+    group_by(model) %>% tally()
+#1 GTR20     1
+#2 m5       19
+#3 true     31
+
+# simulation_topology %>%
+#     filter(whichtest == "au") %>%
+#     gather(model, pvalue, m1:true) %>%
+#     mutate(sig = pvalue < 0.01) %>%
+#     filter(sig == TRUE) %>%
+#     group_by(name, tree, model) %>%
+#     tally() %>% xtable()
+
 
 
 
@@ -302,7 +326,7 @@ msel_pandit %>%
   ggplot(aes(x = model_matrix_levels, y = n), fill = "grey60") + 
   geom_col() +
   geom_text(aes(x = model_matrix_levels, y = n+4, label = n), size=3)+
-  xlab("M1 Model Matrix") + 
+  xlab("m1 Model Matrix") + 
   ylab("Count") +
   theme(axis.text.x = element_text(size=7))-> m1_pandit_model_plot
 
@@ -352,7 +376,7 @@ pandit_rf %>%
     ungroup() %>%
     mutate(model1 = factor(model1, levels=model_levels, labels = model_labels), 
             model2 = factor(model2, levels=model_levels, labels = model_labels)) %>%
-    mutate(hasm1 = (model1 == "M1" | model2 == "M1")) %>%
+    mutate(hasm1 = (model1 == "m1" | model2 == "m1")) %>%
     unite(model_pair, model1, model2, sep = " - ") %>%
     mutate(model_pair_fct = fct_reorder(model_pair, rf, .desc=TRUE)) -> pandit_rf_ridgedata
 
@@ -391,18 +415,6 @@ save_plot(paste0(figure_directory, "pandit_ridgeplot.pdf"), rf_pandit_plot, base
         
     
     
-    # theme(axis.line.y = element_blank(), 
-    #           axis.ticks.y = element_blank(),
-    #           legend.position = c(0.5, 0.01),  
-    #           legend.key.height=unit(.7,"line"),
-    #           legend.title = element_text(size=10), 
-    #           legend.text = element_text(size=9), 
-    #           axis.text = element_text(size=11),
-    #           axis.title = element_text(size=12),
-    #           axis.text.y = element_text(face = font_face) ) +
-
-                                     
-
 
 pandit_topology %>%
     filter(whichtest == "au") %>%
@@ -420,7 +432,7 @@ pandit_au_summary %>%
         geom_col() +
         geom_text(data = pandit_au_summary_false, aes(x = model_levels, y = 1.04, label = label), size=3) + 
         #scale_fill_manual(values=c("seagreen3", "coral2"), name = "In M1 confidence set") +
-        scale_fill_hue(l=50, name = "In M1 Confidence Set") +
+        scale_fill_hue(l=50, name = "In m1 Confidence Set") +
         xlab("Protein models") + ylab("Proportion of alignments") +
         theme(legend.position = "bottom") + 
           guides(fill = guide_legend(nrow=1, title.position = "left")) -> pandit_au_barplot
@@ -438,7 +450,7 @@ venn_numbers <- tibble(type = c("m4_only", "m5_only", "poisson_only", "m4_m5", "
                       y = c(1.5,  -0.7,   -0.7,    0.5,    0.5,    -1,   0))                                
 df.venn <- data.frame(x = c(0, 0.866, -0.866),
                       y = c(1, -0.5, -0.5),
-                      labels = c('M4', 'M5', 'JC'))
+                      labels = c('m4', 'm5', 'JC'))
 ggplot(df.venn, aes(x0 = x, y0 = y, r = 1.5, fill = labels)) +
   geom_circle(alpha = 0.5, size = 1, colour = 'grey50') +
   theme_void() + 
@@ -448,32 +460,14 @@ theme(legend.position = 'none') +
   #scale_colour_manual(values = c('cornflowerblue', 'firebrick', 'gold'), guide = FALSE) +
   scale_fill_hue(l=50) + labs(fill = NULL) +
   annotate("text", x = venn_numbers$x, y = venn_numbers$y, label = venn_numbers$labels, size = 5) +
-  annotate("text", x = 0, y = 2.65, label = "M4",fontface = "bold", size=4) +
+  annotate("text", x = 0, y = 2.65, label = "m4",fontface = "bold", size=4) +
   annotate("text", x = -2.3, y = -1.5,  label = "JC",fontface = "bold", size=4) +
-  annotate("text", x = 2.3, y = -1.5, label = "M5",fontface = "bold", size=4) -> disagree_m1_venn
+  annotate("text", x = 2.3, y = -1.5, label = "m5",fontface = "bold", size=4) -> disagree_m1_venn
 
 
 
 pandit_au_plot <- plot_grid(pandit_au_barplot, disagree_m1_venn, labels="auto", scale=c(0.95, 0.8))
 save_plot(paste0(figure_directory,"pandit_au.pdf"), pandit_au_plot, base_width=8, base_height=3.5)
-
-
-#pandit_au_barplot_nolegend <- pandit_au_barplot + theme(legend.position = "none")
-#pandit_au_barplot_legend<- get_legend(pandit_au_barplot)
-
-
-#pandit_rf_nolegend <- rf_pandit_plot + theme(legend.position = "none")
-#pandit_rf_legend<- get_legend(rf_pandit_plot)
-
-#pandit_rf_au_plot <- plot_grid(pandit_rf_nolegend, pandit_au_barplot_nolegend, disagree_m1_venn, scale=c(1, 0.92, 0.7), nrow=1, labels="auto")
-
-#part1 <- plot_grid(pandit_rf_nolegend, pandit_au_barplot_nolegend, nrow=1, labels=c("a", "b"))
-#part2 <- plot_grid(pandit_rf_legend, pandit_au_barplot_legend, nrow=1)
-#part12 <- plot_grid(part1, part2, nrow=2, rel_heights=c(1,0.1))
-#pandit_rf_au_plot_full <- plot_grid(part12, disagree_m1_venn, nrow=1, labels=c("","c"),vjust=2.45, scale=c(0.95, 0.95, 0.5), rel_widths=c(0.7, 0.3))
-#save_plot(paste0(figure_directory,"rf_pandit_plot.pdf"), pandit_rf_au_plot_full, base_width=14, base_height=5)
-
-
 
 
 ######################### Model matrices and schematic ############################
@@ -498,13 +492,13 @@ simulation_rf_fit %>%
 msel_simulation %>%
   filter(name == scheme_name, tree == scheme_tree, repl == scheme_rep) %>%
   rowwise() %>%
-  mutate(modelm2 = paste0("M", modelm),
+  mutate(modelm2 = paste0("m", modelm),
     model_levels_matrix = paste0(modelm2, " (", model_name, ")")) %>%
   bind_rows(
           tibble(name = scheme_name, tree = scheme_tree, repl = scheme_rep, modelm = 4.3, modelm2 = "JC", model_name = "JC", model_levels_matrix = "JC", bic = poisson_bic),
           tibble(name = scheme_name, tree = scheme_tree, repl = scheme_rep, modelm = 4.6, modelm2 = "GTR", model_name = "GTR", model_levels_matrix = "GTR", bic = gtr20_bic)
       ) %>%
-  mutate(model_levels= factor(modelm2, levels=c("M1", "M2", "M3", "M4", "M5", "JC", "GTR")))   -> chunks
+  mutate(model_levels= factor(modelm2, levels=model_levels))   -> chunks
 
 
 ggplot(scheme_data, aes(x = "", y = bic)) + 
@@ -627,33 +621,6 @@ glht(fit, linfct=mcp(model='Tukey')) %>% summary()
 # m5 - m3 == 0          0.0181480  0.0020367   8.910  < 0.001 ***
 
 
-
-
-
-
-
-
-
-
-# 
-# #### PANDIT results
-# simulation_topology %>%
-#     filter(whichtest == "au") %>%
-#     gather(model, pvalue, m1:true) %>%
-#     
-#     
-#     mutate(sig = pvalue < 0.01) %>%
-#     filter(sig == TRUE) %>%
-#     group_by(name, tree, model) %>%
-#     tally() %>%
-#     mutate(n = 100* n/20)
-#     group_by(model, name, tree, notsig) %>%
-#     tally() %>%
-#     mutate(perc_in_conf=n/200) %>%
-#     mutate(model_levels = factor(model, levels=model_levels, labels = model_labels)) -> pandit_au_summary
-# 
-# 
-# 
 
 
 
