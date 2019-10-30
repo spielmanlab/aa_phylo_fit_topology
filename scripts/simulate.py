@@ -34,18 +34,22 @@ mudict = {'AC':1.,  'CA':1.,  'AG':1.,  'GA':1.,  'AT':1.,  'TA':1.,  'CG':1.,  
 
 name   = sys.argv[1]
 simrep = sys.argv[2]
+dms_sims = ["HA", "NP", "HIV"]
 
 treepath = "../simulations/true_trees/" ## since simulating nucleotide level but want BL to describe, more or less, protein divergence
 prefpath = "../simulations/preferences/"
 simpath  = "../simulations/alignments/"
 trees = [x for x in os.listdir(treepath) if x.endswith("_resolved.tree")] ## 8 trees
-print(trees)
 prefs = np.loadtxt(prefpath + name + "_prefs.csv", delimiter=",")
 partitions = []
 
 print("Loading parameters")
 for siteprefs in prefs:
-    sitefit = np.log(  siteprefs/np.sum(siteprefs)   ) ## renormalize, my tolerance is a bit more stringent
+    # preferences are already fitness for yeast
+    if name in dms_sims:
+        sitefit = np.log(  siteprefs/np.sum(siteprefs)   ) ## renormalize DMS, my tolerance is a bit more stringent
+    else:
+        sitefit = siteprefs
     m = pyvolve.Model("mutsel", {"fitness": sitefit, "mu": mudict})
     p = pyvolve.Partition(models = m, size = 1)
     partitions.append(p)
