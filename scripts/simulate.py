@@ -65,7 +65,6 @@ for tree in trees:
     #outname = simpath + name + "_" + treename + "_rep" + str(simrep) + "_CODON.fasta" ##### CODON
     #outname1 = outname.replace("_CODON", "_DNA")               ##### NUCLEOTIDE (same as codon but naming is convenient downstream)
     outname = simpath + name + "_" + treename + "_rep" + str(simrep) + "_AA.fasta"
-    outname_dat = outname.replace(".fasta", ".dat")    
     
     if os.path.exists(outname):
         continue
@@ -91,7 +90,3 @@ for tree in trees:
 
     with open(outname, "w") as f:
         f.write(aa_out)
-
-    with open(outname_dat, "w") as f:
-        f.write(aa_out)
-        f.write("\n" + treestring) 
