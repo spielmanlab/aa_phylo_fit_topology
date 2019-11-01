@@ -40,8 +40,8 @@ type = sys.argv[1]
 assert(len(sys.argv)==2),"\n specify `simulation`, `pandit`"
 reps  = list(range(1,21))
 if type == "simulation":
-    alignment_path = "../simulations/simulation_alignments/"
-    names = ["HA", "NP", "HIV"] #, "LAC", "Gal4"]
+    alignment_path = "../simulations/alignments/"
+    names = ["HA", "NP", "HIV", "1IBS", "1R6M", "1RII"]
     trees = ["opisthokonta", "prum", "ruhfel", "salichos", "dosreis", "andersen", "spiralia", "rayfinned"]
 
 if type == "pandit":
@@ -49,8 +49,8 @@ if type == "pandit":
     names = [x.replace(".fasta", "") for x in os.listdir(alignment_path) if x.endswith(".fasta")]
     
 
-output_path    = "selected_models_" + type + "/" ## mv log files here
-outfile = "processed_model_selection/all_model_selection_" + type + ".csv"
+output_path = "../selected_models_" + type + "/" ## mv log files here
+outfile     = "../processed_model_selection/all_model_selection_" + type + ".csv"
 
 outstring = "name,tree,repl,model,logl,df,aic,aicc,bic\n"
 if type == "simulation":
