@@ -7,11 +7,11 @@
 #SBATCH --array=1-20
 
 REP=${SLURM_ARRAY_TASK_ID}
-TOPPATH=/csm_data/spielman_lab/dms_modelselection
-ALNPATH=${TOPPATH}/simulations/alignments_simulation
+TOPPATH=/csm_data/spielman_lab/aa_phylo_fit_topology
+ALNPATH=${TOPPATH}/simulations/alignments
 OUTPATH=${TOPPATH}/selected_models_simulation
 mkdir -p $OUTPATH
-for NAME in HA NP HIV; do 
+for NAME in 1IBS 1R6M 1RII HA NP HIV; do
     for TREE in opisthokonta prum ruhfel salichos dosreis andersen rayfinned spiralia; do
        X=${NAME}_${TREE}_rep${REP}_AA
        if [ ! -f $OUTPATH/${X}.model_selection_log ]; then
