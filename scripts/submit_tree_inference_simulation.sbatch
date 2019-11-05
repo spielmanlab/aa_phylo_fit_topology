@@ -7,10 +7,10 @@
 #SBATCH --array=1-20
 
 REP=${SLURM_ARRAY_TASK_ID}
-TOPPATH=/csm_data/spielman_lab/dms_modelselection/
+TOPPATH=/csm_data/spielman_lab/aa_phylo_fit_topology/
 ALNPATH=${TOPPATH}/simulations/alignments/
 OUTPATH=${TOPPATH}/fitted_trees_ufb_simulation/
-NAME=HA
+NAME=$1
 cd $TOPPATH
 for TREE in opisthokonta prum ruhfel salichos dosreis andersen rayfinned spiralia; do
    python3 scripts/infer_trees.py $NAME $TREE $REP $OUTPATH $ALNPATH processed_model_selection/quantile_model_selection_simulation.csv 8
