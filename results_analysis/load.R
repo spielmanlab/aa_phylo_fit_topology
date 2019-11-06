@@ -14,8 +14,8 @@ theme_set(theme_classic() + theme(axis.line = element_line(colour = "grey10"),
 figure_directory <- "figures/"
 
 ########################## Factor levels and labeling ################################ 
-name_levels <- c("NP", "HA", "HIV")
-name_labels_nsites <- c("NP (497)", "HA (564)", "HIV (661)")
+name_levels <- c("1RII", "1R6M", "1IBS", "NP", "HA", "HIV")
+name_labels_nsites <- c("1RII (195)", "1R6M (203)", "1IBS (291)", "NP (497)", "HA (564)", "HIV (661)")
 
 model_levels <- c("m1", "m2", "m3", "m4", "m5", "poisson", "GTR20")
 model_labels <- c("m1", "m2", "m3", "m4", "m5", "JC", "GTR")
