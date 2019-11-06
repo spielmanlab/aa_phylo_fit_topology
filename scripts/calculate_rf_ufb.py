@@ -108,20 +108,20 @@ if type == "simulation":
     alignmentpath  = "../simulations/alignments/"
     inferencepath  = "../fitted_trees_ufb_simulation/" 
     true_tree_path = "../simulations/true_trees/"
-    dms_list       = ["NP", "HA", "HIV"]
+    sim_list       = ["NP", "HA", "HIV", "1IBS", "1R6M", "1RII"]
     treenames      = ["dosreis","andersen", "dosreis", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]        
     reps           = 20
     fileinfo_order = ["name", "tree", "rep", "model"]
     outstring_rf_fit = ",".join(fileinfo_order) + "," + ",".join(fitinfo_order) +",rf,treelength\n"
     outstring_boot   = ",".join(fileinfo_order) + ",boot,level,in_true\n"
-    outfile_rf_fit  = outpath + "rf_fit_" + type + "2.csv"
-    outfile_boot   = outpath + "ufb_splits_" + type + "2.csv"
+    outfile_rf_fit  = outpath + "rf_fit_" + type + ".csv"
+    outfile_boot   = outpath + "ufb_splits_" + type + ".csv"
 
 
     iqfiles_all = [x for x in os.listdir(inferencepath) if x.endswith(".iqtree")]
 
-    for dms in dms_list: 
-        print(dms)
+    for sim in sim_list: 
+        print(sim)
         for repindex in range(1,reps+1): ## files indexed from 1
             print(repindex)
             treespaces = {}
@@ -137,7 +137,7 @@ if type == "simulation":
             for this_treename in treenames:
                 print("  ",this_treename)
 
-                prefix = dms + "_" + this_treename.replace(".tree","") + "_rep" + str(repindex) + "_AA"
+                prefix = sim + "_" + this_treename.replace(".tree","") + "_rep" + str(repindex) + "_AA"
                 iqfiles = [x for x in iqfiles_all if x.startswith(prefix)]
                 assert(len(iqfiles) == 7), "bad iqfiles"
                 for iqfile in iqfiles:

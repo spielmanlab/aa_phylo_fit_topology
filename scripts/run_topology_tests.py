@@ -19,12 +19,12 @@ quantilefile  = "../processed_model_selection/quantile_model_selection_" + type 
 
 if type == "pandit":
     alignmentpath = "../pandit_aa_alignments/"
-    inferencepath = "../fitted_with_ufb_pandit/" #"../fitted_trees_pandit/"
+    inferencepath = "../fitted_trees_ufb_pandit/" #"../fitted_trees_pandit/"
 elif type == "simulation":
     alignmentpath  = "../simulations/alignments/"
-    inferencepath  = "../fitted_with_ufb/" #"../fitted_trees_simulation/"
+    inferencepath  = "../fitted_trees_ufb_simulation/" #"../fitted_trees_simulation/"
     true_tree_path = "../simulations/true_trees/"
-    dms_list       = ["NP", "HA", "HIV"]
+    sim_list       = ["1RII", "1R6M", "1IBS", "NP", "HA", "HIV"]
     treenames      = ["andersen", "dosreis", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]        
     reps           = 20
 
@@ -109,7 +109,7 @@ def loop_over_tests(type):
 
     if type == "simulation":
         outstring  = "name,tree,repl,m1,m2,m3,m4,m5,poisson,GTR20,true\n"
-        for name in dms_list:
+        for name in sim_list:
             print(name)
             for tree in treenames:
                 print("  ", tree)
