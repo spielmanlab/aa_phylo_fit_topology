@@ -130,122 +130,95 @@ simulation_topology %>%
 
 
 
-
-
      
 ############## False positive nodes ##############
 ufb_fact %>% 
-    group_by(model_levels, tree_levels, name_levels, rep, classif) %>%
-    tally() %>% 
-    complete(model_levels, tree_levels, name_levels, rep, classif, fill = list(n = 0)) %>%
+    count(model_levels, tree_levels, name_levels, rep, classif) %>%
+    #complete(model_levels, tree_levels, name_levels, rep, classif, fill = list(n = 0)) %>%
     pivot_wider(names_from = classif, values_from = n) %>%
     ungroup() %>%
-    mutate(FPR = FP / (TN+FP), 
+    replace_na(list(FP = 0, FN = 0, TP = 0, TN = 0)) %>%
+    mutate(FPR = ifelse(is.nan(FP / (TN+FP)), 0, FP / (TN+FP)), 
            accuracy = (TP + TN)/(TP+TN+FP+FN)) -> ufb_fact_classif
 
+some_trees <- c("Green Plant (360)", "Aves (200)","Opisthokonta (70)")
+some_names <- c("1IBS", "HA")
 ufb_fact_classif %>%
-    filter(name_levels == "HA") %>%
+    filter(name_levels %in% some_names, tree_levels %in% some_trees) %>%
     ggplot(aes(x = model_levels, y = FPR, fill = model_levels)) + 
-        geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5,  size=2, color="grey10")  +     
+        geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5, color="grey10")  +     
         scale_fill_manual(values=model_colors, name = "Protein Model") +         
-        facet_wrap(~tree_levels, nrow=2) +
+        facet_grid(name_levels~tree_levels, scales="free_y") +
         #scale_y_continuous(breaks=c(0, 0.02, 0.04, 0.06)) + 
         background_grid() + 
         panel_border() +
         theme(legend.position = "none",
               strip.text = element_text(size=8), 
-              axis.text.x = element_text(size=8)) +
+              strip.background = element_rect(fill = "grey80"), 
+              axis.text.x = element_text(size=8),
+              panel.spacing = unit(0.2, "cm")) +
         xlab("Protein Models") + ylab("False positive rate") +
-        geom_hline(yintercept = 0.05, color = "dodgerblue3")  -> sim_ufb_fp_ha
-
-
+        geom_hline(yintercept = 0.05, color = "dodgerblue3")  -> fpr_subset
 
 ufb_fact_classif %>%
-    filter(name_levels == "1RII") %>%
-    ggplot(aes(x = model_levels, y = FPR, fill = model_levels)) + 
-        geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5,  size=2, color="grey10")  +     
+    filter(name_levels %in% some_names, tree_levels %in% some_trees) %>%
+    ggplot(aes(x = model_levels, y = accuracy, fill = model_levels)) + 
+        geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5, color="grey10")  +     
         scale_fill_manual(values=model_colors, name = "Protein Model") +         
-        facet_wrap(~tree_levels, nrow=2) +
+        facet_grid(name_levels~tree_levels, scales="free_y") +
         #scale_y_continuous(breaks=c(0, 0.02, 0.04, 0.06)) + 
         background_grid() + 
         panel_border() +
         theme(legend.position = "none",
               strip.text = element_text(size=8), 
-              axis.text.x = element_text(size=8)) +
+              strip.background = element_rect(fill = "grey80"), 
+              axis.text.x = element_text(size=8),
+              panel.spacing = unit(0.2, "cm")) +
+        xlab("Protein Models") + ylab("Accuracy")   -> acc_subset
+
+
+ufb_subset_grid <- plot_grid(fpr_subset, acc_subset, nrow=2, labels= "auto", scale=0.98)
+save_plot(paste0(figure_directory,"ufb_subset_grid.pdf"), ufb_subset_grid, base_width = 6, base_height=7)
+             
+             
+             
+             
+ufb_fact_classif %>%
+    ggplot(aes(x = model_levels, y = FPR, fill = model_levels)) + 
+        geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5, color="grey10")  +     
+        scale_fill_manual(values=model_colors, name = "Protein Model") +         
+        facet_grid(name_levels~tree_levels, scales="free_y") +
+        #scale_y_continuous(breaks=c(0, 0.02, 0.04, 0.06)) + 
+        background_grid() + 
+        panel_border() +
+        theme(legend.position = "none",
+              strip.text = element_text(size=8), 
+              strip.background = element_rect(fill = "grey80"), 
+              axis.text.x = element_text(size=8),
+              panel.spacing = unit(0.2, "cm")) +
         xlab("Protein Models") + ylab("False positive rate") +
-        geom_hline(yintercept = 0.05, color = "dodgerblue3")  -> sim_ufb_fp_1RII
+        geom_hline(yintercept = 0.05, color = "dodgerblue3")  -> fpr_all
 
-
-ufb_accuracy %>%
-    filter(name_levels == "HA") %>%
-    ggplot(aes(x = model_levels, y = percent, fill = model_levels)) + 
-        geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5,  size=2, color="grey10")  +     
+ufb_fact_classif %>%
+    ggplot(aes(x = model_levels, y = accuracy, fill = model_levels)) + 
+        geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5, color="grey10")  +     
         scale_fill_manual(values=model_colors, name = "Protein Model") +         
-        facet_wrap(~tree_levels, nrow=2, scales="free_y") +
+        facet_grid(name_levels~tree_levels, scales="free_y") +
+        #scale_y_continuous(breaks=c(0, 0.02, 0.04, 0.06)) + 
         background_grid() + 
         panel_border() +
         theme(legend.position = "none",
               strip.text = element_text(size=8), 
-              axis.text = element_text(size=8)) +
-             xlab("Protein Models") + ylab("Proportion accurate nodes") -> sim_ufb_acc_ha
+              strip.background = element_rect(fill = "grey80"), 
+              axis.text.x = element_text(size=8),
+              panel.spacing = unit(0.2, "cm")) +
+        xlab("Protein Models") + ylab("Accuracy")   -> acc_all
+save_plot(paste0(figure_directory,"ufb_fpr_all.pdf"), fpr_all, base_width = 12, base_height=10)
+save_plot(paste0(figure_directory,"ufb_acc_all.pdf"), acc_all, base_width = 12, base_height=10)
 
 
+######### TODO: THE SI VERSION WITH ALL DATA ########
 
-ufb_accuracy %>%
-    filter(name_levels == "1RII") %>%
-    ggplot(aes(x = model_levels, y = percent, fill = model_levels)) + 
-        geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5,  size=2, color="grey10")  +     
-        scale_fill_manual(values=model_colors, name = "Protein Model") +         
-        facet_wrap(~tree_levels, nrow=2, scales="free_y") +
-        background_grid() + 
-        panel_border() +
-        theme(legend.position = "none",
-              strip.text = element_text(size=8), 
-              axis.text = element_text(size=8)) +
-             xlab("Protein Models") + ylab("Proportion accurate nodes")-> sim_ufb_acc_1RII
-             
-             
-ufb_ha_grid <- plot_grid(sim_ufb_fp_ha, sim_ufb_acc_ha, nrow=2, labels="auto", scale=0.98)
-save_plot(paste0(figure_directory,"ufb_simulation_fp_accuracy_HA.pdf"), ufb_ha_grid, base_width = 9, base_height=5)
-
-ufb_ha_grid <- plot_grid(sim_ufb_fp_1RII, sim_ufb_acc_1RII, nrow=2, labels="auto", scale=0.98)
-save_plot(paste0(figure_directory,"ufb_simulation_fp_accuracy_1RII.pdf"), ufb_ha_grid, base_width = 9, base_height=5)
-
-
-
-
-ufb_fp %>%
-    filter(!(name_levels %in% c("HA", "1RII"))) %>%
-    ggplot(aes(x = model_levels, y = percent, fill = model_levels)) + 
-        geom_jitter(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5,  size=1.75, color="grey10")  +     
-        scale_fill_manual(values=model_colors, name = "Protein Model") +         
-        facet_grid(name_levels~tree_levels) +
-        background_grid() + 
-        panel_border() +
-        theme(legend.position = "none",
-              strip.text = element_text(size=8), 
-              axis.text.x = element_text(size=6, angle=30)) +
-        xlab("Protein Models") + ylab("Percent false positive nodes") +
-        geom_hline(yintercept = 0.05, color = "dodgerblue3")  -> sim_ufb_fp_nphiv
-save_plot(paste0(figure_directory,"ufb_simulation_fp_HIV-NP.pdf"), sim_ufb_fp_nphiv, base_width = 10, base_height=3)
-
-
-
-
-ufb_accuracy %>%
-    filter(!(name_levels %in% c("HA", "1RII"))) %>%
-    ggplot(aes(x = model_levels, y = percent, fill = model_levels)) + 
-        geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5,  size=1.75, color="grey10")  +     
-        scale_fill_manual(values=model_colors, name = "Protein Model") +         
-        facet_grid(name_levels~tree_levels) +
-        scale_y_continuous(breaks=seq(0.5, 1.0, 0.1)) + 
-        background_grid() + 
-        panel_border() +
-        theme(legend.position = "none",
-              strip.text = element_text(size=8), 
-              axis.text.x = element_text(size=6, angle=30)) +
-        xlab("Protein Models") + ylab("Percent accurate nodes") -> sim_ufb_acc_nphiv
-save_plot(paste0(figure_directory,"ufb_simulation_accuracy_rest.pdf"), sim_ufb_acc_nphiv, base_width = 10, base_height=3)
 
 ################################## PANDIT figures ###########################################
 
@@ -386,18 +359,17 @@ df.venn <- data.frame(x = c(0, 0.866, -0.866),
                       y = c(1, -0.5, -0.5),
                       labels = c('m4', 'm5', 'JC'))
 ggplot(df.venn, aes(x0 = x, y0 = y, r = 1.5, fill = labels)) +
-  geom_circle(alpha = 0.5, size = 1, colour = 'grey50') +
+  geom_circle(alpha = 0.4, size = 1, colour = 'grey50') +
   theme_void() + 
   coord_fixed(clip = "off") + 
 theme(legend.position = 'none') +
-  #scale_fill_manual(values = c(poisson_col, m1to5_cols[4], m1to5_cols[5])) +
-  #scale_colour_manual(values = c('cornflowerblue', 'firebrick', 'gold'), guide = FALSE) +
-  scale_fill_hue(l=50) + labs(fill = NULL) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(fill = NULL) +
   annotate("text", x = venn_numbers$x, y = venn_numbers$y, label = venn_numbers$labels, size = 5) +
   annotate("text", x = 0, y = 2.65, label = "m4",fontface = "bold", size=4) +
   annotate("text", x = -2.3, y = -1.5,  label = "JC",fontface = "bold", size=4) +
   annotate("text", x = 2.3, y = -1.5, label = "m5",fontface = "bold", size=4) -> disagree_m1_venn
-
+save_plot("temp.jpg", disagree_m1_venn)
 
 
 pandit_au_plot <- plot_grid(pandit_au_barplot, disagree_m1_venn, labels="auto", scale=c(0.95, 0.8))
@@ -406,47 +378,90 @@ save_plot(paste0(figure_directory,"pandit_au.pdf"), pandit_au_plot, base_width=8
 
 ######################### Model matrices and schematic ############################
 
+###################################################################################
 #### Plot schematic for m1-m5
-scheme_name <- "HA"
+scheme_name1 <- "HA"
+scheme_name2 <- "1IBS"
 scheme_tree <- "dosreis"
-scheme_rep <- 1
+scheme_rep <- 7
 all_sel %>% 
   dplyr::select(name, tree, model, bic, repl) %>%
-  filter(name == scheme_name, tree == scheme_tree, repl == scheme_rep) -> scheme_data
-
+  filter(name == scheme_name1, tree == scheme_tree, repl == scheme_rep) -> data1
 simulation_rf_fit %>% 
-  filter(name == scheme_name, model == "poisson", rep == scheme_rep, tree == scheme_tree) %>% 
-  pull(BIC) -> poisson_bic
-
+  filter(name == scheme_name1, model == "poisson", rep == scheme_rep, tree == scheme_tree) %>% 
+  pull(BIC) -> poisson_bic_1
 simulation_rf_fit %>% 
-  filter(name == scheme_name, model == "GTR20", rep == scheme_rep, tree == scheme_tree) %>% 
-  pull(BIC) -> gtr20_bic
+  filter(name == scheme_name1, model == "GTR20", rep == scheme_rep, tree == scheme_tree) %>% 
+  pull(BIC) -> gtr20_bic_1
+
+
+all_sel %>% 
+  dplyr::select(name, tree, model, bic, repl) %>%
+  filter(name == scheme_name2, tree == scheme_tree, repl == scheme_rep) -> data2
+simulation_rf_fit %>% 
+  filter(name == scheme_name2, model == "poisson", rep == scheme_rep, tree == scheme_tree) %>% 
+  pull(BIC) -> poisson_bic_2
+simulation_rf_fit %>% 
+  filter(name == scheme_name2, model == "GTR20", rep == scheme_rep, tree == scheme_tree) %>% 
+  pull(BIC) -> gtr20_bic_2
 
 
 msel_simulation %>%
-  filter(name == scheme_name, tree == scheme_tree, repl == scheme_rep) %>%
+  filter(name == scheme_name1, tree == scheme_tree, repl == scheme_rep) %>%
   rowwise() %>%
   mutate(modelm2 = paste0("m", modelm),
     model_levels_matrix = paste0(modelm2, " (", model_name, ")")) %>%
   bind_rows(
-          tibble(name = scheme_name, tree = scheme_tree, repl = scheme_rep, modelm = 4.3, modelm2 = "JC", model_name = "JC", model_levels_matrix = "JC", bic = poisson_bic),
-          tibble(name = scheme_name, tree = scheme_tree, repl = scheme_rep, modelm = 4.6, modelm2 = "GTR", model_name = "GTR", model_levels_matrix = "GTR", bic = gtr20_bic)
+          tibble(name = scheme_name1, tree = scheme_tree, repl = scheme_rep, modelm = 4.3, modelm2 = "JC", model_name = "JC", model_levels_matrix = "JC", bic = poisson_bic_1),
+          tibble(name = scheme_name1, tree = scheme_tree, repl = scheme_rep, modelm = 4.6, modelm2 = "GTR", model_name = "GTR", model_levels_matrix = "GTR", bic = gtr20_bic_1)
       ) %>%
-  mutate(model_levels= factor(modelm2, levels=model_levels))   -> chunks
+  distinct() %>%
+  mutate(model_levels= factor(modelm2, levels=model_labels)) -> chunks1
 
+msel_simulation %>%
+  filter(name == scheme_name2, tree == scheme_tree, repl == scheme_rep) %>%
+  rowwise() %>%
+  mutate(modelm2 = paste0("m", modelm),
+    model_levels_matrix = paste0(modelm2, " (", model_name, ")")) %>%
+  bind_rows(
+          tibble(name = scheme_name2, tree = scheme_tree, repl = scheme_rep, modelm = 4.3, modelm2 = "JC", model_name = "JC", model_levels_matrix = "JC", bic = poisson_bic_2),
+          tibble(name = scheme_name2, tree = scheme_tree, repl = scheme_rep, modelm = 4.6, modelm2 = "GTR", model_name = "GTR", model_levels_matrix = "GTR", bic = gtr20_bic_2)
+      ) %>%
+  distinct() %>%
+  mutate(model_levels= factor(modelm2, levels=model_labels)) -> chunks2
 
-ggplot(scheme_data, aes(x = "", y = bic)) + 
+ggplot(data1, aes(x = "", y = bic)) + 
     geom_violin(fill="dodgerblue3", color = "dodgerblue4", alpha=0.3) + 
-  geom_point(alpha = 0.2, size=2.5) +
-  geom_point(data = chunks, shape=21, aes(x = 1, y = bic, fill = model_levels), size=2.5) + 
-    geom_label(data = chunks,  x = 1.02, hjust="outward", color = "black", aes(y = bic+300, fill = model_levels, label = model_levels_matrix), size=3, fontface = "bold", alpha=0.8) + 
+    geom_point(alpha = 0.1, size=1.5) +
+    geom_point(data = chunks1, shape=21, aes(x = 1, y = bic, fill = model_levels), size=3) + 
+    geom_label(data = chunks1,  x = 1.02, hjust="outward", color = "black", aes(y = bic+300, fill = model_levels, label = model_levels_matrix), size=3, fontface = "bold", alpha=0.8) + 
     #geom_label(data = subset(chunks, model_levels != "M1"),  x = 1.02, hjust="outward", color = "black", aes(y = bic+300, fill = model_levels, label = model_levels_matrix), size=3, fontface = "bold", alpha=0.75) + 
     #geom_label(data = subset(chunks, model_levels == "M1"), x = 1.02, hjust="outward", color = "white", aes(y = bic+300, fill = model_levels, label = model_levels_matrix), size=3, fontface = "bold", alpha=0.75) + 
-  scale_fill_manual(values = c(  lighten(lighten(model_colors[1])), model_colors[2:7])) +
-  theme(legend.position = "none", axis.ticks.x = element_blank()) +
-    xlab("") + ylab("BIC values across all tested models")  -> quant_scheme_plot
+    ggtitle("HA simulation replicate") + 
+    scale_fill_manual(values = c(  lighten(lighten(model_colors[1])), model_colors[2:7])) +
+    theme(legend.position = "none", axis.ticks.x = element_blank()) +
+    xlab("") + ylab("BIC values across all tested models")  -> quant_scheme_plot_1
 
-ggsave(paste0(figure_directory, "bic_dist_scheme_qviolin.pdf"), quant_scheme_plot, width = 6, height=5)
+ggplot(data2, aes(x = "", y = bic)) + 
+    geom_violin(fill="dodgerblue3", color = "dodgerblue4", alpha=0.3) + 
+    geom_point(alpha = 0.1, size=1.5) +
+    geom_point(data = chunks2, shape=21, aes(x = 1, y = bic, fill = model_levels), size=3) + 
+    geom_label(data = chunks2,  x = 1.02, hjust="outward", color = "black", aes(y = bic + 25, fill = model_levels, label = model_levels_matrix), size=3, fontface = "bold", alpha=0.8) + 
+    #geom_label(data = subset(chunks, model_levels != "M1"),  x = 1.02, hjust="outward", color = "black", aes(y = bic+300, fill = model_levels, label = model_levels_matrix), size=3, fontface = "bold", alpha=0.75) + 
+    #geom_label(data = subset(chunks, model_levels == "M1"), x = 1.02, hjust="outward", color = "white", aes(y = bic+300, fill = model_levels, label = model_levels_matrix), size=3, fontface = "bold", alpha=0.75) + 
+    ggtitle("1IBS simulation replicate") + 
+    scale_fill_manual(values = c(  lighten(lighten(model_colors[1])), model_colors[2:7])) +
+    theme(legend.position = "none", axis.ticks.x = element_blank()) +
+    xlab("") + ylab("BIC values across all tested models")  -> quant_scheme_plot_2
+
+bic_dist_grid <- plot_grid(quant_scheme_plot_1, quant_scheme_plot_2, labels="auto", nrow=1, scale=0.97)
+
+ggsave(paste0(figure_directory, "bic_dist_grid.pdf"), bic_dist_grid, width = 8, height=3)
+    
+    
+    
+    
+    
     
 
 for (m in 1:5) {
@@ -510,6 +525,16 @@ selected_grid <- plot_grid(plotlist = plot_list, nrow=2, labels = "auto")
 save_plot(paste0(figure_directory, "selected_models_m2-5_pandit.pdf"), selected_grid, base_width=11, base_height=6) 
 
 
+
+### entropy comparisons to distinguish simulation conditions
+ggplot(entropy, aes(x = name_levels, y = entropy, color = name_levels)) + 
+    geom_sina(alpha=0.7) + 
+    scale_color_brewer(palette = "Set2") + 
+    stat_summary(fun.data = "mean_se",size = 0.5, color = "black") + # se is too small to see so this ends up being mean, chachiiiiing 
+    xlab("Simulation parameterization") + 
+    ylab("Sitewise entropy") + 
+    background_grid() + theme(legend.position = "none") -> entropy_sina
+ggsave(paste0(figure_directory, "entropy_sina.pdf"), entropy_sina, width = 6, height=2.5)
 
 ############################### Linear models ################################
 

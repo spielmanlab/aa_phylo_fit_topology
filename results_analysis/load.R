@@ -4,10 +4,10 @@ library(lme4)
 library(lmerTest)
 library(multcomp)
 library(broom)
-library(ggforce)
 library(xtable)
 library(colorspace)
 library(ggridges)
+library(ggforce)
 
 theme_set(theme_classic() + theme(axis.line = element_line(colour = "grey10"),
                                   strip.background = element_rect(size=0.5)))
@@ -32,7 +32,6 @@ tree_levels <- c("ruhfel", "rayfinned", "dosreis", "prum", "andersen", "spiralia
 tree_labels <- c("Green Plant", "Ray-finned fish", "Mammals", "Aves", "Lassa Virus", "Spiralia", "Opisthokonta", "Yeast")
 tree_labels_abbr <- c("Plant", "Fish", "Mammals", "Aves", "Lassa", "Spiralia", "Opis.", "Yeast")
 tree_labels_ntaxa <- c("Green Plant (360)", "Ray-finned fish (305)", "Mammals (274)", "Aves (200)", "Lassa Virus (179)", "Spiralia (103)", "Opisthokonta (70)", "Yeast (23)")
-
 
 ################################### Read in all data ##################################
 
@@ -75,3 +74,10 @@ pandit_rf %>%
     mutate(max_rf = 2*ntaxa - 6) %>%
     mutate(rf     = rf/max_rf) -> pandit_rf
 pandit_fit %>% left_join(pandit_info) -> pandit_fit
+
+##### entropy (for distinguishing simulations) ######
+entropy <- read_csv("simulation_site_entropy.csv") %>%
+                mutate(name_levels  = factor(name, levels=name_levels))
+
+
+
