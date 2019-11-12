@@ -132,70 +132,47 @@ simulation_topology %>%
 
 
 
-
-sim_ufb %>% 
-    mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
-        tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels_ntaxa),
-        name_levels  = factor(name, levels=name_levels), 
-        rep = factor(rep)) -> ufb_fact
-ufb_fact %>%
-    group_by(model_levels, tree_levels, name_levels, rep) %>%
-    tally() %>%
-    rename(total_considered = n) -> ufb_total_nodes
      
 ############## False positive nodes ##############
 ufb_fact %>% 
-    mutate(supported = boot >= 95) %>% 
-    filter(in_true == FALSE, supported == TRUE) %>% 
-    group_by(model_levels, tree_levels, name_levels, rep) %>%
+    group_by(model_levels, tree_levels, name_levels, rep, classif) %>%
     tally() %>% 
-    complete(model_levels, tree_levels, name_levels, rep, fill = list(n = 0)) %>%
-    left_join(ufb_total_nodes) %>%
-    mutate(percent = n / total_considered) %>%
-    distinct() -> ufb_fp
+    complete(model_levels, tree_levels, name_levels, rep, classif, fill = list(n = 0)) %>%
+    pivot_wider(names_from = classif, values_from = n) %>%
+    ungroup() %>%
+    mutate(FPR = FP / (TN+FP), 
+           accuracy = (TP + TN)/(TP+TN+FP+FN)) -> ufb_fact_classif
 
-ufb_fact %>% 
-    mutate(supported = boot >= 95) %>% 
-    filter(in_true == supported) %>% 
-    group_by(model_levels, tree_levels, name_levels, rep) %>%
-    tally() %>% 
-    complete(model_levels, tree_levels, name_levels, rep, fill = list(n = 0)) %>%
-    left_join(ufb_total_nodes) %>%
-    mutate(percent = n / total_considered) %>%
-    distinct() -> ufb_accuracy
-
-
-
-ufb_fp %>%
+ufb_fact_classif %>%
     filter(name_levels == "HA") %>%
-    ggplot(aes(x = model_levels, y = percent, fill = model_levels)) + 
+    ggplot(aes(x = model_levels, y = FPR, fill = model_levels)) + 
         geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5,  size=2, color="grey10")  +     
         scale_fill_manual(values=model_colors, name = "Protein Model") +         
         facet_wrap(~tree_levels, nrow=2) +
-        scale_y_continuous(breaks=c(0, 0.02, 0.04, 0.06)) + 
+        #scale_y_continuous(breaks=c(0, 0.02, 0.04, 0.06)) + 
         background_grid() + 
         panel_border() +
         theme(legend.position = "none",
               strip.text = element_text(size=8), 
               axis.text.x = element_text(size=8)) +
-        xlab("Protein Models") + ylab("Proportion false positive nodes") +
+        xlab("Protein Models") + ylab("False positive rate") +
         geom_hline(yintercept = 0.05, color = "dodgerblue3")  -> sim_ufb_fp_ha
 
 
 
-ufb_fp %>%
+ufb_fact_classif %>%
     filter(name_levels == "1RII") %>%
-    ggplot(aes(x = model_levels, y = percent, fill = model_levels)) + 
+    ggplot(aes(x = model_levels, y = FPR, fill = model_levels)) + 
         geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5,  size=2, color="grey10")  +     
         scale_fill_manual(values=model_colors, name = "Protein Model") +         
         facet_wrap(~tree_levels, nrow=2) +
-        scale_y_continuous(breaks=c(0, 0.02, 0.04, 0.06)) + 
+        #scale_y_continuous(breaks=c(0, 0.02, 0.04, 0.06)) + 
         background_grid() + 
         panel_border() +
         theme(legend.position = "none",
               strip.text = element_text(size=8), 
               axis.text.x = element_text(size=8)) +
-        xlab("Protein Models") + ylab("Proportion false positive nodes") +
+        xlab("Protein Models") + ylab("False positive rate") +
         geom_hline(yintercept = 0.05, color = "dodgerblue3")  -> sim_ufb_fp_1RII
 
 
@@ -269,77 +246,6 @@ ufb_accuracy %>%
               axis.text.x = element_text(size=6, angle=30)) +
         xlab("Protein Models") + ylab("Percent accurate nodes") -> sim_ufb_acc_nphiv
 save_plot(paste0(figure_directory,"ufb_simulation_accuracy_rest.pdf"), sim_ufb_acc_nphiv, base_width = 10, base_height=3)
-
-############################ linear model fp, acc ##################
-#fit <- lmer(percent ~ model_levels + (1|tree_levels) + (1|name_levels), data = ufb_fp)
-#glht(fit, linfct=mcp(model_levels='Tukey')) %>% summary()
-# 
-# 	 Simultaneous Tests for General Linear Hypotheses
-# 
-# Multiple Comparisons of Means: Tukey Contrasts
-# 
-# 
-# Fit: lmer(formula = percent ~ model_levels + (1 | tree_levels) + (1 | 
-#     name_levels), data = ufb_fp)
-# 
-# Linear Hypotheses:
-#                 Estimate Std. Error z value Pr(>|z|)    
-# m2 - m1 == 0   1.079e-03  6.815e-04   1.583  0.69375    
-# m3 - m1 == 0   2.392e-03  6.815e-04   3.510  0.00815 ** 
-# m4 - m1 == 0   3.851e-03  6.815e-04   5.650  < 0.001 ***
-# m5 - m1 == 0   1.055e-02  6.815e-04  15.475  < 0.001 ***
-# JC - m1 == 0   2.325e-03  6.815e-04   3.412  0.01149 *  NS
-# GTR - m1 == 0  7.051e-03  6.815e-04  10.346  < 0.001 ***
-# m3 - m2 == 0   1.314e-03  6.815e-04   1.928  0.46186    
-
-# m4 - m2 == 0   2.772e-03  6.815e-04   4.068  < 0.001 ***
-# m5 - m2 == 0   9.468e-03  6.815e-04  13.892  < 0.001 ***
-# JC - m2 == 0   1.247e-03  6.815e-04   1.829  0.52812    
-# GTR - m2 == 0  5.973e-03  6.815e-04   8.764  < 0.001 ***
-
-
-# m4 - m3 == 0   1.458e-03  6.815e-04   2.140  0.32896    
-# m5 - m3 == 0   8.154e-03  6.815e-04  11.964  < 0.001 ***
-# JC - m3 == 0  -6.715e-05  6.815e-04  -0.099  1.00000    
-# GTR - m3 == 0  4.659e-03  6.815e-04   6.836  < 0.001 ***
-
-# m5 - m4 == 0   6.696e-03  6.815e-04   9.825  < 0.001 ***
-# JC - m4 == 0  -1.526e-03  6.815e-04  -2.238  0.27471    
-# GTR - m4 == 0  3.200e-03  6.815e-04   4.696  < 0.001 ***
-# JC - m5 == 0  -8.221e-03  6.815e-04 -12.063  < 0.001 ***
-# GTR - m5 == 0 -3.495e-03  6.815e-04  -5.129  < 0.001 ***
-# GTR - JC == 0  4.726e-03  6.815e-04   6.934  < 0.001 ***
-
-
-fit <- lmer(percent ~ model_levels + (1|tree_levels) + (1|name_levels), data = ufb_accuracy)
-glht(fit, linfct=mcp(model_levels='Tukey')) %>% summary()
-# Linear Hypotheses:
-#                 Estimate Std. Error z value Pr(>|z|)    
-# m2 - m1 == 0  -0.0009798  0.0023054  -0.425  0.99955    
-# m3 - m1 == 0   0.0005854  0.0023054   0.254  0.99998    
-# m4 - m1 == 0  -0.0015766  0.0023054  -0.684  0.99351    
-# m5 - m1 == 0  -0.0048861  0.0023054  -2.119  0.34129    
-# JC - m1 == 0  -0.0020356  0.0023054  -0.883  0.97520    
-# GTR - m1 == 0  0.0084079  0.0023054   3.647  0.00505 ** 
-
-# m3 - m2 == 0   0.0015652  0.0023054   0.679  0.99376    
-# m4 - m2 == 0  -0.0005968  0.0023054  -0.259  0.99998    
-# m5 - m2 == 0  -0.0039063  0.0023054  -1.694  0.61975    
-# JC - m2 == 0  -0.0010558  0.0023054  -0.458  0.99931    
-# GTR - m2 == 0  0.0093876  0.0023054   4.072  < 0.001 ***
-
-# m4 - m3 == 0  -0.0021620  0.0023054  -0.938  0.96646    
-# m5 - m3 == 0  -0.0054715  0.0023054  -2.373  0.20995    
-# JC - m3 == 0  -0.0026210  0.0023054  -1.137  0.91677    
-# GTR - m3 == 0  0.0078225  0.0023054   3.393  0.01222 * NS
- 
-# m5 - m4 == 0  -0.0033095  0.0023054  -1.436  0.78248    
-# JC - m4 == 0  -0.0004590  0.0023054  -0.199  0.99999    
-# GTR - m4 == 0  0.0099844  0.0023054   4.331  < 0.001 ***
-# JC - m5 == 0   0.0028505  0.0023054   1.236  0.87999    
-# GTR - m5 == 0  0.0132939  0.0023054   5.767  < 0.001 ***
-# GTR - JC == 0  0.0104435  0.0023054   4.530  < 0.001 ***
-
 
 ################################## PANDIT figures ###########################################
 
@@ -611,152 +517,103 @@ save_plot(paste0(figure_directory, "selected_models_m2-5_pandit.pdf"), selected_
 simulation_rf_fit$model <- factor(simulation_rf_fit$model, levels=c("m1", "m2", "m3", "m4", "m5", "poisson", "GTR20"))
 lmer(rf_true_norm ~ model + (1|name) + (1|tree), data = simulation_rf_fit) -> fit
 glht(fit, linfct=mcp(model='Tukey')) %>% summary()
+#                        Estimate Std. Error z value Pr(>|z|)    
+# m2 - m1 == 0          0.0028237  0.0034829   0.811  0.98398    
+# m3 - m1 == 0          0.0050753  0.0034829   1.457  0.77026    
+# m4 - m1 == 0          0.0077192  0.0034829   2.216  0.28652    
+# poisson - m1 == 0     0.0026428  0.0034829   0.759  0.98867    
+# GTR20 - m1 == 0      -0.0024479  0.0034829  -0.703  0.99247    
+# m3 - m2 == 0          0.0022516  0.0034829   0.646  0.99522    
+# m4 - m2 == 0          0.0048955  0.0034829   1.406  0.79917    
+# poisson - m2 == 0    -0.0001809  0.0034829  -0.052  1.00000    
+# GTR20 - m2 == 0      -0.0052716  0.0034829  -1.514  0.73699    
+# m4 - m3 == 0          0.0026439  0.0034829   0.759  0.98865    
+# poisson - m3 == 0    -0.0024325  0.0034829  -0.698  0.99272    
+# GTR20 - m3 == 0      -0.0075232  0.0034829  -2.160  0.31765    
+# poisson - m4 == 0    -0.0050764  0.0034829  -1.458  0.76998    
+# GTR20 - m4 == 0      -0.0101671  0.0034829  -2.919  0.05429 .  
+# GTR20 - poisson == 0 -0.0050907  0.0034829  -1.462  0.76767 
+
+# m5 - m1 == 0          0.0216532  0.0034829   6.217  < 0.001 ***
+# m5 - m2 == 0          0.0188295  0.0034829   5.406  < 0.001 ***
+# m5 - m3 == 0          0.0165779  0.0034829   4.760  < 0.001 ***
+# m5 - m4 == 0          0.0139340  0.0034829   4.001  0.00127 ** 
+# poisson - m5 == 0    -0.0190104  0.0034829  -5.458  < 0.001 ***
+# GTR20 - m5 == 0      -0.0241011  0.0034829  -6.920  < 0.001 ***
+
+
+
+
+############################ linear model fp, acc ##################
+#fit <- lmer(percent ~ model_levels + (1|tree_levels) + (1|name_levels), data = ufb_fp)
+#glht(fit, linfct=mcp(model_levels='Tukey')) %>% summary()
+# 
+# 	 Simultaneous Tests for General Linear Hypotheses
+# 
+# Multiple Comparisons of Means: Tukey Contrasts
+# 
+# 
+# Fit: lmer(formula = percent ~ model_levels + (1 | tree_levels) + (1 | 
+#     name_levels), data = ufb_fp)
+# 
 # Linear Hypotheses:
-# m2 - m1 == 0          0.0024572  0.0020367   1.206  0.89194    
-# m3 - m1 == 0          0.0044539  0.0020367   2.187  0.30229    
-# m4 - m1 == 0          0.0064229  0.0020367   3.154  0.02686 *  
-# m5 - m1 == 0          0.0226019  0.0020367  11.097  < 0.001 ***
-# poisson - m1 == 0     0.0034234  0.0020367   1.681  0.62890    
-# GTR20 - m1 == 0      -0.0072462  0.0020367  -3.558  0.00693 ** 
-# m3 - m2 == 0          0.0019968  0.0020367   0.980  0.95833    
-# m4 - m2 == 0          0.0039657  0.0020367   1.947  0.44881    
-# m5 - m2 == 0          0.0201447  0.0020367   9.891  < 0.001 ***
-# poisson - m2 == 0     0.0009663  0.0020367   0.474  0.99916    
-# GTR20 - m2 == 0      -0.0097033  0.0020367  -4.764  < 0.001 ***
-# m4 - m3 == 0          0.0019690  0.0020367   0.967  0.96108    
-# m5 - m3 == 0          0.0181480  0.0020367   8.910  < 0.001 ***
-# poisson - m3 == 0    -0.0010305  0.0020367  -0.506  0.99878    
-# GTR20 - m3 == 0      -0.0117001  0.0020367  -5.745  < 0.001 ***
-# m5 - m4 == 0          0.0161790  0.0020367   7.944  < 0.001 ***
-# poisson - m4 == 0    -0.0029994  0.0020367  -1.473  0.76118    
-# GTR20 - m4 == 0      -0.0136690  0.0020367  -6.711  < 0.001 ***
-# poisson - m5 == 0    -0.0191785  0.0020367  -9.416  < 0.001 ***
-# GTR20 - m5 == 0      -0.0298481  0.0020367 -14.655  < 0.001 ***
-# GTR20 - poisson == 0 -0.0106696  0.0020367  -5.239  < 0.001 ***
+#                 Estimate Std. Error z value Pr(>|z|)    
+# m2 - m1 == 0   1.079e-03  6.815e-04   1.583  0.69375    
+# m3 - m1 == 0   2.392e-03  6.815e-04   3.510  0.00815 ** 
+# m4 - m1 == 0   3.851e-03  6.815e-04   5.650  < 0.001 ***
+# m5 - m1 == 0   1.055e-02  6.815e-04  15.475  < 0.001 ***
+# JC - m1 == 0   2.325e-03  6.815e-04   3.412  0.01149 *  NS
+# GTR - m1 == 0  7.051e-03  6.815e-04  10.346  < 0.001 ***
+# m3 - m2 == 0   1.314e-03  6.815e-04   1.928  0.46186    
 
-## SIG LINES:
-# GTR20 - m1 == 0      -0.0072462  0.0020367  -3.558  0.00693 ** 
-# GTR20 - m2 == 0      -0.0097033  0.0020367  -4.764  < 0.001 ***
-# GTR20 - m3 == 0      -0.0117001  0.0020367  -5.745  < 0.001 ***
-# GTR20 - m5 == 0      -0.0298481  0.0020367 -14.655  < 0.001 ***
-# GTR20 - m4 == 0      -0.0136690  0.0020367  -6.711  < 0.001 ***
-# GTR20 - poisson == 0 -0.0106696  0.0020367  -5.239  < 0.001 ***
-
-# m5 - m4 == 0          0.0161790  0.0020367   7.944  < 0.001 ***
-# m5 - m1 == 0          0.0226019  0.0020367  11.097  < 0.001 ***
-# m5 - m2 == 0          0.0201447  0.0020367   9.891  < 0.001 ***
-# poisson - m5 == 0    -0.0191785  0.0020367  -9.416  < 0.001 ***
-# m5 - m3 == 0          0.0181480  0.0020367   8.910  < 0.001 ***
+# m4 - m2 == 0   2.772e-03  6.815e-04   4.068  < 0.001 ***
+# m5 - m2 == 0   9.468e-03  6.815e-04  13.892  < 0.001 ***
+# JC - m2 == 0   1.247e-03  6.815e-04   1.829  0.52812    
+# GTR - m2 == 0  5.973e-03  6.815e-04   8.764  < 0.001 ***
 
 
+# m4 - m3 == 0   1.458e-03  6.815e-04   2.140  0.32896    
+# m5 - m3 == 0   8.154e-03  6.815e-04  11.964  < 0.001 ***
+# JC - m3 == 0  -6.715e-05  6.815e-04  -0.099  1.00000    
+# GTR - m3 == 0  4.659e-03  6.815e-04   6.836  < 0.001 ***
+
+# m5 - m4 == 0   6.696e-03  6.815e-04   9.825  < 0.001 ***
+# JC - m4 == 0  -1.526e-03  6.815e-04  -2.238  0.27471    
+# GTR - m4 == 0  3.200e-03  6.815e-04   4.696  < 0.001 ***
+# JC - m5 == 0  -8.221e-03  6.815e-04 -12.063  < 0.001 ***
+# GTR - m5 == 0 -3.495e-03  6.815e-04  -5.129  < 0.001 ***
+# GTR - JC == 0  4.726e-03  6.815e-04   6.934  < 0.001 ***
 
 
+fit <- lmer(percent ~ model_levels + (1|tree_levels) + (1|name_levels), data = ufb_accuracy)
+glht(fit, linfct=mcp(model_levels='Tukey')) %>% summary()
+# Linear Hypotheses:
+#                 Estimate Std. Error z value Pr(>|z|)    
+# m2 - m1 == 0  -0.0009798  0.0023054  -0.425  0.99955    
+# m3 - m1 == 0   0.0005854  0.0023054   0.254  0.99998    
+# m4 - m1 == 0  -0.0015766  0.0023054  -0.684  0.99351    
+# m5 - m1 == 0  -0.0048861  0.0023054  -2.119  0.34129    
+# JC - m1 == 0  -0.0020356  0.0023054  -0.883  0.97520    
+# GTR - m1 == 0  0.0084079  0.0023054   3.647  0.00505 ** 
+
+# m3 - m2 == 0   0.0015652  0.0023054   0.679  0.99376    
+# m4 - m2 == 0  -0.0005968  0.0023054  -0.259  0.99998    
+# m5 - m2 == 0  -0.0039063  0.0023054  -1.694  0.61975    
+# JC - m2 == 0  -0.0010558  0.0023054  -0.458  0.99931    
+# GTR - m2 == 0  0.0093876  0.0023054   4.072  < 0.001 ***
+
+# m4 - m3 == 0  -0.0021620  0.0023054  -0.938  0.96646    
+# m5 - m3 == 0  -0.0054715  0.0023054  -2.373  0.20995    
+# JC - m3 == 0  -0.0026210  0.0023054  -1.137  0.91677    
+# GTR - m3 == 0  0.0078225  0.0023054   3.393  0.01222 * NS
+ 
+# m5 - m4 == 0  -0.0033095  0.0023054  -1.436  0.78248    
+# JC - m4 == 0  -0.0004590  0.0023054  -0.199  0.99999    
+# GTR - m4 == 0  0.0099844  0.0023054   4.331  < 0.001 ***
+# JC - m5 == 0   0.0028505  0.0023054   1.236  0.87999    
+# GTR - m5 == 0  0.0132939  0.0023054   5.767  < 0.001 ***
+# GTR - JC == 0  0.0104435  0.0023054   4.530  < 0.001 ***
 
 
-
-
-
-# 
-# 
-# pandit_ufb %>% 
-#     filter(model != "m1") %>%
-#     mutate(model_levels = factor(model, levels=model_levels_nom1, labels = model_labels_nom1),
-#         name_levels  = factor(name)) -> ufb_fact
-# ufb_fact %>%
-#     group_by(model_levels, name_levels) %>%
-#     tally() %>%
-#     rename(total_considered = n) -> ufb_total_nodes
-#      
-# ############## False positive nodes ##############
-# ufb_fact %>% 
-#     mutate(supported = boot >= 95) %>% 
-#     filter(supported == TRUE, in_true == FALSE) %>% 
-#     group_by(model_levels, name_levels) %>%
-#     tally() %>% 
-#     complete(model_levels, name_levels, fill = list(n = 0)) %>%
-#     left_join(ufb_total_nodes) %>%
-#     mutate(percent = n / total_considered) %>%
-#     distinct() -> ufb_fp
-# 
-# ufb_fp %>%
-#     ungroup() %>%
-#     mutate(controlled = percent <= 0.05) %>%
-#     group_by(model_levels) %>%
-#     summarize(percent_controlled = 100 * sum(controlled) / 200) -> ufb_fp_controlled
-# 
-#     
-# ufb_fp %>%
-#     ggplot(aes(x = model_levels, y = percent, fill = model_levels)) +
-#         geom_sina(shape=21, color="grey30", maxwidth=0.75) +
-#         #geom_jitter(position=position_jitterdodge(), shape = 21, alpha=0.5,  size=2, color="grey10")  +     
-#         scale_fill_manual(values=model_colors_nom1) +         
-#         background_grid() + 
-#         panel_border() +
-#         theme(legend.position = "none",
-#               strip.text = element_text(size=8), 
-#               axis.text.x = element_text(size=8)) +
-#         xlab("Protein Models") + ylab("Percent false positive nodes\nrelative to M1") +
-#         geom_hline(yintercept = 0.05, color = "dodgerblue3")  +
-#         geom_text(data = ufb_fp_controlled, aes(x = model_levels, y = 0.043, label = paste0(percent_controlled, "%")), fontface="bold", size=3, nudge_x = -0.36) -> pandit_ufb_fp  
-# 
-# save_plot(paste0(figure_directory,"ufb_pandit_fp.pdf"), pandit_ufb_fp, base_width = 10, base_height=3)
-# 
-# 
-# 
-# 
-# ##################### Node accuracy #####################################
-# give.n <- function(x){
-#   return(c(y = median(x) + 0.1, label = length(x)))
-# }
-# ufb_fact %>% 
-#     mutate(supported = boot >= 95) %>% 
-#     filter(supported == in_true) %>% 
-#     group_by(model_levels, name_levels) %>%
-#     tally() %>% 
-#     complete(model_levels, name_levels, fill = list(n = 0)) %>%
-#     left_join(ufb_total_nodes) %>%
-#     mutate(percent = n / total_considered) %>% ## fuck you yy hack
-#     distinct() -> ufb_fact_acc
-# 
-# ufb_fact_acc %>%
-#     group_by(model_levels) %>%
-#     summarize(meanpercent= 100* round(mean(percent), 3)) -> ufb_fact_acc_means
-#  
-# ufb_fact_acc %>%   
-#     ggplot(aes(x = model_levels, y = percent, fill = model_levels)) +
-#         geom_sina(shape=21, color="grey30", maxwidth=0.75) +
-#         #geom_jitter(position=position_jitterdodge(), shape = 21, alpha=0.5,  size=2, color="grey10")  +     
-#         scale_fill_manual(values=model_colors_nom1) +         
-#         background_grid() + 
-#         panel_border() +
-#         theme(legend.position = "none",
-#               strip.text = element_text(size=8), 
-#               axis.text.x = element_text(size=8)) +
-#         scale_y_continuous(limits=c(0,1), breaks=c(0, 0.2, 0.4, 0.6, 0.8, 1)) + 
-#         geom_text(data = ufb_fact_acc_means, y=0.9, aes(x = model_levels, label = paste0(meanpercent, "%")), nudge_x = -0.35)+
-#         #stat_summary(fun.y = "mean", geom = "text", aes(x = model_levels, label = round(..y.., 2)), position = position_nudge(x = -0.4)) +
-#         xlab("Protein Models") + ylab("Percent accurate nodes\nrelative to M1")  -> pandit_ufb_acc 
-# 
-# save_plot(paste0(figure_directory,"ufb_pandit_accuracy.pdf"), pandit_ufb_acc, base_width = 10, base_height=3)
-# 
-# 
-# ufb_fp %>%
-#     filter(name_levels %in% c("HIV", "NP")) %>%
-#     ggplot(aes(x = model_levels, y = percent, fill = model_levels)) + 
-#         geom_jitter(position=position_jitterdodge(), shape = 21, alpha=0.5,  size=2, color="grey10")  +     
-#         scale_fill_manual(values=model_colors, name = "Protein Model") +         
-#         facet_grid(name_levels~tree_levels) +
-#         background_grid() + 
-#         panel_border() +
-#         theme(legend.position = "none",
-#               strip.text = element_text(size=8), 
-#               axis.text.x = element_text(size=6, angle=30)) +
-#         xlab("Protein Models") + ylab("Percent false positive nodes") +
-#         geom_hline(yintercept = 0.05, color = "dodgerblue3")  -> sim_ufb_fp
-# save_plot(paste0(figure_directory,"ufb_simulation_fp_HIV-NP.pdf"), sim_ufb_fp, base_width = 10, base_height=4)
-# 
-# 
-# 
-# 
 # 
 

@@ -4,7 +4,7 @@ import dendropy
 from dendropy.calculate import treecompare
 import pprint
 
-
+THRESHOLD=95 ## calling positive, negative
 
 
 
@@ -37,10 +37,21 @@ def compare_ufb(bp_prefix, inftree, truetree):
         if not node.is_leaf():
             if node.label: ## near-zero branch lengths aren't included
                 ufb = node.label
+                ufb_float = float(ufb)
+                # TRUE SPLIT
                 if bp in truetree.bipartition_edge_map:
-                    ufb_string += bp_prefix + "," + str(ufb) + "," + str(node.level()) + ",TRUE\n"
+                    ufb_string += bp_prefix + "," + str(ufb)  + ",TRUE"
+                    if ufb_float >= THRESHOLD:  # true split and high boot
+                        ufb_string += ",TP\n"
+                    elif ufb_float < THRESHOLD:  # true split and low boot
+                        ufb_string += ",FN\n"
+                # FALSE SPLIT
                 else:
-                    ufb_string += bp_prefix + "," + str(ufb) + "," + str(node.level()) + ",FALSE\n"
+                    ufb_string += bp_prefix + "," + str(ufb) + ",FALSE"
+                    if ufb_float >= THRESHOLD:  # false split and high boot
+                        ufb_string += ",FP\n"
+                    elif ufb_float < THRESHOLD:  # false split and low boot
+                        ufb_string += ",TN\n"
             else:
                 if node.edge_length is not None:
                     assert(node.edge_length <= 1e-5), "MISSING BOOTSTRAP?!"
@@ -113,7 +124,7 @@ if type == "simulation":
     reps           = 20
     fileinfo_order = ["name", "tree", "rep", "model"]
     outstring_rf_fit = ",".join(fileinfo_order) + "," + ",".join(fitinfo_order) +",rf,treelength\n"
-    outstring_boot   = ",".join(fileinfo_order) + ",boot,level,in_true\n"
+    outstring_boot   = ",".join(fileinfo_order) + ",boot,in_true,classif\n"
     outfile_rf_fit  = outpath + "rf_fit_" + type + ".csv"
     outfile_boot   = outpath + "ufb_splits_" + type + ".csv"
 

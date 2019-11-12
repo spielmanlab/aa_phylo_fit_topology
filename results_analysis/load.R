@@ -58,6 +58,11 @@ msel_pandit     <- read_csv("../processed_model_selection/quantile_model_selecti
 ## Bootstrap analysis
 sim_ufb <- read_csv("ufb_splits_simulation.csv")
 
+sim_ufb %>% 
+    mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
+        tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels_ntaxa),
+        name_levels  = factor(name, levels=name_levels), 
+        rep = factor(rep)) -> ufb_fact
 
 ######### Normalize RF values #########
 simulation_rf_fit %>% 
