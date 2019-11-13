@@ -60,48 +60,94 @@ simulation_rf_fit %>%
 save_plot(paste0(figure_directory,"simulation_rf_boxplot.pdf"), simulation_rf_boxplot, base_width=10, base_height=4)
 
 
-
-#### NO YEAST GOT IT RIGHT ####
-# simulation_rf_fit %>% group_by(name, tree, model) %>% tally(rf ==0) %>% filter(n>1) %>% xtable()
-# % latex table generated in R 3.5.1 by xtable 1.8-4 package
-# % Thu Jun  6 12:09:44 2019
+simulation_rf_fit %>% 
+    filter(rf == 0) %>%
+    count(name, tree, model) %>% 
+    xtable()
+# % latex table generated in R 3.6.1 by xtable 1.8-4 package
+# % Tue Nov 12 11:07:04 2019
 # \begin{table}[ht]
 # \centering
 # \begin{tabular}{rlllr}
 #   \hline
 #  & name & tree & model & n \\ 
 #   \hline
-# 1 & HA & opisthokonta & GTR20 &   4 \\ 
-#   2 & HA & salichos & GTR20 &   4 \\ 
-#   3 & HA & salichos & m1 &   2 \\ 
-#   4 & HA & salichos & m2 &   2 \\ 
-#   5 & HIV & opisthokonta & GTR20 &  16 \\ 
-#   6 & HIV & opisthokonta & m1 &   9 \\ 
-#   7 & HIV & opisthokonta & m2 &   9 \\ 
-#   8 & HIV & opisthokonta & m3 &   4 \\ 
-#   9 & HIV & opisthokonta & m4 &   4 \\ 
-#   10 & HIV & opisthokonta & poisson &   6 \\ 
-#   11 & HIV & salichos & GTR20 &   6 \\ 
-#   12 & HIV & salichos & m1 &   2 \\ 
-#   13 & HIV & salichos & m2 &   2 \\ 
-#   14 & HIV & salichos & m3 &   2 \\ 
-#   15 & HIV & salichos & m4 &   2 \\ 
-#   16 & HIV & salichos & poisson &   3 \\ 
-#   17 & HIV & spiralia & GTR20 &   5 \\ 
-#   18 & HIV & spiralia & m1 &   3 \\ 
-#   19 & HIV & spiralia & m2 &   2 \\ 
-#   20 & HIV & spiralia & m3 &   3 \\ 
-#   21 & HIV & spiralia & m4 &   4 \\ 
-#   22 & HIV & spiralia & poisson &   4 \\ 
-#   23 & NP & opisthokonta & GTR20 &   3 \\ 
-#   24 & NP & salichos & GTR20 &   4 \\ 
-#   25 & NP & salichos & m1 &   4 \\ 
-#   26 & NP & salichos & m2 &   3 \\ 
-#   27 & NP & salichos & m4 &   3 \\     
-# \hline
+# 1 & 1IBS & salichos & m4 &   1 \\ 
+#   2 & HA & opisthokonta & GTR20 &   4 \\ 
+#   3 & HA & opisthokonta & m2 &   1 \\ 
+#   4 & HA & opisthokonta & m3 &   1 \\ 
+#   5 & HA & salichos & GTR20 &   4 \\ 
+#   6 & HA & salichos & m1 &   2 \\ 
+#   7 & HA & salichos & m2 &   2 \\ 
+#   8 & HA & salichos & m4 &   1 \\ 
+#   9 & HA & salichos & m5 &   1 \\ 
+#   10 & HA & salichos & poisson &   1 \\ 
+#   11 & HA & spiralia & GTR20 &   1 \\ 
+#   12 & HA & spiralia & m2 &   1 \\ 
+#   13 & HA & spiralia & m3 &   1 \\ 
+#   14 & HIV & opisthokonta & GTR20 &  16 \\ 
+#   15 & HIV & opisthokonta & m1 &   9 \\ 
+#   16 & HIV & opisthokonta & m2 &   9 \\ 
+#   17 & HIV & opisthokonta & m3 &   4 \\ 
+#   18 & HIV & opisthokonta & m4 &   4 \\ 
+#   19 & HIV & opisthokonta & poisson &   6 \\ 
+#   20 & HIV & salichos & GTR20 &   6 \\ 
+#   21 & HIV & salichos & m1 &   2 \\ 
+#   22 & HIV & salichos & m2 &   2 \\ 
+#   23 & HIV & salichos & m3 &   2 \\ 
+#   24 & HIV & salichos & m4 &   2 \\ 
+#   25 & HIV & salichos & m5 &   1 \\ 
+#   26 & HIV & salichos & poisson &   3 \\ 
+#   27 & HIV & spiralia & GTR20 &   5 \\ 
+#   28 & HIV & spiralia & m1 &   3 \\ 
+#   29 & HIV & spiralia & m2 &   2 \\ 
+#   30 & HIV & spiralia & m3 &   3 \\ 
+#   31 & HIV & spiralia & m4 &   4 \\ 
+#   32 & HIV & spiralia & poisson &   4 \\ 
+#   33 & NP & opisthokonta & GTR20 &   3 \\ 
+#   34 & NP & opisthokonta & m1 &   1 \\ 
+#   35 & NP & opisthokonta & m3 &   1 \\ 
+#   36 & NP & opisthokonta & poisson &   1 \\ 
+#   37 & NP & salichos & GTR20 &   4 \\ 
+#   38 & NP & salichos & m1 &   4 \\ 
+#   39 & NP & salichos & m2 &   3 \\ 
+#   40 & NP & salichos & m3 &   1 \\ 
+#   41 & NP & salichos & m4 &   3 \\ 
+#   42 & NP & salichos & poisson &   1 \\ 
+#   43 & NP & spiralia & GTR20 &   1 \\ 
+#    \hline
 # \end{tabular}
 # \end{table}
 
+
+simulation_rf_fit %>% 
+    filter(rf == 0) %>%
+    count(model, name) %>%
+    mutate(model_levels = factor(model, levels = model_levels, labels = model_labels),
+           name_levels = factor(name, levels = name_levels)) %>%
+    ggplot(aes(x = model_levels, y = n, fill = model_levels)) + 
+        geom_bar(stat = "identity", color = "black") + 
+        scale_fill_manual(values = model_colors) +
+        xlab("Protein model") + 
+        ylab("Number of inferences\nwith RF=0") + 
+        facet_wrap(~name_levels, nrow=1) + 
+        background_grid() + 
+        theme(legend.position = "none") -> bars_rf0
+
+
+simulation_rf_fit %>% 
+    filter(rf == 0) %>%
+    count(model) 
+# A tibble: 7 x 2
+#   model       n
+#   <chr>   <int>
+# 1 GTR20      44
+# 2 m1         21
+# 3 m2         20
+# 4 m3         13
+# 5 m4         15
+# 6 m5          2
+# 7 poisson    16
 
 
 simulation_topology %>%
@@ -109,9 +155,9 @@ simulation_topology %>%
     gather(model, pvalue, m1:true) %>%
     mutate(sig = pvalue < 0.01) %>%
     filter(sig == TRUE) %>%
-    group_by(name, tree, model) %>%
-    tally() %>%
-    group_by(model) %>% tally()
+    count(name, tree, model) %>%
+    ungroup() %>%
+    count(model)
 #1 GTR20     1
 #2 m3        1
 #3 m4        2
@@ -123,8 +169,9 @@ simulation_topology %>%
     gather(model, pvalue, m1:true) %>%
     mutate(sig = pvalue < 0.01) %>%
     filter(sig == TRUE) %>%
-    group_by(name, tree, model) %>%
-    tally() %>%
+    count(name, tree, model) %>%
+    ungroup() %>%
+    count(model)
 #1 m5        2
 #2 true      9
 
@@ -134,14 +181,13 @@ simulation_topology %>%
 ############## False positive nodes ##############
 ufb_fact %>% 
     count(model_levels, tree_levels, name_levels, rep, classif) %>%
-    #complete(model_levels, tree_levels, name_levels, rep, classif, fill = list(n = 0)) %>%
     pivot_wider(names_from = classif, values_from = n) %>%
     ungroup() %>%
     replace_na(list(FP = 0, FN = 0, TP = 0, TN = 0)) %>%
     mutate(FPR = ifelse(is.nan(FP / (TN+FP)), 0, FP / (TN+FP)), 
            accuracy = (TP + TN)/(TP+TN+FP+FN)) -> ufb_fact_classif
 
-some_trees <- c("Green Plant (360)", "Aves (200)","Opisthokonta (70)")
+some_trees <- c("Green Plant (360)", "Aves (200)", "Opisthokonta (70)")
 some_names <- c("1IBS", "HA")
 ufb_fact_classif %>%
     filter(name_levels %in% some_names, tree_levels %in% some_trees) %>%
@@ -154,7 +200,6 @@ ufb_fact_classif %>%
         panel_border() +
         theme(legend.position = "none",
               strip.text = element_text(size=8), 
-              strip.background = element_rect(fill = "grey80"), 
               axis.text.x = element_text(size=8),
               panel.spacing = unit(0.2, "cm")) +
         xlab("Protein Models") + ylab("False positive rate") +
@@ -215,9 +260,6 @@ ufb_fact_classif %>%
         xlab("Protein Models") + ylab("Accuracy")   -> acc_all
 save_plot(paste0(figure_directory,"ufb_fpr_all.pdf"), fpr_all, base_width = 12, base_height=10)
 save_plot(paste0(figure_directory,"ufb_acc_all.pdf"), acc_all, base_width = 12, base_height=10)
-
-
-######### TODO: THE SI VERSION WITH ALL DATA ########
 
 
 ################################## PANDIT figures ###########################################

@@ -10,7 +10,7 @@ library(ggridges)
 library(ggforce)
 
 theme_set(theme_classic() + theme(axis.line = element_line(colour = "grey10"),
-                                  strip.background = element_rect(size=0.5)))
+                                  strip.background = element_rect(size=0.5, fill="grey90")))
 figure_directory <- "figures/"
 
 ########################## Factor levels and labeling ################################ 
