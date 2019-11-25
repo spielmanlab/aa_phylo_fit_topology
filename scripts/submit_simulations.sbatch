@@ -13,7 +13,6 @@ cd $TOPDIR
 #mkdir -p alignments
 
 #python3 simulate_empirical.py $REP
-#for NAME in HA NP HIV; do
-for NAME in 1IBS 1R6M 1RII; do
+for NAME in LAC HA NP HIV; do
   python3 simulate.py $NAME $REP
 done
