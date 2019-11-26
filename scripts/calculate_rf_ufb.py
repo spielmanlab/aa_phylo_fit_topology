@@ -119,7 +119,7 @@ if type == "simulation":
     alignmentpath  = "../simulations/alignments/"
     inferencepath  = "../fitted_trees_ufb_simulation/" 
     true_tree_path = "../simulations/true_trees/"
-    sim_list       = ["1IBS", "1R6M", "1RII", "NP", "HA", "HIV"]
+    sim_list       = ["LAC", "NP", "HA", "HIV"]
     treenames      = ["dosreis","andersen", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]        
     reps           = 20
     fileinfo_order = ["name", "tree", "rep", "model"]
