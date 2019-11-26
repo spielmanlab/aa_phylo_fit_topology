@@ -40,7 +40,7 @@ save_plot(paste0(figure_directory,"model_fit_simulation_bars.pdf"), both, base_w
 simulation_rf_fit %>%
   mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
          tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels_ntaxa),
-         name_levels  = factor(name, levels=name_levels, labels = name_labels_nsites)) %>%
+         name_levels  = factor(name, levels=name_levels)) %>%
         ggplot(aes(x = model_levels, y = rf_true_norm)) + 
             #geom_sina(aes(color = name_levels), position = position_dodge(width=0.5)) + 
             geom_boxplot(aes(fill = name_levels), outlier.size = 0.3, size=0.25,  width=0.9) + 
@@ -48,8 +48,8 @@ simulation_rf_fit %>%
             #geom_point(position=position_jitterdodge(jitter.width = 0.2), size=0.75, alpha=0.7, aes(color = name_levels))  +       
             facet_wrap(~tree_levels, scales = "free_y", nrow=2) +
             #scale_color_brewer(palette = "RdYlBu", name = "Protein Model", labels = model_labels) +
-            #scale_fill_brewer(palette = "Set1", name = "DMS Simulations", labels = name_labels_nsites) +
-            scale_fill_hue(l=50, name = "DMS Parameterization", labels = name_labels_nsites) +
+            #scale_fill_brewer(palette = "Set1", name = "DMS Simulations") +
+            scale_fill_hue(l=50, name = "DMS Parameterization") +
             panel_border() +
             background_grid() + 
             #scale_y_continuous(limits = y_limits) + 
@@ -72,49 +72,48 @@ simulation_rf_fit %>%
 #   \hline
 #  & name & tree & model & n \\ 
 #   \hline
-# 1 & 1IBS & salichos & m4 &   1 \\ 
-#   2 & HA & opisthokonta & GTR20 &   4 \\ 
-#   3 & HA & opisthokonta & m2 &   1 \\ 
-#   4 & HA & opisthokonta & m3 &   1 \\ 
-#   5 & HA & salichos & GTR20 &   4 \\ 
-#   6 & HA & salichos & m1 &   2 \\ 
-#   7 & HA & salichos & m2 &   2 \\ 
-#   8 & HA & salichos & m4 &   1 \\ 
-#   9 & HA & salichos & m5 &   1 \\ 
-#   10 & HA & salichos & poisson &   1 \\ 
-#   11 & HA & spiralia & GTR20 &   1 \\ 
-#   12 & HA & spiralia & m2 &   1 \\ 
-#   13 & HA & spiralia & m3 &   1 \\ 
-#   14 & HIV & opisthokonta & GTR20 &  16 \\ 
-#   15 & HIV & opisthokonta & m1 &   9 \\ 
-#   16 & HIV & opisthokonta & m2 &   9 \\ 
-#   17 & HIV & opisthokonta & m3 &   4 \\ 
-#   18 & HIV & opisthokonta & m4 &   4 \\ 
-#   19 & HIV & opisthokonta & poisson &   6 \\ 
-#   20 & HIV & salichos & GTR20 &   6 \\ 
-#   21 & HIV & salichos & m1 &   2 \\ 
-#   22 & HIV & salichos & m2 &   2 \\ 
-#   23 & HIV & salichos & m3 &   2 \\ 
-#   24 & HIV & salichos & m4 &   2 \\ 
-#   25 & HIV & salichos & m5 &   1 \\ 
-#   26 & HIV & salichos & poisson &   3 \\ 
-#   27 & HIV & spiralia & GTR20 &   5 \\ 
-#   28 & HIV & spiralia & m1 &   3 \\ 
-#   29 & HIV & spiralia & m2 &   2 \\ 
-#   30 & HIV & spiralia & m3 &   3 \\ 
-#   31 & HIV & spiralia & m4 &   4 \\ 
-#   32 & HIV & spiralia & poisson &   4 \\ 
-#   33 & NP & opisthokonta & GTR20 &   3 \\ 
-#   34 & NP & opisthokonta & m1 &   1 \\ 
-#   35 & NP & opisthokonta & m3 &   1 \\ 
-#   36 & NP & opisthokonta & poisson &   1 \\ 
-#   37 & NP & salichos & GTR20 &   4 \\ 
-#   38 & NP & salichos & m1 &   4 \\ 
-#   39 & NP & salichos & m2 &   3 \\ 
-#   40 & NP & salichos & m3 &   1 \\ 
-#   41 & NP & salichos & m4 &   3 \\ 
-#   42 & NP & salichos & poisson &   1 \\ 
-#   43 & NP & spiralia & GTR20 &   1 \\ 
+# 1 & HA & opisthokonta & GTR20 &   4 \\ 
+#   2 & HA & opisthokonta & m2 &   1 \\ 
+#   3 & HA & opisthokonta & m3 &   1 \\ 
+#   4 & HA & salichos & GTR20 &   4 \\ 
+#   5 & HA & salichos & m1 &   2 \\ 
+#   6 & HA & salichos & m2 &   2 \\ 
+#   7 & HA & salichos & m4 &   1 \\ 
+#   8 & HA & salichos & m5 &   1 \\ 
+#   9 & HA & salichos & poisson &   1 \\ 
+#   10 & HA & spiralia & GTR20 &   1 \\ 
+#   11 & HA & spiralia & m2 &   1 \\ 
+#   12 & HA & spiralia & m3 &   1 \\ 
+#   13 & HIV & opisthokonta & GTR20 &  16 \\ 
+#   14 & HIV & opisthokonta & m1 &   9 \\ 
+#   15 & HIV & opisthokonta & m2 &   9 \\ 
+#   16 & HIV & opisthokonta & m3 &   4 \\ 
+#   17 & HIV & opisthokonta & m4 &   4 \\ 
+#   18 & HIV & opisthokonta & poisson &   6 \\ 
+#   19 & HIV & salichos & GTR20 &   6 \\ 
+#   20 & HIV & salichos & m1 &   2 \\ 
+#   21 & HIV & salichos & m2 &   2 \\ 
+#   22 & HIV & salichos & m3 &   2 \\ 
+#   23 & HIV & salichos & m4 &   2 \\ 
+#   24 & HIV & salichos & m5 &   1 \\ 
+#   25 & HIV & salichos & poisson &   3 \\ 
+#   26 & HIV & spiralia & GTR20 &   5 \\ 
+#   27 & HIV & spiralia & m1 &   3 \\ 
+#   28 & HIV & spiralia & m2 &   2 \\ 
+#   29 & HIV & spiralia & m3 &   3 \\ 
+#   30 & HIV & spiralia & m4 &   4 \\ 
+#   31 & HIV & spiralia & poisson &   4 \\ 
+#   32 & NP & opisthokonta & GTR20 &   3 \\ 
+#   33 & NP & opisthokonta & m1 &   1 \\ 
+#   34 & NP & opisthokonta & m3 &   1 \\ 
+#   35 & NP & opisthokonta & poisson &   1 \\ 
+#   36 & NP & salichos & GTR20 &   4 \\ 
+#   37 & NP & salichos & m1 &   4 \\ 
+#   38 & NP & salichos & m2 &   3 \\ 
+#   39 & NP & salichos & m3 &   1 \\ 
+#   40 & NP & salichos & m4 &   3 \\ 
+#   41 & NP & salichos & poisson &   1 \\ 
+#   42 & NP & spiralia & GTR20 &   1 \\ 
 #    \hline
 # \end{tabular}
 # \end{table}
@@ -213,14 +212,14 @@ ufb_fact %>%
     mutate(FPR = ifelse(is.nan(FP / (TN+FP)), 0, FP / (TN+FP)), 
            accuracy = (TP + TN)/(TP+TN+FP+FN)) -> ufb_fact_classif
 
-some_trees <- c("Green Plant (360)", "Aves (200)", "Opisthokonta (70)")
-some_names <- c("1IBS", "HA")
+some_trees <- c("Green Plant", "Aves", "Opisthokonta")
+demo_name <- "HA"
 ufb_fact_classif %>%
-    filter(name_levels %in% some_names, tree_levels %in% some_trees) %>%
+    filter(name_levels == demo_name, tree_levels %in% some_trees) %>%
     ggplot(aes(x = model_levels, y = FPR, fill = model_levels)) + 
         geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5, color="grey10")  +     
         scale_fill_manual(values=model_colors, name = "Protein Model") +         
-        facet_grid(name_levels~tree_levels, scales="free_y") +
+        facet_grid(~tree_levels, scales="free_y") +
         #scale_y_continuous(breaks=c(0, 0.02, 0.04, 0.06)) + 
         background_grid() + 
         panel_border() +
@@ -229,14 +228,14 @@ ufb_fact_classif %>%
               axis.text.x = element_text(size=8),
               panel.spacing = unit(0.2, "cm")) +
         xlab("Protein Models") + ylab("False positive rate") +
-        geom_hline(yintercept = 0.05, color = "dodgerblue3")  -> fpr_subset
+        geom_hline(yintercept = 0.05, color = "dodgerblue3")  -> fpr_ha
 
 ufb_fact_classif %>%
-    filter(name_levels %in% some_names, tree_levels %in% some_trees) %>%
+    filter(name_levels == demo_name, tree_levels %in% some_trees) %>%
     ggplot(aes(x = model_levels, y = accuracy, fill = model_levels)) + 
         geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5, color="grey10")  +     
         scale_fill_manual(values=model_colors, name = "Protein Model") +         
-        facet_grid(name_levels~tree_levels, scales="free_y") +
+        facet_grid(~tree_levels, scales="free_y") +
         #scale_y_continuous(breaks=c(0, 0.02, 0.04, 0.06)) + 
         background_grid() + 
         panel_border() +
@@ -245,11 +244,11 @@ ufb_fact_classif %>%
               strip.background = element_rect(fill = "grey80"), 
               axis.text.x = element_text(size=8),
               panel.spacing = unit(0.2, "cm")) +
-        xlab("Protein Models") + ylab("Accuracy")   -> acc_subset
+        xlab("Protein Models") + ylab("Accuracy")   -> acc_ha
 
 
-ufb_subset_grid <- plot_grid(fpr_subset, acc_subset, nrow=2, labels= "auto", scale=0.98)
-save_plot(paste0(figure_directory,"ufb_subset_grid.pdf"), ufb_subset_grid, base_width = 6, base_height=7)
+ufb_ha_grid <- plot_grid(fpr_ha, acc_ha, nrow=2, labels= "auto", scale=0.98)
+save_plot(paste0(figure_directory,"ufb_ha_grid.pdf"), ufb_ha_grid, base_width = 6, base_height=7)
              
              
              
@@ -449,9 +448,8 @@ save_plot(paste0(figure_directory,"pandit_au.pdf"), pandit_au_plot, base_width=8
 ###################################################################################
 #### Plot schematic for m1-m5
 scheme_name1 <- "HA"
-scheme_name2 <- "1IBS"
 scheme_tree <- "dosreis"
-scheme_rep <- 7
+scheme_rep <- 1
 all_sel %>% 
   dplyr::select(name, tree, model, bic, repl) %>%
   filter(name == scheme_name1, tree == scheme_tree, repl == scheme_rep) -> data1
@@ -462,16 +460,16 @@ simulation_rf_fit %>%
   filter(name == scheme_name1, model == "GTR20", rep == scheme_rep, tree == scheme_tree) %>% 
   pull(BIC) -> gtr20_bic_1
 
-
-all_sel %>% 
-  dplyr::select(name, tree, model, bic, repl) %>%
-  filter(name == scheme_name2, tree == scheme_tree, repl == scheme_rep) -> data2
-simulation_rf_fit %>% 
-  filter(name == scheme_name2, model == "poisson", rep == scheme_rep, tree == scheme_tree) %>% 
-  pull(BIC) -> poisson_bic_2
-simulation_rf_fit %>% 
-  filter(name == scheme_name2, model == "GTR20", rep == scheme_rep, tree == scheme_tree) %>% 
-  pull(BIC) -> gtr20_bic_2
+# 
+# all_sel %>% 
+#   dplyr::select(name, tree, model, bic, repl) %>%
+#   filter(name == scheme_name2, tree == scheme_tree, repl == scheme_rep) -> data2
+# simulation_rf_fit %>% 
+#   filter(name == scheme_name2, model == "poisson", rep == scheme_rep, tree == scheme_tree) %>% 
+#   pull(BIC) -> poisson_bic_2
+# simulation_rf_fit %>% 
+#   filter(name == scheme_name2, model == "GTR20", rep == scheme_rep, tree == scheme_tree) %>% 
+#   pull(BIC) -> gtr20_bic_2
 
 
 msel_simulation %>%
@@ -486,17 +484,17 @@ msel_simulation %>%
   distinct() %>%
   mutate(model_levels= factor(modelm2, levels=model_labels)) -> chunks1
 
-msel_simulation %>%
-  filter(name == scheme_name2, tree == scheme_tree, repl == scheme_rep) %>%
-  rowwise() %>%
-  mutate(modelm2 = paste0("m", modelm),
-    model_levels_matrix = paste0(modelm2, " (", model_name, ")")) %>%
-  bind_rows(
-          tibble(name = scheme_name2, tree = scheme_tree, repl = scheme_rep, modelm = 4.3, modelm2 = "JC", model_name = "JC", model_levels_matrix = "JC", bic = poisson_bic_2),
-          tibble(name = scheme_name2, tree = scheme_tree, repl = scheme_rep, modelm = 4.6, modelm2 = "GTR", model_name = "GTR", model_levels_matrix = "GTR", bic = gtr20_bic_2)
-      ) %>%
-  distinct() %>%
-  mutate(model_levels= factor(modelm2, levels=model_labels)) -> chunks2
+# msel_simulation %>%
+#   filter(name == scheme_name2, tree == scheme_tree, repl == scheme_rep) %>%
+#   rowwise() %>%
+#   mutate(modelm2 = paste0("m", modelm),
+#     model_levels_matrix = paste0(modelm2, " (", model_name, ")")) %>%
+#   bind_rows(
+#           tibble(name = scheme_name2, tree = scheme_tree, repl = scheme_rep, modelm = 4.3, modelm2 = "JC", model_name = "JC", model_levels_matrix = "JC", bic = poisson_bic_2),
+#           tibble(name = scheme_name2, tree = scheme_tree, repl = scheme_rep, modelm = 4.6, modelm2 = "GTR", model_name = "GTR", model_levels_matrix = "GTR", bic = gtr20_bic_2)
+#       ) %>%
+#   distinct() %>%
+#   mutate(model_levels= factor(modelm2, levels=model_labels)) -> chunks2
 
 ggplot(data1, aes(x = "", y = bic)) + 
     geom_violin(fill="dodgerblue3", color = "dodgerblue4", alpha=0.3) + 
@@ -509,22 +507,23 @@ ggplot(data1, aes(x = "", y = bic)) +
     scale_fill_manual(values = c(  lighten(lighten(model_colors[1])), model_colors[2:7])) +
     theme(legend.position = "none", axis.ticks.x = element_blank()) +
     xlab("") + ylab("BIC values across all tested models")  -> quant_scheme_plot_1
+ggsave(paste0(figure_directory, "bic_dist_ha_dosreis.pdf"), quant_scheme_plot_1, width = 4, height=4)
 
-ggplot(data2, aes(x = "", y = bic)) + 
-    geom_violin(fill="dodgerblue3", color = "dodgerblue4", alpha=0.3) + 
-    geom_point(alpha = 0.1, size=1.5) +
-    geom_point(data = chunks2, shape=21, aes(x = 1, y = bic, fill = model_levels), size=3) + 
-    geom_label(data = chunks2,  x = 1.02, hjust="outward", color = "black", aes(y = bic + 25, fill = model_levels, label = model_levels_matrix), size=3, fontface = "bold", alpha=0.8) + 
-    #geom_label(data = subset(chunks, model_levels != "M1"),  x = 1.02, hjust="outward", color = "black", aes(y = bic+300, fill = model_levels, label = model_levels_matrix), size=3, fontface = "bold", alpha=0.75) + 
-    #geom_label(data = subset(chunks, model_levels == "M1"), x = 1.02, hjust="outward", color = "white", aes(y = bic+300, fill = model_levels, label = model_levels_matrix), size=3, fontface = "bold", alpha=0.75) + 
-    ggtitle("1IBS simulation replicate") + 
-    scale_fill_manual(values = c(  lighten(lighten(model_colors[1])), model_colors[2:7])) +
-    theme(legend.position = "none", axis.ticks.x = element_blank()) +
-    xlab("") + ylab("BIC values across all tested models")  -> quant_scheme_plot_2
+# ggplot(data2, aes(x = "", y = bic)) + 
+#     geom_violin(fill="dodgerblue3", color = "dodgerblue4", alpha=0.3) + 
+#     geom_point(alpha = 0.1, size=1.5) +
+#     geom_point(data = chunks2, shape=21, aes(x = 1, y = bic, fill = model_levels), size=3) + 
+#     geom_label(data = chunks2,  x = 1.02, hjust="outward", color = "black", aes(y = bic + 25, fill = model_levels, label = model_levels_matrix), size=3, fontface = "bold", alpha=0.8) + 
+#     #geom_label(data = subset(chunks, model_levels != "M1"),  x = 1.02, hjust="outward", color = "black", aes(y = bic+300, fill = model_levels, label = model_levels_matrix), size=3, fontface = "bold", alpha=0.75) + 
+#     #geom_label(data = subset(chunks, model_levels == "M1"), x = 1.02, hjust="outward", color = "white", aes(y = bic+300, fill = model_levels, label = model_levels_matrix), size=3, fontface = "bold", alpha=0.75) + 
+#     ggtitle("1IBS simulation replicate") + 
+#     scale_fill_manual(values = c(  lighten(lighten(model_colors[1])), model_colors[2:7])) +
+#     theme(legend.position = "none", axis.ticks.x = element_blank()) +
+#     xlab("") + ylab("BIC values across all tested models")  -> quant_scheme_plot_2
 
-bic_dist_grid <- plot_grid(quant_scheme_plot_1, quant_scheme_plot_2, labels="auto", nrow=1, scale=0.97)
+#bic_dist_grid <- plot_grid(quant_scheme_plot_1, quant_scheme_plot_2, labels="auto", nrow=1, scale=0.97)
 
-ggsave(paste0(figure_directory, "bic_dist_grid.pdf"), bic_dist_grid, width = 8, height=3)
+#ggsave(paste0(figure_directory, "bic_dist_grid.pdf"), bic_dist_grid, width = 8, height=3)
     
     
     
@@ -599,7 +598,7 @@ ggplot(entropy, aes(x = name_levels, y = entropy, color = name_levels)) +
     geom_sina(alpha=0.7) + 
     scale_color_brewer(palette = "Set2") + 
     stat_summary(fun.data = "mean_se",size = 0.5, color = "black") + # se is too small to see so this ends up being mean, chachiiiiing 
-    xlab("Simulation parameterization") + 
+    xlab("DMS parameterization") + 
     ylab("Sitewise entropy") + 
     background_grid() + theme(legend.position = "none") -> entropy_sina
 ggsave(paste0(figure_directory, "entropy_sina.pdf"), entropy_sina, width = 6, height=2.5)
@@ -610,31 +609,30 @@ ggsave(paste0(figure_directory, "entropy_sina.pdf"), entropy_sina, width = 6, he
 simulation_rf_fit$model <- factor(simulation_rf_fit$model, levels=c("m1", "m2", "m3", "m4", "m5", "poisson", "GTR20"))
 lmer(rf_true_norm ~ model + (1|name) + (1|tree), data = simulation_rf_fit) -> fit
 glht(fit, linfct=mcp(model='Tukey')) %>% summary()
-#                        Estimate Std. Error z value Pr(>|z|)    
-# m2 - m1 == 0          0.0028237  0.0034829   0.811  0.98398    
-# m3 - m1 == 0          0.0050753  0.0034829   1.457  0.77026    
-# m4 - m1 == 0          0.0077192  0.0034829   2.216  0.28652    
-# poisson - m1 == 0     0.0026428  0.0034829   0.759  0.98867    
-# GTR20 - m1 == 0      -0.0024479  0.0034829  -0.703  0.99247    
-# m3 - m2 == 0          0.0022516  0.0034829   0.646  0.99522    
-# m4 - m2 == 0          0.0048955  0.0034829   1.406  0.79917    
-# poisson - m2 == 0    -0.0001809  0.0034829  -0.052  1.00000    
-# GTR20 - m2 == 0      -0.0052716  0.0034829  -1.514  0.73699    
-# m4 - m3 == 0          0.0026439  0.0034829   0.759  0.98865    
-# poisson - m3 == 0    -0.0024325  0.0034829  -0.698  0.99272    
-# GTR20 - m3 == 0      -0.0075232  0.0034829  -2.160  0.31765    
-# poisson - m4 == 0    -0.0050764  0.0034829  -1.458  0.76998    
-# GTR20 - m4 == 0      -0.0101671  0.0034829  -2.919  0.05429 .  
-# GTR20 - poisson == 0 -0.0050907  0.0034829  -1.462  0.76767 
-
-# m5 - m1 == 0          0.0216532  0.0034829   6.217  < 0.001 ***
-# m5 - m2 == 0          0.0188295  0.0034829   5.406  < 0.001 ***
-# m5 - m3 == 0          0.0165779  0.0034829   4.760  < 0.001 ***
-# m5 - m4 == 0          0.0139340  0.0034829   4.001  0.00127 ** 
-# poisson - m5 == 0    -0.0190104  0.0034829  -5.458  < 0.001 ***
-# GTR20 - m5 == 0      -0.0241011  0.0034829  -6.920  < 0.001 ***
+#                       Estimate Std. Error z value Pr(>|z|)    
+# m2 - m1 == 0          0.003153   0.002037   1.548  0.71541    
+# m3 - m1 == 0          0.005978   0.002037   2.935  0.05228 .  
+# poisson - m1 == 0     0.004602   0.002037   2.259  0.26449    
+# m3 - m2 == 0          0.002824   0.002037   1.387  0.80928    
+# m4 - m2 == 0          0.004165   0.002037   2.045  0.38580    
+# poisson - m2 == 0     0.001449   0.002037   0.711  0.99198    
+# m4 - m3 == 0          0.001341   0.002037   0.658  0.99471    
+# poisson - m3 == 0    -0.001376   0.002037  -0.675  0.99393    
+# poisson - m4 == 0    -0.002717   0.002037  -1.334  0.83605    
 
 
+# m4 - m1 == 0          0.007319   0.002037   3.593  0.00606 ** 
+# m5 - m1 == 0          0.025066   0.002037  12.307  < 0.001 ***
+# GTR20 - m4 == 0      -0.015510   0.002037  -7.615  < 0.001 ***
+# poisson - m5 == 0    -0.020464   0.002037 -10.047  < 0.001 ***
+# GTR20 - m5 == 0      -0.033257   0.002037 -16.328  < 0.001 ***
+# GTR20 - poisson == 0 -0.012793   0.002037  -6.281  < 0.001 ***
+# GTR20 - m3 == 0      -0.014169   0.002037  -6.957  < 0.001 ***
+# m5 - m4 == 0          0.017747   0.002037   8.713  < 0.001 ***
+# m5 - m3 == 0          0.019088   0.002037   9.372  < 0.001 ***
+# GTR20 - m2 == 0      -0.011345   0.002037  -5.570  < 0.001 ***
+# m5 - m2 == 0          0.021913   0.002037  10.759  < 0.001 ***
+# GTR20 - m1 == 0      -0.008191   0.002037  -4.022  0.00112 ** 
 
 
 ############################ linear model fp, acc ##################
@@ -642,53 +640,53 @@ fit <- lmer(accuracy ~ model_levels + (1|tree_levels) + (1|name_levels), data = 
 glht(fit, linfct=mcp(model_levels='Tukey')) %>% summary()
 # Linear Hypotheses:
 #                 Estimate Std. Error z value Pr(>|z|)    
-# m2 - m1 == 0  -0.0009798  0.0023054  -0.425  0.99955    
-# m3 - m1 == 0   0.0005854  0.0023054   0.254  0.99998    
-# m4 - m1 == 0  -0.0015766  0.0023054  -0.684  0.99351    
-# m5 - m1 == 0  -0.0048861  0.0023054  -2.119  0.34101    
-# JC - m1 == 0  -0.0020356  0.0023054  -0.883  0.97518    
-# m3 - m2 == 0   0.0015652  0.0023054   0.679  0.99376    
-# m4 - m2 == 0  -0.0005968  0.0023054  -0.259  0.99998    
-# m5 - m2 == 0  -0.0039063  0.0023054  -1.694  0.61976    
-# JC - m2 == 0  -0.0010558  0.0023054  -0.458  0.99931    
-# m4 - m3 == 0  -0.0021620  0.0023054  -0.938  0.96648    
-# m5 - m3 == 0  -0.0054715  0.0023054  -2.373  0.21002    
-# JC - m3 == 0  -0.0026210  0.0023054  -1.137  0.91684    
-# GTR - m3 == 0  0.0078225  0.0023054   3.393  0.01230 *  
-# m5 - m4 == 0  -0.0033095  0.0023054  -1.436  0.78256    
-# JC - m4 == 0  -0.0004590  0.0023054  -0.199  0.99999    
-# JC - m5 == 0   0.0028505  0.0023054   1.236  0.88000    
+# m2 - m1 == 0  -0.0020768  0.0023208  -0.895  0.97345    
+# m3 - m1 == 0  -0.0023590  0.0023208  -1.016  0.95042    
+# m4 - m1 == 0  -0.0059715  0.0023208  -2.573  0.13396    
+# JC - m1 == 0  -0.0039578  0.0023208  -1.705  0.61239    
+# m3 - m2 == 0  -0.0002822  0.0023208  -0.122  1.00000    
+# m4 - m2 == 0  -0.0038947  0.0023208  -1.678  0.63070    
+# JC - m2 == 0  -0.0018810  0.0023208  -0.811  0.98398    
+# m4 - m3 == 0  -0.0036125  0.0023208  -1.557  0.71026    
+# JC - m3 == 0  -0.0015988  0.0023208  -0.689  0.99324    
+# JC - m4 == 0   0.0020137  0.0023208   0.868  0.97727    
 
+# GTR - m4 == 0  0.0148799  0.0023208   6.411  < 0.001 ***
+# JC - m5 == 0   0.0103975  0.0023208   4.480  < 0.001 ***
+# GTR - m5 == 0  0.0232637  0.0023208  10.024  < 0.001 ***
+# GTR - JC == 0  0.0128662  0.0023208   5.544  < 0.001 ***
+# GTR - m3 == 0  0.0112674  0.0023208   4.855  < 0.001 ***
+# m5 - m4 == 0  -0.0083838  0.0023208  -3.612  0.00579 ** 
+# m5 - m3 == 0  -0.0119963  0.0023208  -5.169  < 0.001 ***
+# GTR - m2 == 0  0.0109852  0.0023208   4.733  < 0.001 ***
+# m5 - m2 == 0  -0.0122785  0.0023208  -5.291  < 0.001 ***
+# GTR - m1 == 0  0.0089084  0.0023208   3.838  0.00242 ** 
+# m5 - m1 == 0  -0.0143553  0.0023208  -6.185  < 0.001 ***
 
-# GTR - m1 == 0  0.0084079  0.0023054   3.647  0.00486 ** 
-# GTR - m2 == 0  0.0093876  0.0023054   4.072  < 0.001 ***
-# GTR - m3 == 0  0.0078225  0.0023054   3.393  0.01230 *  
-# GTR - m4 == 0  0.0099844  0.0023054   4.331  < 0.001 ***
-# GTR - m5 == 0  0.0132939  0.0023054   5.767  < 0.001 ***
-# GTR - JC == 0  0.0104435  0.0023054   4.530  < 0.001 ***
 
 fit <- lmer(FPR ~ model_levels + (1|tree_levels) + (1|name_levels), data = ufb_fact_classif)
 glht(fit, linfct=mcp(model_levels='Tukey')) %>% summary()
-# m2 - m1 == 0   0.0035259  0.0040665   0.867   0.9774    
-# m3 - m1 == 0   0.0112082  0.0040665   2.756   0.0851 .  
-# m4 - m1 == 0   0.0114709  0.0040665   2.821   0.0714 .  
-# JC - m1 == 0   0.0082240  0.0040665   2.022   0.4003    
-# m3 - m2 == 0   0.0076824  0.0040665   1.889   0.4876    
-# m4 - m2 == 0   0.0079450  0.0040665   1.954   0.4444    
-# JC - m2 == 0   0.0046982  0.0040665   1.155   0.9106    
-# m4 - m3 == 0   0.0002627  0.0040665   0.065   1.0000    
-# JC - m3 == 0  -0.0029842  0.0040665  -0.734   0.9905    
-# GTR - m3 == 0  0.0135901  0.0040665   3.342   0.0146 *  
-# JC - m4 == 0  -0.0032469  0.0040665  -0.798   0.9852    
-# GTR - m4 == 0  0.0133275  0.0040665   3.277   0.0182 *  
-# GTR - m5 == 0 -0.0053953  0.0040665  -1.327   0.8395    
+#                 Estimate Std. Error z value Pr(>|z|)    
+# m2 - m1 == 0  -0.0020768  0.0023208  -0.895  0.97346    
+# m3 - m1 == 0  -0.0023590  0.0023208  -1.016  0.95045    
+# m4 - m1 == 0  -0.0059715  0.0023208  -2.573  0.13432    
+# JC - m1 == 0  -0.0039578  0.0023208  -1.705  0.61249    
+# m3 - m2 == 0  -0.0002822  0.0023208  -0.122  1.00000    
+# m4 - m2 == 0  -0.0038947  0.0023208  -1.678  0.63079    
+# JC - m2 == 0  -0.0018810  0.0023208  -0.811  0.98399    
+# m4 - m3 == 0  -0.0036125  0.0023208  -1.557  0.70999    
+# JC - m3 == 0  -0.0015988  0.0023208  -0.689  0.99324    
+# JC - m4 == 0   0.0020137  0.0023208   0.868  0.97728    
 # 
-
-# GTR - m1 == 0  0.0247983  0.0040665   6.098   <0.001 ***
-# GTR - m2 == 0  0.0212725  0.0040665   5.231   <0.001 ***
-# GTR - JC == 0  0.0165743  0.0040665   4.076   <0.001 ***
-# m5 - m1 == 0   0.0301936  0.0040665   7.425   <0.001 ***
-# m5 - m2 == 0   0.0266678  0.0040665   6.558   <0.001 ***
-# m5 - m3 == 0   0.0189854  0.0040665   4.669   <0.001 ***
-# m5 - m4 == 0   0.0187228  0.0040665   4.604   <0.001 ***
-# m5 - JC == 0   0.0219696  0.0040665   5.403   <0.001 ***
+# 
+# m5 - m1 == 0  -0.0143553  0.0023208  -6.185  < 0.001 ***
+# GTR - m4 == 0  0.0148799  0.0023208   6.411  < 0.001 ***
+# JC - m5 == 0   0.0103975  0.0023208   4.480  < 0.001 ***
+# GTR - m5 == 0  0.0232637  0.0023208  10.024  < 0.001 ***
+# GTR - JC == 0  0.0128662  0.0023208   5.544  < 0.001 ***
+# GTR - m3 == 0  0.0112674  0.0023208   4.855  < 0.001 ***
+# m5 - m4 == 0  -0.0083838  0.0023208  -3.612  0.00560 ** 
+# m5 - m3 == 0  -0.0119963  0.0023208  -5.169  < 0.001 ***
+# GTR - m2 == 0  0.0109852  0.0023208   4.733  < 0.001 ***
+# m5 - m2 == 0  -0.0122785  0.0023208  -5.291  < 0.001 ***
+# GTR - m1 == 0  0.0089084  0.0023208   3.838  0.00231 ** 

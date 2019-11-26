@@ -14,8 +14,7 @@ theme_set(theme_classic() + theme(axis.line = element_line(colour = "grey10"),
 figure_directory <- "figures/"
 
 ########################## Factor levels and labeling ################################ 
-name_levels <- c("1RII", "1R6M", "1IBS", "NP", "HA", "HIV")
-name_labels_nsites <- c("1RII (195)", "1R6M (203)", "1IBS (291)", "NP (497)", "HA (564)", "HIV (661)")
+name_levels <- c("LAC", "NP", "HA", "HIV")
 
 model_levels <- c("m1", "m2", "m3", "m4", "m5", "poisson", "GTR20")
 model_labels <- c("m1", "m2", "m3", "m4", "m5", "JC", "GTR")
@@ -31,7 +30,6 @@ model_labels_nom1 <- c("m2", "m3", "m4",  "m5", "JC", "GTR")
 tree_levels <- c("ruhfel", "rayfinned", "dosreis", "prum", "andersen", "spiralia", "opisthokonta", "salichos")
 tree_labels <- c("Green Plant", "Ray-finned fish", "Mammals", "Aves", "Lassa Virus", "Spiralia", "Opisthokonta", "Yeast")
 tree_labels_abbr <- c("Plant", "Fish", "Mammals", "Aves", "Lassa", "Spiralia", "Opis.", "Yeast")
-tree_labels_ntaxa <- c("Green Plant (360)", "Ray-finned fish (305)", "Mammals (274)", "Aves (200)", "Lassa Virus (179)", "Spiralia (103)", "Opisthokonta (70)", "Yeast (23)")
 
 ################################### Read in all data ##################################
 
@@ -59,7 +57,7 @@ sim_ufb <- read_csv("ufb_splits_simulation.csv")
 
 sim_ufb %>% 
     mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
-        tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels_ntaxa),
+        tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
         name_levels  = factor(name, levels=name_levels), 
         rep = factor(rep)) -> ufb_fact
 
