@@ -1,0 +1,109 @@
+---
+title: "Linear Models"
+author: "Stephanie J. Spielman"
+date: "12/5/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Description
+
+This RMarkdown document displays results from several linear models performed for associated manuscript. 
+
+```{r load-libs-data, warning=FALSE, message=FALSE}
+source("load.R") ## loads in all libraries, data and formats for use
+library(knitr)
+library(multcomp)
+library(lme4)
+library(lmerTest)
+SIG.ALPHA <- 0.01 ## significance threshold
+```
+
+### Model 1: Does the model fit systematically affect distance from true tree? 
+
+We perform a random effects model with:
++ normalized robinson-foulds distance as the response
++ model as a fixed effect
++ simulation parameterization and tree each as random effects
+
+```{r model-1, warning=FALSE, message=FALSE}
+######## RF for simulations
+lmer(rf_true_norm ~ model_levels + (1|name_levels) + (1|tree_levels), data = simulation_rf_fit) -> fit
+glht(fit, linfct=mcp(model_levels='Tukey')) %>% 
+  summary() %>% 
+  broom::tidy() %>%
+  mutate(sig = p.value <= SIG.ALPHA) %>%
+  arrange(sig, lhs, estimate) %>%
+  knitr::kable()
+```
+
+For all signficant comparisons, effect sizes are exceedingly small with a maximum of 3.3% (for the GTR-m5 comparison). The GTR models shows significantly SMALLER normalized RF compared to all other models, and the m5 models show significantly LARGER normalized RF compared to all other models. In addition, m4 shows a significantly larger RF compared to m1 but with the smallest significant effect size observed of 0.7% - hardly worth worrying about.
+
+
+All models m1, m2, m3, m4, poisson (with the exception of the aforementioned m1-m4 comparison) do not show significant nRF differences.
+
+
+
+
+### Model 2: Does the model fit systematically affect false positive rates (assessed using UFBoot2 with a 95% threshold)? 
+
+We perform a random effects model with:
++ false positive rate as the response
++ model as a fixed effect
++ simulation parameterization and tree each as random effects
+
+```{r model-2, warning=FALSE, message=FALSE}
+######## RF for simulations
+fit <- lmer(FPR ~ model_levels + (1|tree_levels) + (1|name_levels), data = ufb_fact_classif)
+glht(fit, linfct=mcp(model_levels='Tukey')) %>% 
+  summary() %>% 
+  broom::tidy() %>%
+  mutate(sig = p.value <= SIG.ALPHA) %>%
+  arrange(sig, lhs, estimate) %>%
+  knitr::kable()
+```
+
+
+For all signficant comparisons, effect sizes are exceedingly small with a maximum of 3.7% (for the m1-m5 comparison). The GTR models shows significantly LARGER FPR compared to m1, m2, and JC. The m5 models show a significantly larger FPR compared to m1, m2, m3, m4, but it has no significant difference compared to GTR. 
+
+All models m1, m2, m3, m4, poisson do not show significant FPR differences.
+
+
+
+
+
+### Model 3: Does the model fit systematically affect accuracy (assessed using UFBoot2 with a 95% threshold)? 
+
+We perform a random effects model with:
++ false positive rate as the response
++ model as a fixed effect
++ simulation parameterization and tree each as random effects
+
+```{r model-3, warning=FALSE, message=FALSE}
+######## RF for simulations
+fit <- lmer(accuracy ~ model_levels + (1|tree_levels) + (1|name_levels), data = ufb_fact_classif)
+glht(fit, linfct=mcp(model_levels='Tukey')) %>% 
+  summary() %>% 
+  broom::tidy() %>%
+  mutate(sig = p.value <= SIG.ALPHA) %>%
+  arrange(sig, lhs, estimate) %>%
+  knitr::kable()
+```
+
+
+For all signficant comparisons, effect sizes are exceedingly small with a maximum of 2.3% (for the GTR-m5 comparison). The GTR models shows significantly HIGHER accuracy compared to ALL other models, and the m5 model has a significantly LOWER accuracy compared to all other models. All models m1, m2, m3, m4, poisson do not show significant accuracy differences.
+
+
+
+
+
+
+
+
+
+
+
+

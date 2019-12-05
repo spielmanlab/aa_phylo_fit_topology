@@ -4,30 +4,31 @@ import re
 
 
 
-iqtree_topline = ['Tree', 'logL', 'deltaL', 'bp-RELL', 'p-KH', 'p-SH', 'c-ELW']
-sh_index = iqtree_topline.index("p-SH")
 model_order    = ["m1", "m2", "m3", "m4", "m5", "poisson", "GTR20"]
 
-type = sys.argv[1]
-threads = sys.argv[2]
-outfilesh        = "shtests_" + type + ".csv"
-outfileau        = "autests_" + type + ".csv"
-treelist_name  = type + ".trees"
-shpath        = "../topology_tests_" + type + "/"
-quantilefile  = "../processed_model_selection/quantile_model_selection_" + type + ".csv"
-
+type                = sys.argv[1]
+threads             = sys.argv[2]
+treelist_name       = type + ".trees"
+topology_test_path  = "../topology_tests_" + type + "/"
+quantilefile        = "../processed_model_selection/quantile_model_selection_" + type + ".csv"
+relll_reps          = "10000"
 
 if type == "pandit":
     alignmentpath = "../pandit_aa_alignments/"
-    inferencepath = "../fitted_trees_ufb_pandit/" #"../fitted_trees_pandit/"
+    inferencepath = "../fitted_trees_ufb_pandit/" 
 elif type == "simulation":
     alignmentpath  = "../simulations/alignments/"
-    inferencepath  = "../fitted_trees_ufb_simulation/" #"../fitted_trees_simulation/"
+    inferencepath  = "../fitted_trees_ufb_simulation/"
     true_tree_path = "../simulations/true_trees/"
-    sim_list       = ["1RII", "1R6M", "1IBS", "NP", "HA", "HIV"]
+    sim_list       = ["LAC", "NP", "HA", "HIV"]
     treenames      = ["andersen", "dosreis", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]        
     reps           = 20
 
+
+def call_test(threads, alnfile, modelname, treelist_name, relll_reps, m1tree, outfile):
+    os.system("iqtree -quiet -nt " + threads + " -s " + alnfile + " -m " + modelname + " -z " + treelist_name + " -zb " + relll_reps + " -au -te " + m1tree + " -redo")
+    os.system("mv " + alnfile + ".iqtree " + outfile)
+    os.system("rm " + alnfile + ".*")
 
 def determine_best_models(type, quantilefile):
     fitmodels = {}
@@ -53,32 +54,6 @@ def determine_best_models(type, quantilefile):
                 fitmodels[prefix] = model
     return(fitmodels)
 
-
-def parse_tests(output, name):
-
-    x = 0
-    for line in output:
-        if re.split("\s+", line.strip()) == iqtree_topline:
-            break
-        x+=1
-    start = x + 2
-    if type == "simulation":
-        stop = x + len(model_order) + 3
-    if type == "pandit":
-        stop = x + len(model_order) + 2
-    p_sh = []
-    for i in range(start, stop):
-        #print(i, output[i])
-        clean = re.split("\s+", output[i].replace("-","").replace("+","").strip())
-        p_sh.append( clean[sh_index] )
-    p_sh_string = ",".join(p_sh)
-
-    outstring = ",".join([name, p_sh_string]) + "\n"
-    
-    return(outstring)
-
-
-
 def loop_over_tests(type):
 
     if type == "pandit":
@@ -99,12 +74,11 @@ def loop_over_tests(type):
             m1tree = inferencepath + name + "_m1_inferredtree.treefile"
             alnfile = alignmentpath + name + ".fasta"
             
-            ## Call the SH test
-            sh_outfile = shpath + name + ".topology_tests"
-            if not os.path.exists(sh_outfile):
-                os.system("iqtree -quiet -nt " + threads + " -s " + alnfile + " -m " + fitmodels[name] + " -z " + treelist_name + " -zb 10000 -au -te " + m1tree + " -redo")
-                os.system("mv " + alnfile + ".iqtree " + sh_outfile)
-                os.system("rm " + alnfile + ".*")
+            ## Call the test
+            outfile = topology_test_path + name + ".topology_tests"
+            if not os.path.exists(outfile):
+                call_test(threads, alnfile, fitmodels[name], treelist_name, relll_reps, m1tree, outfile)
+
 
 
     if type == "simulation":
@@ -136,13 +110,10 @@ def loop_over_tests(type):
                     alnfile = alignmentpath + rawname + ".fasta"
                     m1tree = inferencepath + rawname + "_m1_inferredtree.treefile"
                     
-                    ## Call the SH test
-                    sh_outfile = shpath + rawname + ".topology_tests"
-                    if not os.path.exists(sh_outfile):
-                        os.system("iqtree -quiet -nt " + threads + " -s " + alnfile + " -m " + fitmodels[rawname] + " -z " + treelist_name + " -zb 10000 -au -te " + m1tree + " -redo")
-                        os.system("mv " + alnfile + ".iqtree " + sh_outfile)
-                        os.system("rm " + alnfile + ".*")
-
+                    ## Call the test
+                    outfile = topology_test_path + rawname + ".topology_tests"
+                    if not os.path.exists(outfile):
+                        call_test(threads, alnfile, fitmodels[rawname], treelist_name, relll_reps, m1tree, outfile)
             
         
    
