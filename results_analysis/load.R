@@ -1,9 +1,5 @@
-library(cowplot)
 library(tidyverse)
-library(lme4)
-library(lmerTest)
-library(multcomp)
-library(broom)
+library(cowplot)
 library(xtable)
 library(colorspace)
 library(ggridges)
@@ -12,7 +8,7 @@ library(ggforce)
 theme_set(theme_classic() + theme(axis.line = element_line(colour = "grey10"),
                                   strip.background = element_rect(size=0.5, fill="grey90")))
 figure_directory <- "figures/"
-
+SIG.ALPHA <- 0.01 ## significance threshold
 ########################## Factor levels and labeling ################################ 
 name_levels <- c("LAC", "NP", "HA", "HIV")
 
@@ -33,14 +29,34 @@ tree_labels_abbr <- c("Plant", "Fish", "Mammals", "Aves", "Lassa", "Spiralia", "
 
 ################################### Read in all data ##################################
 
-### RF and BIC results
-simulation_rf_fit  <- read_csv("rf_fit_simulation.csv",guess_max = 10000)
-pandit_rf  <- read_csv("rf_pandit.csv",guess_max = 10000) 
-pandit_fit <- read_csv("fit_pandit.csv",guess_max = 10000) 
-
 ### basic information about datasets
 sim_info    <- read_csv("../simulations/simulation_trees_ntaxa.csv") 
 pandit_info <- read_csv("../pandit_aa_alignments/pandit_info.csv")
+
+
+### RF and BIC results
+simulation_rf_fit  <- read_csv("rf_fit_simulation.csv",guess_max = 10000)
+simulation_rf_fit %<>% 
+    left_join(sim_info) %>%
+    mutate(max_rf = 2*ntaxa - 6) %>%  ### twice the number of internal edges
+    mutate(rf_true_norm = rf/max_rf) %>%
+    dplyr::select(-AIC, -AICc, -k,-logl, -rf, -treelength, -max_rf, -ntaxa) %>%
+    distinct() %>%
+    group_by(name, tree, rep) %>%
+    mutate(ic.rank = as.integer(rank(BIC))) %>%
+    ungroup() %>%
+    mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
+           tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
+           name_levels  = factor(name, levels=name_levels)) %>%
+    dplyr::select(-model, -tree, -name)
+
+pandit_rf  <- read_csv("rf_pandit.csv",guess_max = 10000) 
+pandit_fit <- read_csv("fit_pandit.csv",guess_max = 10000) 
+pandit_rf %>% 
+    left_join(pandit_info) %>%
+    mutate(max_rf = 2*ntaxa - 6) %>%
+    mutate(rf     = rf/max_rf) -> pandit_rf
+pandit_fit %>% left_join(pandit_info) -> pandit_fit
 
 ### Topology test results
 simulation_topology <- read_csv("topology_tests_simulation.csv")
@@ -60,18 +76,14 @@ sim_ufb %>%
         tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
         name_levels  = factor(name, levels=name_levels), 
         rep = factor(rep)) -> ufb_fact
+ufb_fact %>% 
+    count(model_levels, tree_levels, name_levels, rep, classif) %>%
+    pivot_wider(names_from = classif, values_from = n) %>%
+    ungroup() %>%
+    replace_na(list(FP = 0, FN = 0, TP = 0, TN = 0)) %>%
+    mutate(FPR = ifelse(is.nan(FP / (TN+FP)), 0, FP / (TN+FP)), 
+           accuracy = (TP + TN)/(TP+TN+FP+FN)) -> ufb_fact_classif
 
-######### Normalize RF values #########
-simulation_rf_fit %>% 
-    left_join(sim_info) %>%
-    mutate(max_rf = 2*ntaxa - 6) %>%  ### twice the number of internal edges
-    mutate(rf_true_norm = rf/max_rf) -> simulation_rf_fit
-
-pandit_rf %>% 
-    left_join(pandit_info) %>%
-    mutate(max_rf = 2*ntaxa - 6) %>%
-    mutate(rf     = rf/max_rf) -> pandit_rf
-pandit_fit %>% left_join(pandit_info) -> pandit_fit
 
 ##### entropy (for distinguishing simulations) ######
 entropy <- read_csv("simulation_site_entropy.csv") %>%
