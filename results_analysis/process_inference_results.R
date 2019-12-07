@@ -4,6 +4,53 @@ source("load.R") # Load all libraries and data
 
 ############################### Simulation figures ################################
 
+###### m1 for simulations
+msel_simulation %>%
+  filter(modelm == 1) %>%
+  rowwise() %>%
+  mutate(model_matrix = str_split(model_name, "\\+")[[1]][1]) %>%
+  group_by(name, tree, model_matrix) %>%
+  tally() %>% 
+  mutate(tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels_abbr),
+         name_levels  = factor(name, levels=name_levels),
+         model_matrix_levels = fct_reorder(model_matrix, n)) %>% 
+  ggplot(aes(x = tree_levels, y = n, fill = model_matrix_levels)) + 
+  geom_bar(stat="identity") +
+  facet_wrap(~name_levels, nrow=2) + scale_fill_brewer(palette = "Dark2", name = paste("m1 Model Matrix")) +
+  xlab("Simulation tree") + 
+  ylab("Count") + 
+  theme(axis.text.x = element_text(size=8)) -> selected_m1_plot    
+
+ggplot(m1_comp, aes(x = model1, y = model2, fill = r)) + 
+  geom_tile() + 
+  geom_text(aes(label = round(r, 3)), fontface="bold", size=3) +
+  xlab("") + ylab("") + 
+  scale_fill_gradient(name = "R", low = "red", high = "yellow") +
+  theme(axis.text = element_text(size=11))-> heat_r
+
+
+ggplot(m1_comp, aes(x = model1, y = model2, fill = rmse)) + 
+  geom_tile() + 
+  geom_text(aes(label = round(rmse, 3)), fontface="bold", size=3) +
+  xlab("") + ylab("") + 
+  scale_fill_gradient(name = "RMSE", low = "red", high = "yellow") +
+  theme(axis.text = element_text(size=11))-> heat_rmse
+
+plot_grid(heat_r, heat_rmse, nrow=2, labels=c("b", "c")) -> right
+plot_grid(selected_m1_plot, right, rel_widths=c(0.7, 0.3), nrow=1, labels=c("a", "")) -> full
+
+save_plot(paste0(figure_directory, "selected_m1_simulation_barplo_FULL.pdf"), full, base_width=12, base_height = 4) 
+
+
+ggplot(m1_rates, aes(x = JTT, y = WAG)) + geom_point(alpha=0.3) + geom_abline(color = "red") + facet_zoom(xlim=c(0, 2)) -> jw1
+ggplot(m1_rates, aes(x = JTT, y = HIVb)) + geom_point(alpha=0.3) + geom_abline(color = "red") + facet_zoom(xlim=c(0, 2)) -> jh1
+ggplot(m1_rates, aes(x = WAG, y = HIVb)) + geom_point(alpha=0.3) + geom_abline(color = "red") + facet_zoom(xlim=c(0, 2)) -> hw1
+
+plot_grid(jw, jh, hw, nrow=1, labels="auto") -> m1_si_grid
+save_plot(paste0(figure_directory, "m1_si_grid.pdf"), m1_si_grid, base_width=10, base_height=5)
+
+
+
 #### simulation fit results
 simulation_rf_fit %>%
   ggplot(aes(x = factor(ic.rank), fill = model_levels)) + 
@@ -476,22 +523,7 @@ ggsave(paste0(figure_directory, "bic_dist_ha_dosreis_ONLYm1-5.pdf"), quant_schem
 #ggsave(paste0(figure_directory, "bic_dist_grid.pdf"), bic_dist_grid, width = 8, height=3)
     
 
-msel_simulation %>%
-    filter(modelm == 1) %>%
-    rowwise() %>%
-    mutate(model_matrix = str_split(model_name, "\\+")[[1]][1]) %>%
-    group_by(name, tree, model_matrix) %>%
-    tally() %>% 
-    mutate(tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels_abbr),
-           name_levels  = factor(name, levels=name_levels),
-           model_matrix_levels = fct_reorder(model_matrix, n)) %>% 
-    ggplot(aes(x = tree_levels, y = n, fill = model_matrix_levels)) + 
-    geom_bar(stat="identity") +
-    facet_wrap(~name_levels, nrow=1) + scale_fill_brewer(palette = "Dark2", name = paste("m1 Model Matrix")) +
-    xlab("Simulation tree") + 
-    ylab("Count") + 
-    theme(legend.position = "bottom", axis.text.x = element_text(size=7, angle=20, margin = margin(t = 8, b=5))) -> selected_m1_plot        
-save_plot(paste0(figure_directory, "selected_m1_simulation_barplot.pdf"), selected_m1_plot, base_width=10, base_height = 3.5) 
+
 
 
 for (m in 2:5) {

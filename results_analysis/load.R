@@ -89,5 +89,8 @@ ufb_fact %>%
 entropy <- read_csv("simulation_site_entropy.csv") %>%
                 mutate(name_levels  = factor(name, levels=name_levels))
 
-
-
+#### diffs among m1 models ####
+m1_comp <- read_csv("m1_comparison.csv")
+m1_comp$model1 <- factor(m1_comp$model1, levels = c("JTT", "HIVb", "WAG"))
+m1_comp$model2 <- factor(m1_comp$model2, levels = c("JTT", "HIVb", "WAG"))
+m1_rates <- read_csv("m1_rates.csv") %>% distinct() ## csv is full matrix, we just need lower
