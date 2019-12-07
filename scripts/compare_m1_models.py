@@ -1,4 +1,7 @@
-import pyvolve
+"""
+All m1 models were JTT, HIVb, or WAG. 
+Script to compare matrices.
+"""import pyvolve
 import numpy as np
 from scipy import stats
 
@@ -35,7 +38,7 @@ with open(outpath + "m1_rates.csv", "w") as f:
 
 
 done = []
-outstring = "model1,model2,r,rho,rmse\n"
+outstring = "model1,model2,r,rmse\n"
 for m1 in models:
     for m2 in models:
         sorted_str = "".join(sorted([m1, m2]))
