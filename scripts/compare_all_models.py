@@ -11,7 +11,7 @@ NORM_I = 0
 NORM_J = 1
 
 ## These are all the protein models examined in model selection
-IQTREE_MODELS = ["LG", "cpREV", "mtREV", "Dayhoff", "mtMAM", "JTT", "WAG", "mtART", "mtZOA", "VT", "rtREV", "DCMut", "PMB", "HIVb", "HIVw", "JTTDCMut", "FLU", "Blosum62", "mtMet", "mtVer", "mtInv"]
+IQTREE_MODELS = ["JTT", "HIVb", "WAG", "LG", "cpREV", "mtREV", "Dayhoff", "mtMAM", "mtART", "mtZOA", "VT", "rtREV", "DCMut", "PMB", "HIVw", "JTTDCMut", "FLU", "Blosum62", "mtMet", "mtVer", "mtInv"]
 
 
 def normalize_flatten_matrix(matrix, i, j):
