@@ -121,13 +121,20 @@ msel_pandit %>%
   ylab("Count") +
   theme(axis.text.x = element_text(size=7))-> m1_pandit_model_plot
 
+
+
 pandit_ranks %>%    
-  mutate(model_levels = factor(model, levels=model_levels, labels = model_labels)) %>%
-  ggplot(aes(x = factor(ic.rank), fill = model_levels)) + 
-  geom_bar(color="black", size=.2) + 
-  panel_border() + 
-  scale_fill_manual(values=model_colors, name = "") +
-  xlab("Model rank by BIC") + ylab("Count")-> model_fit_pandit_bars
+  filter(model %in% c("GTR20", "poisson")) %>%
+  count(model, ic.rank) %>%
+  mutate(model_levels = factor(model, levels=c("GTR20", "poisson"), labels = c("GTR", "JC"))) %>%
+  ggplot(aes(x = factor(ic.rank), fill = model_levels, y = n)) + 
+  geom_col(color="black", size=.2, position = position_dodge2(width=1, preserve="single")) + 
+  geom_text(aes(x = factor(ic.rank), y = n+6, label = n), size=2.25, position = position_dodge(width=1)) + 
+  scale_fill_brewer(palette = "Set2", name = "") +
+  xlab("Overall model rank") + ylab("Count") -> gtr_jc_pandit_bars
+
+
+
 
 pandit_ranks %>% 
   filter(model == "GTR20") %>% 
@@ -138,7 +145,7 @@ pandit_ranks %>%
   xlab("GTR model rank") + ylab("Number of taxa") + 
   annotate("text", x = 5, y=325, label = "R^2 == 0.61", parse=TRUE) -> gtr20_rank_plot
 
-plot_grid(m1_pandit_model_plot, model_fit_pandit_bars, gtr20_rank_plot, scale=0.93, nrow=1, labels="auto") -> pandit_model_grid
+plot_grid(m1_pandit_model_plot, gtr_jc_pandit_bars, gtr20_rank_plot, scale=c(0.93, 0.97, 0.93), nrow=1, labels="auto") -> pandit_model_grid
 save_plot(paste0(figure_directory, "pandit_model_bars.pdf"), pandit_model_grid, base_width=12, base_height=2.5)
 
 

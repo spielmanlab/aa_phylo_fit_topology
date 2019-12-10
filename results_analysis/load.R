@@ -68,7 +68,8 @@ pandit_fit %>% left_join(pandit_info) -> pandit_fit
 pandit_fit %>%
     group_by(name) %>%
     mutate(ic.rank = as.integer(rank(BIC))) %>%
-    left_join(pandit_info) -> pandit_ranks
+    left_join(pandit_info) %>%
+    ungroup() -> pandit_ranks
 
 ### Topology test results
 simulation_topology <- read_csv(paste0(data_path, "topology_tests_simulation.csv"))
