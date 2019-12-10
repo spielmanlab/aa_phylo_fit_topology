@@ -4,41 +4,46 @@ if (is.null(LOADED)) source("load.R")
 ####################################### TABLES #############################################
 ############################################################################################
 
-###################### m2-m5 selected models, separately for simulations and PANDIT ##########
-
+#### m1-m5 models for simulations
 msel_simulation %>%
   rowwise() %>%
-  mutate(modelm = paste0("m", modelm),
-         model_matrix = str_split(model_name, "\\+")[[1]][1]) %>%
-  count(modelm, name, tree, model_matrix) %>%
+  mutate(modelm = paste0("m", modelm)) %>%
+  count(modelm, name, tree, model_name) %>%
   mutate(tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
          name_levels  = factor(name, levels=name_levels)) %>%
-  dplyr::select(modelm, name_levels, tree_levels, model_matrix, n) %>%
+  dplyr::select(modelm, name_levels, tree_levels, model_name, n) %>%
   rename("Model rank" = modelm, 
+         "Model name" = model_name,
          "Simulation DMS" = name_levels,
          "Simulation Tree" = tree_levels,
-         "Model matrix" = model_matrix, 
          "Number of replicates" = n) %>%
-  write_csv(paste0(si_figure_directory, "simulation_models.csv"))
-
-
-msel_pandit %>%
-  rowwise() %>%
-  mutate(modelm = paste0("m", modelm),
-         model_matrix = str_split(model_name, "\\+")[[1]][1]) %>%
-  count(modelm, model_matrix) %>%
-  rename("Model rank" = modelm, 
-         "Model matrix" = model_matrix, 
-         "Number of alignments" = n) %>%
-  write_csv(paste0(si_figure_directory, "pandit_models.csv"))
+  write_csv(paste0(si_figure_directory, "table_S1.csv"))
 
 
 ##### Simulations where RF = 0 
 simulation_rf_fit %>% 
   filter(rf_true_norm == 0) %>%
   count(name_levels, tree_levels, model_levels) %>% 
-  write_csv(paste0(si_figure_directory, "simulation_with_rf0.csv"))
+  write_csv(paste0(si_figure_directory, "table_S2.csv"))
 
+#### Simulations with a SIGNIFICANT AU test
+simulation_topology %>%
+  filter(whichtest == "au") %>%
+  pivot_longer(m1:true, names_to="model", values_to = "pvalue") %>%
+  filter(pvalue <= SIG.ALPHA) %>%
+  count(model, name, tree) %>%
+  arrange(model, name, tree) %>%
+  write_csv(paste0(si_figure_directory, "table_S3.csv"))
+
+#### m1-m5 models for pandit
+msel_pandit %>%
+  rowwise() %>%
+  mutate(modelm = paste0("m", modelm)) %>%
+  count(modelm, model_name) %>%
+  rename("Model rank" = modelm, 
+         "Model name" = model_name, 
+         "Number of alignments" = n) %>%
+  write_csv(paste0(si_figure_directory, "table_S4.csv"))
 
 
 ############################################################################################
@@ -84,7 +89,7 @@ ggplot(entropy, aes(x = name_levels, y = total_entropy, color = name_levels)) +
   geom_sina(size=0.5) + 
   scale_color_brewer(palette = "Set2") +
   facet_wrap(~tree_levels, nrow=2) + 
-  stat_summary(geom = "point", color = "black", size=1) + 
+  stat_summary(geom = "point", color = "black", size=2, pch=18) + 
   xlab("Simulations") + ylab("Alignment entropy") + 
   panel_border() + theme(legend.position = "none") -> entropy_sina
 save_plot(paste0(si_figure_directory, "entropy_simulations_sina.pdf"), entropy_sina, base_width=8, base_height=3)
