@@ -48,7 +48,7 @@ model_order    = ["m1", "m2", "m3", "m4", "m5", "poisson", "GTR20"]
 
 type = sys.argv[1]
 inpath = "../topology_tests_" + type + "/"
-outfile = "../results_analysis/topology_tests_" + type + ".csv"
+outfile = "../results_analysis/csv_files/topology_tests_" + type + ".csv"
 
 if type == "simulation":
     outstring = "name,tree,rep,whichtest,m1,m2,m3,m4,m5,poisson,GTR20,true\n"

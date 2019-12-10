@@ -98,7 +98,23 @@ For all signficant comparisons, effect sizes are exceedingly small with a maximu
 
 
 
+### Model 4: Entropy among simulations
 
+```{r model-4, warning=FALSE, message=FALSE}
+
+
+## Fit the model
+lm(total_entropy ~ name_levels+tree_levels, data = entropy) %>% 
+  broom::tidy() %>% 
+  mutate(sig = p.value <= SIG.ALPHA) %>%
+  knitr::kable()
+
+## see the means
+entropy %>% 
+  group_by(name_levels) %>% 
+  summarize(mean(total_entropy)) %>%
+  knitr::kable()
+```
 
 
 

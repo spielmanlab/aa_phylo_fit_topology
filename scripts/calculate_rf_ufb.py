@@ -62,7 +62,7 @@ def compare_ufb(bp_prefix, inftree, truetree):
 
 
 type = sys.argv[1]
-outpath = "../results_analysis/"
+outpath = "../results_analysis/csv_files/"
 fitinfo_order    = ["logl", "k", "AIC", "AICc", "BIC"]
 
 

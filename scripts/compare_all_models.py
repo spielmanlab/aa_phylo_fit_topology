@@ -24,7 +24,7 @@ def main():
 
     models = {}
     
-    outpath = "../results_analysis/"
+    outpath = "../results_analysis/csv_files/"
     for model in IQTREE_MODELS:        
         pyvolve_name = model.lower() + "_matrix"            
         if pyvolve_name == "dcmut_matrix":

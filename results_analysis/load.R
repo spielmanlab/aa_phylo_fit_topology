@@ -1,3 +1,10 @@
+################################################################
+#                                                              #    
+# Load all libraries, data for generating tables and figures.  #
+#                                                              #
+################################################################
+LOADED <- TRUE
+
 library(tidyverse)
 library(cowplot)
 library(xtable)
@@ -7,7 +14,9 @@ library(ggforce)
 
 theme_set(theme_classic() + theme(axis.line = element_line(colour = "grey10"),
                                   strip.background = element_rect(size=0.5, fill="grey90")))
-figure_directory <- "figures/"
+data_path <- "csv_files/"
+figure_directory <- "main_figures/"
+si_figure_directory <- "si_figures_tables/"
 SIG.ALPHA <- 0.01 ## significance threshold
 ########################## Factor levels and labeling ################################ 
 name_levels <- c("LAC", "NP", "HA", "HIV")
@@ -33,9 +42,8 @@ tree_labels_abbr <- c("Plant", "Fish", "Mammals", "Aves", "Lassa", "Spiralia", "
 sim_info    <- read_csv("../simulations/simulation_trees_ntaxa.csv") 
 pandit_info <- read_csv("../pandit_aa_alignments/pandit_info.csv")
 
-
 ### RF and BIC results
-simulation_rf_fit  <- read_csv("rf_fit_simulation.csv",guess_max = 10000)
+simulation_rf_fit  <- read_csv(paste0(data_path, "rf_fit_simulation.csv"),guess_max = 10000)
 simulation_rf_fit %<>% 
     left_join(sim_info) %>%
     mutate(max_rf = 2*ntaxa - 6) %>%  ### twice the number of internal edges
@@ -50,17 +58,21 @@ simulation_rf_fit %<>%
            name_levels  = factor(name, levels=name_levels)) %>%
     dplyr::select(-model, -tree, -name)
 
-pandit_rf  <- read_csv("rf_pandit.csv",guess_max = 10000) 
-pandit_fit <- read_csv("fit_pandit.csv",guess_max = 10000) 
+pandit_rf  <- read_csv(paste0(data_path, "rf_pandit.csv"), guess_max = 10000) 
+pandit_fit <- read_csv(paste0(data_path, "fit_pandit.csv"), guess_max = 10000) 
 pandit_rf %>% 
     left_join(pandit_info) %>%
     mutate(max_rf = 2*ntaxa - 6) %>%
     mutate(rf     = rf/max_rf) -> pandit_rf
 pandit_fit %>% left_join(pandit_info) -> pandit_fit
+pandit_fit %>%
+    group_by(name) %>%
+    mutate(ic.rank = as.integer(rank(BIC))) %>%
+    left_join(pandit_info) -> pandit_ranks
 
 ### Topology test results
-simulation_topology <- read_csv("topology_tests_simulation.csv")
-pandit_topology     <- read_csv("topology_tests_pandit.csv")
+simulation_topology <- read_csv(paste0(data_path, "topology_tests_simulation.csv"))
+pandit_topology     <- read_csv(paste0(data_path, "topology_tests_pandit.csv"))
 
 ## actual selected models
 msel_simulation <- read_csv("../processed_model_selection/quantile_model_selection_simulation.csv")
@@ -69,7 +81,7 @@ msel_pandit     <- read_csv("../processed_model_selection/quantile_model_selecti
 
 
 ## Bootstrap analysis
-sim_ufb <- read_csv("ufb_splits_simulation.csv")
+sim_ufb <- read_csv(paste0(data_path, "ufb_splits_simulation.csv"))
 
 sim_ufb %>% 
     mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
@@ -86,11 +98,14 @@ ufb_fact %>%
 
 
 ##### entropy (for distinguishing simulations) ######
-entropy <- read_csv("simulation_site_entropy.csv") %>%
-                mutate(name_levels  = factor(name, levels=name_levels))
+entropy <- read_csv(paste0(data_path, "simulations_entropy.csv")) %>%
+                mutate(name_levels = factor(name, levels=name_levels),
+                       tree_levels = factor(tree, levels = tree_levels, labels = tree_labels))
 
-#### diffs among m1 models ####
-m1_comp <- read_csv("m1_comparison.csv")
-m1_comp$model1 <- factor(m1_comp$model1, levels = c("JTT", "HIVb", "WAG"))
-m1_comp$model2 <- factor(m1_comp$model2, levels = c("JTT", "HIVb", "WAG"))
-m1_rates <- read_csv("m1_rates.csv") %>% distinct() ## csv is full matrix, we just need lower
+#### diffs among models ####
+model_comp <- read_csv(paste0(data_path, "all_models_pearson.csv"))
+all_models <- unique(c(model_comp$model1, model_comp$model2))
+all_models <- all_models[!all_models %in% c("JTT", "HIVb", "WAG")]
+all_models <- c("JTT", "HIVb", "WAG", all_models)
+model_comp$model1 <- factor(model_comp$model1, levels = all_models)
+model_comp$model2 <- factor(model_comp$model2, levels = all_models)
