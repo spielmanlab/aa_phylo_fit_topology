@@ -1,4 +1,5 @@
-if (is.null(LOADED)) source("load.R") 
+if (!(exists("LOADED"))) source("load.R")
+if (exists("LOADED") && LOADED == FALSE) source("load.R") 
 
 #################################################################################
 ################### Figures associated with simulations #########################
@@ -57,7 +58,7 @@ simulation_rf_fit %>%
   ggplot(aes(x = model_levels, y = rf_true_norm)) + 
   geom_boxplot(aes(fill = name_levels), outlier.size = 0.3, size=0.25,  width=0.9) + 
   facet_wrap(~tree_levels, scales = "free_y", nrow=2) +
-  scale_fill_brewer(palette = "Set2", name = "Simulation Set") +
+  scale_fill_brewer(palette = "Dark2", name = "Simulation Set") +
   panel_border() +
   background_grid() + 
   xlab("Protein model") + ylab("Normalized Robinson-Foulds Distance") + 
@@ -130,7 +131,7 @@ pandit_ranks %>%
   ggplot(aes(x = factor(ic.rank), fill = model_levels, y = n)) + 
   geom_col(color="black", size=.2, position = position_dodge2(width=1, preserve="single")) + 
   geom_text(aes(x = factor(ic.rank), y = n+6, label = n), size=2.25, position = position_dodge(width=1)) + 
-  scale_fill_brewer(palette = "Set2", name = "") +
+  scale_fill_brewer(palette = "Dark2", name = "") +
   xlab("Overall model rank") + ylab("Count") -> gtr_jc_pandit_bars
 
 
@@ -193,9 +194,6 @@ pandit_rf_ridgedata %>%
   )  -> pandit_rf_plot
 
 
-save_plot(paste0(figure_directory, "pandit_ridgeplot.pdf"), pandit_rf_plot, base_width=5, base_height=7)
-
-
 ################### PANDIT AU test results ##################
 pandit_topology %>%
   filter(whichtest == "au") %>%
@@ -212,7 +210,7 @@ pandit_au_summary %>%
   ggplot(aes(x = model_levels, y = perc_in_conf, fill = notsig)) + 
   geom_col() +
   geom_text(data = pandit_au_summary_false, aes(x = model_levels, y = 1.04, label = label), size=3) + 
-  scale_fill_brewer(palette = "Set2", name = "In m1 confidence set") +
+  scale_fill_brewer(palette = "Dark2", name = "In m1 confidence set") +
   xlab("Protein models") + ylab("Proportion of alignments") +
   theme(legend.position = "bottom") + 
   guides(fill = guide_legend(nrow=1, title.position = "left")) -> pandit_au_barplot
@@ -236,14 +234,18 @@ ggplot(df.venn, aes(x0 = x, y0 = y, r = 1.5, fill = labels)) +
   theme_void() + 
   coord_fixed(clip = "off") + 
   theme(legend.position = 'none') +
-  scale_fill_brewer(palette = "Set2") +
+  scale_fill_brewer(palette = "Dark2") +
   labs(fill = NULL) +
   annotate("text", x = venn_numbers$x, y = venn_numbers$y, label = venn_numbers$labels, size = 5) +
   annotate("text", x = 0, y = 2.65, label = "m4",fontface = "bold", size=4) +
   annotate("text", x = -2.3, y = -1.5,  label = "JC",fontface = "bold", size=4) +
   annotate("text", x = 2.3, y = -1.5, label = "m5",fontface = "bold", size=4) -> disagree_m1_venn
 
-pandit_au_plot <- plot_grid(pandit_au_barplot, disagree_m1_venn, labels="auto", scale=c(0.95, 0.8))
-save_plot(paste0(figure_directory,"pandit_au.pdf"), pandit_au_plot, base_width=8, base_height=3.5)
+
+
+pandit_au_plot <- plot_grid(pandit_au_barplot, disagree_m1_venn, labels=c("b", "c"), ncol=1, scale=c(0.95, 0.8))
+pandit_rf_au <- plot_grid(pandit_rf_plot, pandit_au_plot, nrow=1, labels=c("a",""), scale=0.95)
+save_plot(paste0(figure_directory,"pandit_rf_au.pdf"), pandit_rf_au, base_width=8.5, base_height=7)
+
 
 

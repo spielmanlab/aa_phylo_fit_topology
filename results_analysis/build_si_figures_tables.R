@@ -1,4 +1,5 @@
-if (is.null(LOADED)) source("load.R") 
+if (!(exists("LOADED"))) source("load.R")
+if (exists("LOADED") && LOADED == FALSE) source("load.R") 
 
 ############################################################################################
 ####################################### TABLES #############################################
@@ -87,7 +88,7 @@ save_plot(paste0(si_figure_directory, "model_pearson_heatmap.pdf"), all_models_r
 ##################### Entropy of the simulations ##########################
 ggplot(entropy, aes(x = name_levels, y = total_entropy, color = name_levels)) + 
   geom_sina(size=0.5) + 
-  scale_color_brewer(palette = "Set2") +
+  scale_color_brewer(palette = "Dark2") +
   facet_wrap(~tree_levels, nrow=2) + 
   stat_summary(geom = "point", color = "black", size=2, pch=18) + 
   xlab("Simulations") + ylab("Alignment entropy") + 
