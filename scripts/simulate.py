@@ -34,7 +34,6 @@ mudict = {'AC':1.,  'CA':1.,  'AG':1.,  'GA':1.,  'AT':1.,  'TA':1.,  'CG':1.,  
 
 name   = sys.argv[1]
 simrep = sys.argv[2]
-dms_sims = ["HA", "NP", "HIV"]
 
 treepath = "../simulations/true_trees/" ## since simulating nucleotide level but want BL to describe, more or less, protein divergence
 prefpath = "../simulations/preferences/"
@@ -45,11 +44,7 @@ partitions = []
 
 print("Loading parameters")
 for siteprefs in prefs:
-    # preferences are already fitness for yeast
-    if name in dms_sims:
-        sitefit = np.log(  siteprefs/np.sum(siteprefs)   ) ## renormalize DMS, my tolerance is a bit more stringent
-    else:
-        sitefit = siteprefs
+    sitefit = np.log(  siteprefs/np.sum(siteprefs)   ) ## renormalize DMS, my tolerance is a bit more stringent
     m = pyvolve.Model("mutsel", {"fitness": sitefit, "mu": mudict})
     p = pyvolve.Partition(models = m, size = 1)
     partitions.append(p)
@@ -61,16 +56,11 @@ for tree in trees:
     pytree = pyvolve.read_tree(tree = treestring)#, scale_tree=3)
     treename = tree.replace("_resolved.tree","")
     print("Simulating along", treename)
-    
-    #outname = simpath + name + "_" + treename + "_rep" + str(simrep) + "_CODON.fasta" ##### CODON
-    #outname1 = outname.replace("_CODON", "_DNA")               ##### NUCLEOTIDE (same as codon but naming is convenient downstream)
+ 
     outname = simpath + name + "_" + treename + "_rep" + str(simrep) + "_AA.fasta"
     
     if os.path.exists(outname):
         continue
-    #else:
-    #    print(outname)
-    #continue
     e = pyvolve.Evolver(partitions = deepcopy(partitions), tree = deepcopy(pytree))
     e(seqfile = outname.replace("AA", "CODON"), seqfmt = "fasta", ratefile = None, infofile = None)
 
