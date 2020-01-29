@@ -1,5 +1,5 @@
 """
-SJS. Run model selection w/ iqtree on simulations and save csv with best/worst model by each IC for DNA, CODON, and AA models.
+SJS. Run model selection w/ iqtree on simulations and save csv with best/worst model by each IC for AA models.
 """
 
 import os
@@ -37,10 +37,15 @@ def parse_all_fits(file, prefix):
 
 
 type = sys.argv[1]
-assert(len(sys.argv)==2),"\n specify `simulation`, `pandit`"
+assert(len(sys.argv)==2),"\n specify `simulation`, `simulation_control`, or `pandit`"
 reps  = list(range(1,21))
 if type == "simulation":
     alignment_path = "../simulations/alignments/"
+    names = ["LAC", "HA", "NP", "HIV"]
+    trees = ["opisthokonta", "prum", "ruhfel", "salichos", "dosreis", "andersen", "spiralia", "rayfinned"]
+
+if type == "simulation_control":
+    alignment_path = "../simulations/alignments/wag_control/"
     names = ["LAC", "HA", "NP", "HIV"]
     trees = ["opisthokonta", "prum", "ruhfel", "salichos", "dosreis", "andersen", "spiralia", "rayfinned"]
 
@@ -50,10 +55,11 @@ if type == "pandit":
     
 
 output_path = "../selected_models_" + type + "/" ## mv log files here
+os.system("mkdir -p " + output_path)
 outfile     = "../processed_model_selection/all_model_selection_" + type + ".csv"
 
 outstring = "name,tree,repl,model,logl,df,aic,aicc,bic\n"
-if type == "simulation":
+if type == "simulation" or type == "simulation_control":
     for name in names:
         for tree in trees:
             for repli in reps:
