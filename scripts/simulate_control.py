@@ -18,7 +18,7 @@ for name in ["LAC", "NP", "HA", "HIV"]:
     prefs = np.loadtxt(prefpath + name + "_prefs.csv", delimiter=",") ## just to get length
     
     m = pyvolve.Model("WAG", alpha = 0.8, num_categories = 10, pinv = 0.05)
-    partitions = pyvolve.Partition(models = m, size = 1)#len(prefs))
+    partitions = pyvolve.Partition(models = m, size = len(prefs))
     
     for tree in trees:
         with open(treepath + tree, "r") as f:
