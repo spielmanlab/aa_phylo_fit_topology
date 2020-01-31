@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=10
 #SBATCH --mem-per-cpu=100
 #SBATCH -p csm
-#SBATCH --array=1-1
+#SBATCH --array=1-20
 
 REP=${SLURM_ARRAY_TASK_ID}
 TOPPATH=/csm_data/spielman_lab/aa_phylo_fit_topology
