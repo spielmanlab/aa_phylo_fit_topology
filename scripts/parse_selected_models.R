@@ -37,7 +37,7 @@ if (type == "pandit")
 
 }
 
-if (type == "simulation")
+if (type == "simulation" | type == "simulation_control")
 {
 
     selected_models <- tibble(name = as.character(),
