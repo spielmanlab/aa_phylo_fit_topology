@@ -10,7 +10,7 @@ def run_save_iqtree(alignment_file, data_type, model, outname, true_tree, thread
 #    else:
 #        print("OK", alignment_file, model)
 
-        os.system("iqtree -quiet -nt AUTO -ntmax " + str(threadmax) + " -m " + model + " -s " + alignment_file + " -st " + data_type  + " -redo -bb 1000")
+        os.system("iqtree -quiet -nt AUTO -ntmax " + str(threadmax) + " -m " + model + " -s " + alignment_file + " -st " + data_type  + " -redo -bb 1000 -safe")
         os.system("mv " + alignment_file + ".log " + outname + "_inferredtree.log")
         os.system("mv " + alignment_file + ".treefile " + outname + "_inferredtree.treefile")
         os.system("mv " + alignment_file + ".iqtree " + outname + "_inferredtree.iqtree")
