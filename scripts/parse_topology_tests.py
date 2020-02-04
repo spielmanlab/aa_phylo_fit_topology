@@ -2,7 +2,7 @@ import os
 import sys
 import re
 
-def parse_tests(output, name):
+def parse_tests(output, name, type):
 
     x = 0
     for line in output:
@@ -10,7 +10,7 @@ def parse_tests(output, name):
             break
         x+=1
     start = x + 2
-    if type == "simulation":
+    if "simulation" in type:
         stop = x + len(model_order) + 3
     if type == "pandit":
         stop = x + len(model_order) + 2
@@ -50,7 +50,7 @@ type = sys.argv[1]
 inpath = "../topology_tests_" + type + "/"
 outfile = "../results_analysis/csv_files/topology_tests_" + type + ".csv"
 
-if type == "simulation":
+if "simulation" in type:
     outstring = "name,tree,rep,whichtest,m1,m2,m3,m4,m5,poisson,GTR20,true\n"
 if type == "pandit":
     outstring = "name,whichtest,m1,m2,m3,m4,m5,poisson,GTR20\n"
@@ -61,14 +61,13 @@ files = [x for x in os.listdir(inpath) if x.endswith("topology_tests")]
 for file in files:
     rawname = file.split(".topology_tests")[0]
     print(rawname)
-    if type == "simulation":
+    if "simulation" in type:
         name = rawname.split("_AA")[0].replace("_",",").replace("rep","")
     else:
         name = rawname
     with open(inpath + file, "r") as f:
         lines = f.readlines()
-    this_out = parse_tests(lines, name)
-    outstring += parse_tests(lines, name)
+    outstring += parse_tests(lines, name, type)
 with open(outfile, "w") as f:
     f.write(outstring)
 
