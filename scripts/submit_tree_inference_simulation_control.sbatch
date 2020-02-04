@@ -7,9 +7,10 @@
 #SBATCH --array=1-20
 
 REP=${SLURM_ARRAY_TASK_ID}
-TOPPATH=/csm_data/spielman_lab/aa_phylo_fit_topology/
-ALNPATH=${TOPPATH}/simulations/alignments/wag_control
+TOPPATH=/csm_data/spielman_lab/aa_phylo_fit_topology
+ALNPATH=${TOPPATH}/simulations/alignments/wag_control/
 OUTPATH=${TOPPATH}/fitted_trees_ufb_simulation_control/
+mkdir -p ${OUTPATH}
 NAME=$1
 cd $TOPPATH
 for TREE in opisthokonta prum ruhfel salichos dosreis andersen rayfinned spiralia; do
