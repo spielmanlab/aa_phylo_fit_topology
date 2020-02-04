@@ -16,9 +16,13 @@ relll_reps          = "10000"
 if type == "pandit":
     alignmentpath = "../pandit_aa_alignments/"
     inferencepath = "../fitted_trees_ufb_pandit/" 
-elif type == "simulation":
-    alignmentpath  = "../simulations/alignments/"
-    inferencepath  = "../fitted_trees_ufb_simulation/"
+elif "simulation" in type:
+    if type == "simulation":
+        alignmentpath  = "../simulations/alignments/"
+        inferencepath  = "../fitted_trees_ufb_simulation/"
+    if type == "simulation_control":
+        alignmentpath  = "../simulations/alignments/wag_control/"
+        inferencepath  = "../fitted_trees_ufb_simulation_control/"        
     true_tree_path = "../simulations/true_trees/"
     sim_list       = ["LAC", "NP", "HA", "HIV"]
     treenames      = ["andersen", "dosreis", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]        
@@ -42,7 +46,7 @@ def determine_best_models(type, quantilefile):
             quant = qline.split(",")[3].strip()
             if quant == "1":
                 fitmodels[name] = model
-    if type == "simulation":
+    if "simulation" in type:
         for qline in qlines:
             name = qline.split(",")[0]
             tree = qline.split(",")[1]
@@ -81,7 +85,7 @@ def loop_over_tests(type):
 
 
 
-    if type == "simulation":
+    if "simulation" in type:
         outstring  = "name,tree,repl,m1,m2,m3,m4,m5,poisson,GTR20,true\n"
         for name in sim_list:
             print(name)

@@ -62,6 +62,8 @@ def compare_ufb(bp_prefix, inftree, truetree):
 
 
 type = sys.argv[1]
+assert(type in ["pandit", "simulation", "simulation_control"]), "ERROR: specify type as input arg."
+
 outpath = "../results_analysis/csv_files/"
 fitinfo_order    = ["logl", "k", "AIC", "AICc", "BIC"]
 
@@ -115,9 +117,13 @@ if type ==  "pandit":
 
 
 
-if type == "simulation":
-    alignmentpath  = "../simulations/alignments/"
-    inferencepath  = "../fitted_trees_ufb_simulation/" 
+if "simulation" in type:
+    if type == "simulation":
+        alignmentpath  = "../simulations/alignments/"
+        inferencepath  = "../fitted_trees_ufb_simulation/" 
+    if type == "simulation_control":
+        alignmentpath  = "../simulations/alignments/wag_control"
+        inferencepath  = "../fitted_trees_ufb_simulation_control/" 
     true_tree_path = "../simulations/true_trees/"
     sim_list       = ["LAC", "NP", "HA", "HIV"]
     treenames      = ["dosreis","andersen", "opisthokonta", "prum", "ruhfel", "salichos", "rayfinned", "spiralia"]        
