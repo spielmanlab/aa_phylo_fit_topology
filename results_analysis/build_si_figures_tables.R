@@ -127,6 +127,62 @@ ufb_fact_classif %>%
 save_plot(paste0(si_figure_directory,"ufb_fpr_all.pdf"), fpr_all, base_width = 12, base_height=10)
 save_plot(paste0(si_figure_directory,"ufb_acc_all.pdf"), acc_all, base_width = 12, base_height=10)
 
+
+
+###################################################################################################
+############################## CONTROL SIMULATION FIGURES #########################################
+###################################################################################################
+
+################ nRF Boxplots for simulations #################
+control_rf_fit %>%
+  ggplot(aes(x = model_levels, y = rf_true_norm)) + 
+  geom_boxplot(aes(fill = name_levels), outlier.size = 0.3, size=0.25,  width=0.9) + 
+  facet_wrap(~tree_levels, scales = "free_y", nrow=2) +
+  scale_fill_brewer(palette = "Dark2", name = "Simulation Set") +
+  panel_border() +
+  background_grid() + 
+  xlab("Protein model") + ylab("Normalized Robinson-Foulds Distance") + 
+  theme(legend.position = "bottom") -> control_rf_boxplot  
+#save_plot(paste0(figure_directory,"si_control_rf_boxplot.pdf"), control_rf_boxplot, base_width=10, base_height=4)
+
+
+control_ufb_fact_classif %>%
+  ggplot(aes(x = model_levels, y = FPR, fill = model_levels)) + 
+  geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5, color="grey10")  +     
+  scale_fill_manual(values=model_colors, name = "Protein Model") +         
+  facet_grid(name_levels~tree_levels, scales="free_y") +
+  background_grid() + 
+  panel_border() +
+  theme(legend.position = "none",
+        strip.text = element_text(size=8), 
+        axis.text.x = element_text(size=8),
+        panel.spacing = unit(0.2, "cm")) +
+  xlab("Protein Models") + ylab("False positive rate") +
+  geom_hline(yintercept = 0.05, color = "dodgerblue3")  -> fpr_all_control
+
+control_ufb_fact_classif %>%
+  ggplot(aes(x = model_levels, y = accuracy, fill = model_levels)) + 
+  geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5, color="grey10")  +     
+  scale_fill_manual(values=model_colors, name = "Protein Model") +         
+  facet_grid(name_levels~tree_levels, scales="free_y") +
+  background_grid() + 
+  panel_border() +
+  theme(legend.position = "none",
+        strip.text = element_text(size=8), 
+        axis.text.x = element_text(size=8),
+        panel.spacing = unit(0.2, "cm")) +
+  xlab("Protein Models") + ylab("Accuracy")   -> acc_all_control
+
+save_plot(paste0(si_figure_directory,"control_ufb_fpr_all.pdf"), fpr_all_control, base_width = 12, base_height=10)
+save_plot(paste0(si_figure_directory,"control_ufb_acc_all.pdf"), acc_all_control, base_width = 12, base_height=10)
+
+
+
+
+
+
+
+
 ###################################################################################################
 ########################### MISCELLANEOUS EYEBALLING OF SOME DATA #################################
 ###################################################################################################

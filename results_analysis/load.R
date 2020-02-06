@@ -71,18 +71,37 @@ pandit_fit %>%
     left_join(pandit_info) %>%
     ungroup() -> pandit_ranks
 
+
+control_rf_fit  <- read_csv(paste0(data_path, "rf_fit_simulation_control.csv"),guess_max = 10000)
+control_rf_fit %<>% 
+    left_join(sim_info) %>%
+    mutate(max_rf = 2*ntaxa - 6) %>%  ### twice the number of internal edges
+    mutate(rf_true_norm = rf/max_rf) %>%
+    dplyr::select(-AIC, -AICc, -k,-logl, -rf, -treelength, -max_rf, -ntaxa) %>%
+    distinct() %>%
+    group_by(name, tree, rep) %>%
+    mutate(ic.rank = as.integer(rank(BIC))) %>%
+    ungroup() %>%
+    mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
+           tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
+           name_levels  = factor(name, levels=name_levels)) %>%
+    dplyr::select(-model, -tree, -name)
+
 ### Topology test results
 simulation_topology <- read_csv(paste0(data_path, "topology_tests_simulation.csv"))
 pandit_topology     <- read_csv(paste0(data_path, "topology_tests_pandit.csv"))
+control_topology    <- read_csv(paste0(data_path, "topology_tests_simulation_control.csv"))
 
 ## actual selected models
 msel_simulation <- read_csv("../processed_model_selection/quantile_model_selection_simulation.csv")
+msel_control    <- read_csv("../processed_model_selection/quantile_model_selection_simulation_control.csv")
 all_sel         <- read_csv("../processed_model_selection/all_model_selection_simulation.csv")
 msel_pandit     <- read_csv("../processed_model_selection/quantile_model_selection_pandit.csv")
 
 
 ## Bootstrap analysis
 sim_ufb <- read_csv(paste0(data_path, "ufb_splits_simulation.csv"))
+control_ufb <- read_csv(paste0(data_path, "ufb_splits_simulation_control.csv"))
 
 sim_ufb %>% 
     mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
@@ -97,6 +116,18 @@ ufb_fact %>%
     mutate(FPR = ifelse(is.nan(FP / (TN+FP)), 0, FP / (TN+FP)), 
            accuracy = (TP + TN)/(TP+TN+FP+FN)) -> ufb_fact_classif
 
+control_ufb %>% 
+    mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
+           tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
+           name_levels  = factor(name, levels=name_levels), 
+           rep = factor(rep)) -> control_ufb_fact
+control_ufb_fact %>% 
+    count(model_levels, tree_levels, name_levels, rep, classif) %>%
+    pivot_wider(names_from = classif, values_from = n) %>%
+    ungroup() %>%
+    replace_na(list(FP = 0, FN = 0, TP = 0, TN = 0)) %>%
+    mutate(FPR = ifelse(is.nan(FP / (TN+FP)), 0, FP / (TN+FP)), 
+           accuracy = (TP + TN)/(TP+TN+FP+FN)) -> control_ufb_fact_classif
 
 ##### entropy (for distinguishing simulations) ######
 entropy <- read_csv(paste0(data_path, "simulations_entropy.csv")) %>%
