@@ -6,25 +6,30 @@ if (exists("LOADED") && LOADED == FALSE) source("load.R")
 ############################################################################################
 
 #### m1-m5 models for simulations
-msel_simulation %>%
+msel_simulation %>% mutate(simtype = "MutSel") -> mutsel
+msel_control %>% 
+  mutate(simtype = "control") %>%
+  bind_rows(mutsel) %>%
   rowwise() %>%
   mutate(modelm = paste0("m", modelm)) %>%
-  count(modelm, name, tree, model_name) %>%
+  count(modelm, name, tree, model_name, simtype) %>%
   mutate(tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
          name_levels  = factor(name, levels=name_levels)) %>%
-  dplyr::select(modelm, name_levels, tree_levels, model_name, n) %>%
-  rename("Model rank" = modelm, 
-         "Model name" = model_name,
-         "Simulation DMS" = name_levels,
-         "Simulation Tree" = tree_levels,
-         "Number of replicates" = n) %>%
+  dplyr::select(simtype, modelm, name_levels, tree_levels, model_name, n) %>%
+  arrange(simtype, modelm, n) %>%
   write_csv(paste0(si_figure_directory, "table_S1.csv"))
 
 
 ##### Simulations where RF = 0 
 simulation_rf_fit %>% 
   filter(rf_true_norm == 0) %>%
-  count(name_levels, tree_levels, model_levels) %>% 
+  count(name_levels, tree_levels, model_levels) %>%
+  mutate(simtype = "MutSel") -> sim_rf0
+control_rf_fit %>% 
+  filter(rf_true_norm == 0) %>%
+  count(name_levels, tree_levels, model_levels) %>%
+  mutate(simtype = "control") %>%
+  bind_rows(sim_rf0) %>%
   write_csv(paste0(si_figure_directory, "table_S2.csv"))
 
 #### Simulations with a SIGNIFICANT AU test
@@ -34,6 +39,15 @@ simulation_topology %>%
   filter(pvalue <= SIG.ALPHA) %>%
   count(model, name, tree) %>%
   arrange(model, name, tree) %>%
+  mutate(simtype = "MutSel") -> sim_au
+control_topology %>%
+  filter(whichtest == "au") %>%
+  pivot_longer(m1:true, names_to="model", values_to = "pvalue") %>%
+  filter(pvalue <= SIG.ALPHA) %>%
+  count(model, name, tree) %>%
+  arrange(model, name, tree) %>%
+  mutate(simtype = "control") %>%
+  bind_rows(sim_au) %>%
   write_csv(paste0(si_figure_directory, "table_S3.csv"))
 
 #### m1-m5 models for pandit
@@ -60,17 +74,32 @@ simulation_rf_fit %>%
   panel_border() + 
   scale_fill_manual(values=model_colors, name = "Protein Model") +
   xlab("Model rank by BIC") + ylab("Count") + 
-  theme(strip.text = element_text(size=8), 
-        legend.position = "bottom", 
-        legend.key.size = unit(6, "pt"), 
-        legend.text = element_text(size=7), 
-        legend.title = element_text(size=7), 
+  theme(strip.text = element_text(size=7), 
+        legend.key.size = unit(10, "pt"), 
+        legend.position = "bottom",
+        legend.text = element_text(size=8), 
+        legend.title = element_text(size=9), 
         axis.text = element_text(size=7), 
         axis.title = element_text(size=8)) +
-  guides(fill = guide_legend(nrow=1)) -> model_fit_simulation_bars
-l <- get_legend(model_fit_simulation_bars)
-both <- plot_grid(model_fit_simulation_bars + theme(legend.position = "none"), l, nrow=2, rel_heights=c(1,0.05))
-save_plot(paste0(si_figure_directory,"model_fit_simulation_bars.pdf"), both, base_width=10)
+  guides(fill = guide_legend(nrow=1)) -> model_fit_simulation_bars_mutsel
+
+control_rf_fit %>%
+  ggplot(aes(x = factor(ic.rank), fill = model_levels)) + 
+  geom_bar(color="black", size=.2) + 
+  facet_grid(name_levels~tree_levels) +
+  panel_border() + 
+  scale_fill_manual(values=model_colors, name = "Protein Model") +
+  xlab("Model rank by BIC") + ylab("Count") + 
+  theme(strip.text = element_text(size=7), 
+        axis.text = element_text(size=7), 
+        axis.title = element_text(size=8)) -> model_fit_simulation_bars_control
+
+l <- get_legend(model_fit_simulation_bars_mutsel)
+both <- plot_grid(model_fit_simulation_bars_mutsel + theme(legend.position = "none"),
+                  model_fit_simulation_bars_control + theme(legend.position = "none"), 
+                  ncol=1, labels = "auto")
+both_l <- plot_grid(both, l, ncol=1, rel_heights=c(1,0.05))
+save_plot(paste0(si_figure_directory,"model_fit_simulation_bars.pdf"), both_l, base_width=8,base_height=6.25)
 
 
 ################ Protein model correlations #################
@@ -143,7 +172,7 @@ control_rf_fit %>%
   background_grid() + 
   xlab("Protein model") + ylab("Normalized Robinson-Foulds Distance") + 
   theme(legend.position = "bottom") -> control_rf_boxplot  
-#save_plot(paste0(figure_directory,"si_control_rf_boxplot.pdf"), control_rf_boxplot, base_width=10, base_height=4)
+save_plot(paste0(si_figure_directory,"control_rf_boxplot.pdf"), control_rf_boxplot, base_width=10, base_height=4)
 
 
 control_ufb_fact_classif %>%
@@ -175,116 +204,3 @@ control_ufb_fact_classif %>%
 
 save_plot(paste0(si_figure_directory,"control_ufb_fpr_all.pdf"), fpr_all_control, base_width = 12, base_height=10)
 save_plot(paste0(si_figure_directory,"control_ufb_acc_all.pdf"), acc_all_control, base_width = 12, base_height=10)
-
-
-
-
-
-
-
-
-###################################################################################################
-########################### MISCELLANEOUS EYEBALLING OF SOME DATA #################################
-###################################################################################################
-
-
-### which specific simulations had RF=0?
-# simulation_rf_fit %>% 
-#   filter(rf_true_norm == 0) %>%
-#   count(name_levels, tree_levels, model_levels) %>%
-#   print.data.frame()
-# name_levels  tree_levels model_levels  n
-# 1           NP     Spiralia          GTR  1
-# 2           NP Opisthokonta           m1  1
-# 3           NP Opisthokonta           m3  1
-# 4           NP Opisthokonta           JC  1
-# 5           NP Opisthokonta          GTR  3
-# 6           NP        Yeast           m1  4
-# 7           NP        Yeast           m2  3
-# 8           NP        Yeast           m3  1
-# 9           NP        Yeast           m4  3
-# 10          NP        Yeast           JC  1
-# 11          NP        Yeast          GTR  4
-# 12          HA     Spiralia           m2  1
-# 13          HA     Spiralia           m3  1
-# 14          HA     Spiralia          GTR  1
-# 15          HA Opisthokonta           m2  1
-# 16          HA Opisthokonta           m3  1
-# 17          HA Opisthokonta          GTR  4
-# 18          HA        Yeast           m1  2
-# 19          HA        Yeast           m2  2
-# 20          HA        Yeast           m4  1
-# 21          HA        Yeast           m5  1
-# 22          HA        Yeast           JC  1
-# 23          HA        Yeast          GTR  4
-# 24         HIV     Spiralia           m1  3
-# 25         HIV     Spiralia           m2  2
-# 26         HIV     Spiralia           m3  3
-# 27         HIV     Spiralia           m4  4
-# 28         HIV     Spiralia           JC  4
-# 29         HIV     Spiralia          GTR  5
-# 30         HIV Opisthokonta           m1  9
-# 31         HIV Opisthokonta           m2  9
-# 32         HIV Opisthokonta           m3  4
-# 33         HIV Opisthokonta           m4  4
-# 34         HIV Opisthokonta           JC  6
-# 35         HIV Opisthokonta          GTR 16
-# 36         HIV        Yeast           m1  2
-# 37         HIV        Yeast           m2  2
-# 38         HIV        Yeast           m3  2
-# 39         HIV        Yeast           m4  2
-# 40         HIV        Yeast           m5  1
-# 41         HIV        Yeast           JC  3
-# 42         HIV        Yeast          GTR  6
-
-### which trees overall showed SIGNIFICANT AU tests?
-# simulation_topology %>%
-#   filter(whichtest == "au") %>%
-#   pivot_longer(m1:true, names_to="model", values_to = "pvalue") %>%
-#   filter(pvalue <= SIG.ALPHA) %>%
-#   count(model)
-# A tibble: 3 x 2
-# model     n
-# <chr> <int>
-# 1 GTR20     1
-# 2 m5       25
-# 3 true     72
-
-### which specific simulations showed SIGNIFICANT AU tests?
-# simulation_topology %>%
-#   filter(whichtest == "au") %>%
-#   pivot_longer(m1:true, names_to="model", values_to = "pvalue") %>%
-#   filter(pvalue <= SIG.ALPHA) %>%
-#   count(model, name, tree) %>% 
-#   arrange(model, name, tree) %>%
-#   print.data.frame()
-# model name         tree  n
-# 1  GTR20  HIV      dosreis  1
-# 2     m5   HA     andersen  1
-# 3     m5   HA opisthokonta  1
-# 4     m5  HIV opisthokonta  5
-# 5     m5  HIV       ruhfel  4
-# 6     m5  HIV     salichos  1
-# 7     m5  HIV     spiralia  1
-# 8     m5  LAC      dosreis  1
-# 9     m5  LAC opisthokonta  3
-# 10    m5  LAC       ruhfel  1
-# 11    m5  LAC     salichos  1
-# 12    m5   NP      dosreis  1
-# 13    m5   NP opisthokonta  2
-# 14    m5   NP       ruhfel  3
-# 15  true   HA     andersen  5
-# 16  true   HA opisthokonta  1
-# 17  true   HA         prum  9
-# 18  true   HA    rayfinned  2
-# 19  true   HA       ruhfel  3
-# 20  true  HIV         prum  1
-# 21  true  LAC     andersen 13
-# 22  true  LAC      dosreis  2
-# 23  true  LAC         prum  8
-# 24  true  LAC    rayfinned 11
-# 25  true  LAC       ruhfel  6
-# 26  true   NP     andersen  4
-# 27  true   NP         prum  6
-# 28  true   NP       ruhfel  1
-

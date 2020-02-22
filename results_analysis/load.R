@@ -13,7 +13,7 @@ library(ggridges)
 library(ggforce)
 
 theme_set(theme_classic() + theme(axis.line = element_line(colour = "grey10"),
-                                  strip.background = element_rect(size=0.5, fill="grey90")))
+                                  strip.text = element_text(face = "bold")))
 data_path <- "csv_files/"
 figure_directory <- "main_figures/"
 si_figure_directory <- "si_figures_tables/"
