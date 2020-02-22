@@ -114,7 +114,8 @@ ufb_fact %>%
     ungroup() %>%
     replace_na(list(FP = 0, FN = 0, TP = 0, TN = 0)) %>%
     mutate(FPR = ifelse(is.nan(FP / (TN+FP)), 0, FP / (TN+FP)), 
-           accuracy = (TP + TN)/(TP+TN+FP+FN)) -> ufb_fact_classif
+           accuracy = (TP + TN)/(TP+TN+FP+FN),
+           percent_fp = FP/(FP+FN+TP+TN)) -> ufb_fact_classif
 
 control_ufb %>% 
     mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
@@ -127,7 +128,8 @@ control_ufb_fact %>%
     ungroup() %>%
     replace_na(list(FP = 0, FN = 0, TP = 0, TN = 0)) %>%
     mutate(FPR = ifelse(is.nan(FP / (TN+FP)), 0, FP / (TN+FP)), 
-           accuracy = (TP + TN)/(TP+TN+FP+FN)) -> control_ufb_fact_classif
+           accuracy = (TP + TN)/(TP+TN+FP+FN),
+           percent_fp = FP/(FP+FN+TP+TN)) -> control_ufb_fact_classif
 
 ##### entropy (for distinguishing simulations) ######
 entropy <- read_csv(paste0(data_path, "simulations_entropy.csv")) %>%

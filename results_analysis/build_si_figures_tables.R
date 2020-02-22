@@ -157,6 +157,40 @@ save_plot(paste0(si_figure_directory,"ufb_fpr_all.pdf"), fpr_all, base_width = 1
 save_plot(paste0(si_figure_directory,"ufb_acc_all.pdf"), acc_all, base_width = 12, base_height=10)
 
 
+## NUMBER of false positive nodes
+
+ufb_fact_classif %>%
+  ggplot(aes(x = model_levels, y = accuracy, fill = model_levels)) + 
+  geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5, color="grey10")  +     
+  scale_fill_manual(values=model_colors, name = "Protein Model") +         
+  facet_grid(name_levels~tree_levels, scales="free_y") +
+  background_grid() + 
+  panel_border() +
+  theme(legend.position = "none",
+        strip.text = element_text(size=8), 
+        axis.text.x = element_text(size=8),
+        panel.spacing = unit(0.2, "cm")) +
+  xlab("Protein Models") + ylab("Accuracy")   -> acc_all
+
+ufb_fact_classif %>% 
+  ggplot(aes(x = model_levels, y = percent_fp, fill = model_levels)) + 
+  geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5, color="grey10")  +     
+  scale_fill_manual(values=model_colors, name = "Protein Model") +         
+  facet_grid(name_levels~tree_levels, scales="free_y") +
+  background_grid() + 
+  panel_border() +
+  theme(legend.position = "none",
+        strip.text = element_text(size=8), 
+        axis.text.x = element_text(size=8),
+        panel.spacing = unit(0.2, "cm")) +
+  xlab("Protein Models") + ylab("Percentage of FP nodes")   -> fp_raw_all
+
+
+save_plot(paste0(si_figure_directory,"ufb_fpr_all.pdf"), fpr_all, base_width = 12, base_height=10)
+save_plot(paste0(si_figure_directory,"ufb_acc_all.pdf"), acc_all, base_width = 12, base_height=10)
+save_plot(paste0(si_figure_directory,"ufb_fp_raw_all.pdf"), fp_raw_all, base_width = 12, base_height=10)
+
+  
 
 ###################################################################################################
 ############################## CONTROL SIMULATION FIGURES #########################################
@@ -202,5 +236,21 @@ control_ufb_fact_classif %>%
         panel.spacing = unit(0.2, "cm")) +
   xlab("Protein Models") + ylab("Accuracy")   -> acc_all_control
 
+control_ufb_fact_classif %>% 
+  ggplot(aes(x = model_levels, y = percent_fp, fill = model_levels)) + 
+  geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5, color="grey10")  +  
+  scale_fill_manual(values=model_colors, name = "Protein Model") +         
+  facet_grid(name_levels~tree_levels, scales="free_y") +
+  background_grid() + 
+  panel_border() +
+  theme(legend.position = "none",
+        strip.text = element_text(size=8), 
+        axis.text.x = element_text(size=8),
+        panel.spacing = unit(0.2, "cm")) +
+  xlab("Protein Models") + ylab("Percentage of FP nodes")   -> control_fp_raw_all
+save_plot(paste0(si_figure_directory,"fp_raw_all.pdf"), fp_raw_all_control, base_width = 12, base_height=10)
+
+
 save_plot(paste0(si_figure_directory,"control_ufb_fpr_all.pdf"), fpr_all_control, base_width = 12, base_height=10)
 save_plot(paste0(si_figure_directory,"control_ufb_acc_all.pdf"), acc_all_control, base_width = 12, base_height=10)
+save_plot(paste0(si_figure_directory,"control_ufb_fp_raw_all.pdf"), control_fp_raw_all, base_width = 12, base_height=10)
