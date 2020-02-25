@@ -13,10 +13,11 @@ msel_control %>%
   rowwise() %>%
   mutate(modelm = paste0("m", modelm)) %>%
   count(modelm, name, tree, model_name, simtype) %>%
-  mutate(tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
-         name_levels  = factor(name, levels=name_levels)) %>%
-  dplyr::select(simtype, modelm, name_levels, tree_levels, model_name, n) %>%
-  arrange(simtype, modelm, n) %>%
+  mutate(tree  = factor(tree, levels=tree_levels, labels = tree_labels),
+         name  = factor(name, levels=name_levels)) %>%
+  dplyr::select(simtype, modelm, name, tree, model_name, n) %>%
+  arrange(simtype, modelm, name, tree, n) %>%
+  rename(sim_replicate = n) %>%
   write_csv(paste0(si_figure_directory, "table_S1.csv"))
 
 
@@ -30,6 +31,10 @@ control_rf_fit %>%
   count(name_levels, tree_levels, model_levels) %>%
   mutate(simtype = "control") %>%
   bind_rows(sim_rf0) %>%
+  rename(name = name_levels, 
+         tree = tree_levels, 
+         modelm = model_levels,
+         number_of_replicates = n) %>%
   write_csv(paste0(si_figure_directory, "table_S2.csv"))
 
 #### Simulations with a SIGNIFICANT AU test
@@ -48,6 +53,8 @@ control_topology %>%
   arrange(model, name, tree) %>%
   mutate(simtype = "control") %>%
   bind_rows(sim_au) %>%
+  rename(modelm = model,
+        sim_replicate = n) %>%
   write_csv(paste0(si_figure_directory, "table_S3.csv"))
 
 #### m1-m5 models for pandit
@@ -55,9 +62,8 @@ msel_pandit %>%
   rowwise() %>%
   mutate(modelm = paste0("m", modelm)) %>%
   count(modelm, model_name) %>%
-  rename("Model rank" = modelm, 
-         "Model name" = model_name, 
-         "Number of alignments" = n) %>%
+  rename(model = model_name, 
+         number_alignments = n) %>%
   write_csv(paste0(si_figure_directory, "table_S4.csv"))
 
 
