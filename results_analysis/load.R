@@ -63,7 +63,19 @@ pandit_fit <- read_csv(paste0(data_path, "fit_pandit.csv"), guess_max = 10000)
 pandit_rf %>% 
     left_join(pandit_info) %>%
     mutate(max_rf = 2*ntaxa - 6) %>%
-    mutate(rf     = rf/max_rf) -> pandit_rf
+    mutate(nrf    = rf/max_rf) -> pandit_rf
+pandit_rf %>%
+    group_by(model1, model2) %>% 
+    summarize(medianrf = median(nrf)) %>% ## 0.294 is min
+    left_join(pandit_rf) %>%
+    ungroup() %>%
+    mutate(model1 = factor(model1, levels=model_levels, labels = model_labels), 
+           model2 = factor(model2, levels=model_levels, labels = model_labels)) %>%
+    mutate(hasm1 = (model1 == "m1" | model2 == "m1")) %>%
+    unite(model_pair, model1, model2, sep = " - ") %>%
+    mutate(model_pair_fct = fct_reorder(model_pair, nrf, .desc=TRUE)) -> pandit_rf_ridgedata
+
+
 pandit_fit %>% left_join(pandit_info) -> pandit_fit
 pandit_fit %>%
     group_by(name) %>%
@@ -115,13 +127,15 @@ ufb_fact %>%
     replace_na(list(FP = 0, FN = 0, TP = 0, TN = 0)) %>%
     mutate(FPR = ifelse(is.nan(FP / (TN+FP)), 0, FP / (TN+FP)), 
            accuracy = (TP + TN)/(TP+TN+FP+FN),
-           percent_fp = FP/(FP+FN+TP+TN)) -> ufb_fact_classif
+           percent_fp = FP/(FP+FN+TP+TN),
+           percent_tn = TN/(FP+FN+TP+TN)) -> ufb_fact_classif
 
 control_ufb %>% 
     mutate(model_levels = factor(model, levels=model_levels, labels = model_labels),
            tree_levels  = factor(tree, levels=tree_levels, labels = tree_labels),
            name_levels  = factor(name, levels=name_levels), 
            rep = factor(rep)) -> control_ufb_fact
+
 control_ufb_fact %>% 
     count(model_levels, tree_levels, name_levels, rep, classif) %>%
     pivot_wider(names_from = classif, values_from = n) %>%
@@ -129,7 +143,8 @@ control_ufb_fact %>%
     replace_na(list(FP = 0, FN = 0, TP = 0, TN = 0)) %>%
     mutate(FPR = ifelse(is.nan(FP / (TN+FP)), 0, FP / (TN+FP)), 
            accuracy = (TP + TN)/(TP+TN+FP+FN),
-           percent_fp = FP/(FP+FN+TP+TN)) -> control_ufb_fact_classif
+           percent_fp = FP/(FP+FN+TP+TN),
+           percent_tn = TN/(FP+FN+TP+TN)) -> control_ufb_fact_classif
 
 ##### entropy (for distinguishing simulations) ######
 entropy <- read_csv(paste0(data_path, "simulations_entropy.csv")) %>%

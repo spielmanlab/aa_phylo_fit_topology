@@ -153,17 +153,6 @@ save_plot(paste0(figure_directory, "pandit_model_bars.pdf"), pandit_model_grid, 
 
 
 ################### Ridgeplot of PANDIT nRF all-to-all comparison ##################
-pandit_rf %>%
-  group_by(model1, model2) %>% 
-  summarize(medianrf = median(rf)) %>% ## 0.294 is min
-  left_join(pandit_rf) %>%
-  ungroup() %>%
-  mutate(model1 = factor(model1, levels=model_levels, labels = model_labels), 
-         model2 = factor(model2, levels=model_levels, labels = model_labels)) %>%
-  mutate(hasm1 = (model1 == "m1" | model2 == "m1")) %>%
-  unite(model_pair, model1, model2, sep = " - ") %>%
-  mutate(model_pair_fct = fct_reorder(model_pair, rf, .desc=TRUE)) -> pandit_rf_ridgedata
-
 pandit_rf_ridgedata %>% 
   dplyr::select(model_pair_fct, hasm1) %>% 
   distinct() %>% 
@@ -171,7 +160,7 @@ pandit_rf_ridgedata %>%
   mutate(face = ifelse(hasm1, "bold", "plain")) %>% 
   pull(face) -> font_face
 pandit_rf_ridgedata %>% 
-  ggplot(aes(x = rf, y = fct_reorder(model_pair, rf, .desc=TRUE), fill = medianrf)) + 
+  ggplot(aes(x = nrf, y = fct_reorder(model_pair, nrf, .desc=TRUE), fill = medianrf)) + 
   geom_density_ridges(scale=1.4, quantile_lines=TRUE, quantiles=2, rel_min_height = 0.01) +
   ylab("") + xlab("Normalized Robinson-Foulds Distance") + 
   scale_x_continuous(expand = c(0.01, 0)) +

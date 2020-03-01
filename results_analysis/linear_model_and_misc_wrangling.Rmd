@@ -6,6 +6,8 @@ output:
   html_document:
     highlight: zenburn
     theme: lumen
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -50,7 +52,7 @@ We perform a random effects model with:
 + model as a fixed effect
 + simulation parameterization and tree each as random effects
 
-##### MutSel simulations
+#### MutSel simulations
 ```{r model-1, warning=FALSE, message=FALSE}
 lmer(rf_true_norm ~ model_levels + (1|name_levels) + (1|tree_levels), data = simulation_rf_fit) -> fit
 glht(fit, linfct=mcp(model_levels='Tukey')) %>% 
@@ -61,7 +63,7 @@ glht(fit, linfct=mcp(model_levels='Tukey')) %>%
   style_kable_sig()
 ```
 
-##### Control simulations
+#### Control simulations
 ```{r model-1-control, warning=FALSE, message=FALSE}
 lmer(rf_true_norm ~ model_levels + (1|name_levels) + (1|tree_levels), data = control_rf_fit) -> fit
 glht(fit, linfct=mcp(model_levels='Tukey')) %>% 
@@ -81,7 +83,7 @@ We perform a random effects model with:
 + model as a fixed effect
 + simulation parameterization and tree each as random effects
 
-##### MutSel simulations
+#### MutSel simulations
 ```{r model-2, warning=FALSE, message=FALSE}
 fit <- lmer(FPR ~ model_levels + (1|tree_levels) + (1|name_levels), data = ufb_fact_classif)
 glht(fit, linfct=mcp(model_levels='Tukey')) %>% 
@@ -93,9 +95,9 @@ glht(fit, linfct=mcp(model_levels='Tukey')) %>%
 ```
 
 
-##### Control simulations
+#### Control simulations
 ```{r model-2-control, warning=FALSE, message=FALSE}
-######## RF for simulations
+####### RF for simulations
 fit <- lmer(FPR ~ model_levels + (1|tree_levels) + (1|name_levels), data = control_ufb_fact_classif)
 glht(fit, linfct=mcp(model_levels='Tukey')) %>% 
   summary() %>% 
@@ -114,7 +116,7 @@ We perform a random effects model with:
 + model as a fixed effect
 + simulation parameterization and tree each as random effects
 
-##### MutSel simulations
+#### MutSel simulations
 ```{r model-3, warning=FALSE, message=FALSE}
 fit <- lmer(accuracy ~ model_levels + (1|tree_levels) + (1|name_levels), data = ufb_fact_classif)
 glht(fit, linfct=mcp(model_levels='Tukey')) %>% 
@@ -125,9 +127,9 @@ glht(fit, linfct=mcp(model_levels='Tukey')) %>%
   style_kable_sig()
 ```
 
-##### Control simulations
+#### Control simulations
 ```{r model-control, warning=FALSE, message=FALSE}
-######## RF for simulations
+####### RF for simulations
 fit <- lmer(accuracy ~ model_levels + (1|tree_levels) + (1|name_levels), data = control_ufb_fact_classif)
 glht(fit, linfct=mcp(model_levels='Tukey')) %>% 
   summary() %>% 
@@ -136,48 +138,135 @@ glht(fit, linfct=mcp(model_levels='Tukey')) %>%
   arrange(sig, lhs, estimate) %>%
   style_kable_sig()
 ```
+
+
+### Model 4: Is pairwise RF different among models, for PANDIT data?
+```{r model-pandit, warning=FALSE, message=FALSE}
+####### RF for simulations
+fit <- lm(nrf ~ model_pair_fct, data = pandit_rf_ridgedata)
+glht(fit, linfct=mcp(model_pair_fct='Tukey')) %>% 
+  summary() %>% 
+  broom::tidy() %>%
+  mutate(sig = p.value <= SIG.ALPHA) %>%
+  arrange(sig, lhs, estimate) %>%
+  style_kable_sig()
+```
+
+
+
 ## Data wrangling
 
-put the au stuff here
-and the rf=0 stuff here
+This section contains miscellaneous data wrangling and exploration as reported in the manuscript.
+
+### Which simulations achieved RF=0?
+
+#### MutSel simulations
+```{r, collapse=T}
+simulation_rf_fit %>%
+  filter(rf_true_norm == 0)  %>%
+  count(name_levels, tree_levels, model_levels) %>%
+  rename(number_reps = n)-> mutsel_rf0
 
 
-<!--
-###################################################################################################
-########################### MISCELLANEOUS EYEBALLING OF SOME DATA #################################
-###################################################################################################
-control_rf_fit %>% 
-  filter(rf_true_norm == 0, model_levels == "m1") %>% select(ic.rank) %>% print.data.frame()
+### which simulation CONDITIONS
+mutsel_rf0 %>%
+  dplyr::select(name_levels, tree_levels) %>%
+  distinct()
+
+## which NAMES
+mutsel_rf0 %>%
+  group_by(name_levels) %>% 
+  summarize(total_reps = sum(number_reps))
+
+### which MODELS
+mutsel_rf0 %>%
+  group_by(model_levels) %>% 
+  summarize(total_reps = sum(number_reps))
 
 
-control_rf_fit %>% 
- filter(rf_true_norm == 0) %>%
- count(name_levels, tree_levels, model_levels) %>%
- print.data.frame()
-# name_levels  tree_levels model_levels  n
+## All that are rf=0
+print.data.frame(mutsel_rf0)
+```
 
 
-### which specific simulations had RF=0?
-# simulation_rf_fit %>% 
-#   filter(rf_true_norm == 0) %>%
-#   count(name_levels, tree_levels, model_levels) %>%
-#   print.data.frame()
-
-### which trees overall showed SIGNIFICANT AU tests?
-# simulation_topology %>%
-#   filter(whichtest == "au") %>%
-#   pivot_longer(m1:true, names_to="model", values_to = "pvalue") %>%
-#   filter(pvalue <= SIG.ALPHA) %>%
-#   count(model)
+#### Control simulations
+```{r, collapse=T}
+control_rf_fit %>%
+  filter(rf_true_norm == 0)  %>%
+  count(name_levels, tree_levels, model_levels) %>%
+  rename(number_reps = n)-> control_rf0
 
 
-### which specific simulations showed SIGNIFICANT AU tests?
-# simulation_topology %>%
-#   filter(whichtest == "au") %>%
-#   pivot_longer(m1:true, names_to="model", values_to = "pvalue") %>%
-#   filter(pvalue <= SIG.ALPHA) %>%
-#   count(model, name, tree) %>% 
-#   arrange(model, name, tree) %>%
+### which simulation CONDITIONS
+control_rf0 %>%
+  dplyr::select(name_levels, tree_levels) %>%
+  distinct()
 
 
--->
+
+## which NAMES
+control_rf0 %>%
+  group_by(name_levels) %>% 
+  summarize(total_reps = sum(number_reps))
+
+### which MODELS
+control_rf0 %>%
+  group_by(model_levels) %>% 
+  summarize(total_reps = sum(number_reps))
+
+## All that are rf=0
+print.data.frame(control_rf0)
+```
+
+
+### Which simulations were significant from AU test for `m1` confidence set?
+
+#### MutSel simulations
+```{r, collapse=T}
+simulation_topology %>%
+  filter(whichtest == "au") %>%
+  pivot_longer(m1:true, names_to="model", values_to = "pvalue") %>%
+  filter(pvalue <= SIG.ALPHA) %>%
+  count(name, model, tree) %>%
+  rename(number_of_reps = n) %>%
+  mutate(truetree = if_else(model == "true", "truetree", "inferredtree")) -> mutsel_au
+
+## How many trees showed SIGNIFICANT AU tests?
+mutsel_au %>%
+  group_by(truetree) %>% 
+  summarize(total_trees = sum(number_of_reps))
+
+## For true trees, what are they?
+mutsel_au %>%
+  filter(truetree == "truetree")
+
+## For inferred trees, what are they?
+mutsel_au %>%
+  filter(truetree == "inferredtree")
+```
+
+
+#### Control simulations
+```{r, collapse=T}
+control_topology %>%
+  filter(whichtest == "au") %>%
+  pivot_longer(m1:true, names_to="model", values_to = "pvalue") %>%
+  filter(pvalue <= SIG.ALPHA) %>%
+  count(name, model, tree) %>%
+  rename(number_of_reps = n) %>%
+  mutate(truetree = if_else(model == "true", "truetree", "inferredtree")) -> control_au
+
+## How many trees showed SIGNIFICANT AU tests?
+control_au %>%
+  group_by(truetree) %>% 
+  summarize(total_trees = sum(number_of_reps))
+
+## For true trees, what are they?
+control_au %>%
+  filter(truetree == "truetree")
+
+## For inferred trees, what are they?
+control_au %>%
+  filter(truetree == "inferredtree")
+```
+

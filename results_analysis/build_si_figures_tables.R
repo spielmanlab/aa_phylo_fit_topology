@@ -192,6 +192,23 @@ ufb_fact_classif %>%
   xlab("Protein Models") + ylab("Percentage of FP nodes")   -> fp_raw_all
 
 
+
+ufb_fact_classif %>% 
+  ggplot(aes(x = model_levels, y = percent_tn, fill = model_levels)) + 
+  geom_point(position=position_jitterdodge(jitter.height=0), shape = 21, alpha=0.5, color="grey10")  +     
+  scale_fill_manual(values=model_colors, name = "Protein Model") +         
+  facet_grid(name_levels~tree_levels, scales="free_y") +
+  background_grid() + 
+  panel_border() +
+  theme(legend.position = "none",
+        strip.text = element_text(size=8), 
+        axis.text.x = element_text(size=8),
+        panel.spacing = unit(0.2, "cm")) +
+  xlab("Protein Models") + ylab("Percentage of FP nodes") 
+
+
+
+
 save_plot(paste0(si_figure_directory,"ufb_fpr_all.pdf"), fpr_all, base_width = 12, base_height=10)
 save_plot(paste0(si_figure_directory,"ufb_acc_all.pdf"), acc_all, base_width = 12, base_height=10)
 save_plot(paste0(si_figure_directory,"ufb_fp_raw_all.pdf"), fp_raw_all, base_width = 12, base_height=10)
