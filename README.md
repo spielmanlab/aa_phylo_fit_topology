@@ -1,4 +1,5 @@
 ## Relative model fit does not predict topological accuracy in single-gene protein phylogenetics
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3705372.svg)](https://doi.org/10.5281/zenodo.3705372)
 
 Please direct all questions or comments to Stephanie via `spielman <AT> rowan <DOT> edu`.
 
