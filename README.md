@@ -1,4 +1,4 @@
-## Relationship between model fit and inference accuracy in protein phylogenetics
+## Relative model fit does not predict topological accuracy in single-gene protein phylogenetics
 
 Please direct all questions or comments to Stephanie via `spielman <AT> rowan <DOT> edu`.
 
